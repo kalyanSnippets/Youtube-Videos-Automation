@@ -18,6 +18,31 @@ against Supabase in mind (the spec calls for Supabase Auth + Postgres), but noth
 runtime for server actions and Postgres access). Deploy it anywhere that runs Next.js server
 builds: Vercel, a Node server behind a reverse proxy, a container platform, etc.
 
+### Deploying to Vercel
+
+This is a pnpm-workspace monorepo, so the Next.js app isn't at the repo root:
+
+1. [Import the repo](https://vercel.com/new) in the Vercel dashboard.
+2. When Vercel asks for the project's **Root Directory**, set it to `apps/web`. Vercel then
+   auto-detects the pnpm workspace from `pnpm-lock.yaml` at the repo root and runs the install at
+   the workspace root automatically — no custom install/build command needed.
+3. Add the environment variables below in the project's Settings → Environment Variables
+   (Production, and Preview if you want preview deployments to work too).
+4. Provision a Postgres database Vercel's build can reach at deploy time — e.g. a
+   [Neon](https://neon.tech) or [Supabase](https://supabase.com) project (both have a free tier
+   and work as a plain `DATABASE_URL`). Vercel's own "Vercel Postgres" offering is now a
+   marketplace add-on backed by Neon and works the same way.
+5. Run the schema migration against that database **once**, from your own machine (Vercel's build
+   step doesn't run migrations automatically):
+   ```bash
+   DATABASE_URL=<your production connection string> pnpm db:migrate
+   DATABASE_URL=<your production connection string> pnpm db:seed   # optional: demo data + dev owner
+   ```
+6. Deploy. Vercel gives you a `https://<project>.vercel.app` URL once the build finishes.
+
+Re-run step 5 (`pnpm db:migrate`) against production after any future change to
+`packages/database/src/schema/*` and a fresh `pnpm db:generate`.
+
 Required environment variables:
 
 ```

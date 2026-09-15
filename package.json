@@ -5,7 +5,7 @@
   "description": "YouTube Agent OS - a persistent multi-project operating system for researching, planning, scripting, producing, editing, reviewing, publishing, and learning from YouTube videos.",
   "scripts": {
     "dev": "pnpm --filter @yaos/web dev",
-    "build": "pnpm -r --filter=./packages/* build && pnpm --filter @yaos/web build",
+    "build": "pnpm --filter @yaos/web build",
     "start": "pnpm --filter @yaos/web start",
     "lint": "pnpm -r run lint",
     "typecheck": "pnpm -r run typecheck",
@@ -17,6 +17,7 @@
   "engines": {
     "node": ">=20"
   },
+  "packageManager": "pnpm@10.33.0",
   "pnpm": {
     "onlyBuiltDependencies": ["esbuild", "sharp"]
   }
