@@ -3,6 +3,11 @@ import { getCurrentUser } from "@/lib/auth";
 import { NavSidebar } from "@/components/nav-sidebar";
 import { Topbar } from "@/components/topbar";
 
+// Every page under this layout reads live, per-request DB/auth state (dashboard counts,
+// project lists, the signed-in user) — none of it is safe to prerender at build time, and
+// forcing it here (rather than per-page) also stops the build from needing DB access at all.
+export const dynamic = "force-dynamic";
+
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
   if (!user) redirect("/sign-in");
