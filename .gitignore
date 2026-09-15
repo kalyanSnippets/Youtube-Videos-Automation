@@ -1,0 +1,16 @@
+node_modules/
+.pnpm-store/
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+.env
+.env.local
+.env.*.local
+.turbo/
+.DS_Store
+coverage/
+*.log
+apps/local-worker/data/
+packages/remotion/out/

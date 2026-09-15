@@ -1,0 +1,23 @@
+{
+  "name": "@yaos/seed-scripts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "seed": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo 'no-op'",
+    "test": "echo 'no-op'"
+  },
+  "dependencies": {
+    "@yaos/agents": "workspace:*",
+    "@yaos/database": "workspace:*",
+    "@yaos/remotion": "workspace:*",
+    "@yaos/shared": "workspace:*",
+    "drizzle-orm": "^0.36.4"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "youtube-agent-os",
+  "private": true,
+  "version": "0.1.0",
+  "description": "YouTube Agent OS - a persistent multi-project operating system for researching, planning, scripting, producing, editing, reviewing, publishing, and learning from YouTube videos.",
+  "scripts": {
+    "dev": "pnpm --filter @yaos/web dev",
+    "build": "pnpm -r --filter=./packages/* build && pnpm --filter @yaos/web build",
+    "start": "pnpm --filter @yaos/web start",
+    "lint": "pnpm -r run lint",
+    "typecheck": "pnpm -r run typecheck",
+    "test": "pnpm -r run test",
+    "db:generate": "pnpm --filter @yaos/database generate",
+    "db:migrate": "pnpm --filter @yaos/database migrate",
+    "db:seed": "pnpm --filter @yaos/seed-scripts seed"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild", "sharp"]
+  }
+}

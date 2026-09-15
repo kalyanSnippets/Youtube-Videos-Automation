@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-bg text-text antialiased;
+  }
+  ::selection {
+    @apply bg-accent-cyan/30 text-text;
+  }
+}
+
+@layer components {
+  .panel {
+    @apply bg-bg-panel border border-border rounded-2xl shadow-panel;
+  }
+  .panel-raised {
+    @apply bg-bg-raised border border-border rounded-xl;
+  }
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+}

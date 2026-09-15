@@ -1,0 +1,21 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { eq } from "drizzle-orm";
+import { db, schema } from "@yaos/database";
+import { runIdeaResearch, selectIdea } from "@yaos/agents";
+
+export async function rerunIdeaResearch(projectId: string) {
+  const [project] = await db.select().from(schema.projects).where(eq(schema.projects.id, projectId));
+  if (!project) throw new Error("Project not found");
+  await runIdeaResearch({ db, projectId, topic: project.seedIdea || project.title });
+  revalidatePath(`/projects/${projectId}/ideas`);
+}
+
+export async function selectIdeaAction(projectId: string, ideaId: string) {
+  await selectIdea(db, projectId, ideaId);
+  revalidatePath(`/projects/${projectId}`);
+  revalidatePath(`/projects/${projectId}/ideas`);
+  revalidatePath(`/projects/${projectId}/overview`);
+  revalidatePath("/dashboard");
+}

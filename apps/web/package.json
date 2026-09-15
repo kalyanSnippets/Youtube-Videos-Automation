@@ -1,0 +1,45 @@
+{
+  "name": "@yaos/web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "lint": "next lint",
+    "test": "echo 'no-op'"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.116.0",
+    "@yaos/agent-schemas": "workspace:*",
+    "@yaos/agents": "workspace:*",
+    "@yaos/ai-providers": "workspace:*",
+    "@yaos/database": "workspace:*",
+    "@yaos/prompts": "workspace:*",
+    "@yaos/research": "workspace:*",
+    "@yaos/shared": "workspace:*",
+    "@yaos/transcription": "workspace:*",
+    "@yaos/video-core": "workspace:*",
+    "clsx": "^2.1.1",
+    "drizzle-orm": "^0.36.4",
+    "lucide-react": "^0.454.0",
+    "next": "^15.5.25",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwind-merge": "^2.5.4",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^15.5.25",
+    "postcss": "^8.5.28",
+    "tailwindcss": "^3.4.19",
+    "typescript": "^5.6.3"
+  }
+}
