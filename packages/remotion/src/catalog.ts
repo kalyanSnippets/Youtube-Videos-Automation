@@ -12,7 +12,7 @@ export interface MotionTemplateDef {
   key: string;
   name: string;
   description: string;
-  category: "hook" | "typography" | "evidence" | "structure" | "transition" | "cta";
+  category: "hook" | "typography" | "evidence" | "structure" | "transition" | "cta" | "on_camera";
   defaultIntensity: "LOW" | "MEDIUM" | "HIGH";
   implemented: boolean;
 }
@@ -42,4 +42,11 @@ export const MOTION_TEMPLATE_CATALOG: MotionTemplateDef[] = [
   { key: "SectionTransition", name: "Section Transition", description: "Short transition bumper between chapters.", category: "transition", defaultIntensity: "MEDIUM", implemented: false },
   { key: "CTA", name: "CTA", description: "Subscribe / call-to-action card.", category: "cta", defaultIntensity: "LOW", implemented: true },
   { key: "EndScreen", name: "End Screen", description: "Closing end screen with next-video suggestion.", category: "cta", defaultIntensity: "LOW", implemented: true },
+  { key: "TalkingHeadFrame", name: "Talking Head Frame", description: "Full-bleed on-camera shot with a caption-safe bottom band.", category: "on_camera", defaultIntensity: "MEDIUM", implemented: true },
+  { key: "PictureInPicture", name: "Picture in Picture", description: "Creator face inset over a screen recording or product result.", category: "on_camera", defaultIntensity: "MEDIUM", implemented: true },
+  { key: "CreatorLowerThird", name: "Creator Lower Third", description: "Name/context strip over a screen recording reminding the viewer who's narrating.", category: "on_camera", defaultIntensity: "LOW", implemented: true },
+  { key: "CreatorReaction", name: "Creator Reaction", description: "Small circular reaction bubble popping in over a screen recording.", category: "on_camera", defaultIntensity: "MEDIUM", implemented: true },
+  { key: "ScreenAndFaceSplit", name: "Screen and Face Split", description: "50/50 split between the creator and a screen recording.", category: "on_camera", defaultIntensity: "MEDIUM", implemented: true },
+  { key: "PunchIn", name: "Punch In", description: "Slow deliberate zoom on a static on-camera shot for emphasis without cutting away.", category: "on_camera", defaultIntensity: "LOW", implemented: true },
+  { key: "ArollToDemoTransition", name: "A-Roll to Demo Transition", description: "Directional wipe bridging an on-camera beat into a screen demo (or back).", category: "transition", defaultIntensity: "MEDIUM", implemented: true },
 ];

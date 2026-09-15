@@ -1,4 +1,5 @@
 import type {
+  ArollShot,
   AssetRequirement,
   Claim,
   IdeaCandidate,
@@ -9,7 +10,7 @@ import type {
   ReferenceAnalysis,
   ScriptVersion,
 } from "@yaos/agent-schemas";
-import type { ContentType } from "@yaos/shared";
+import type { ContentType, PresentationMode } from "@yaos/shared";
 
 /**
  * Deterministic MOCK content generators. These stand in for a real
@@ -21,11 +22,11 @@ import type { ContentType } from "@yaos/shared";
 
 export function mockIdeaCandidates(topic: string): IdeaCandidate[] {
   const base = [
-    { angle: "the free-tier reality check", diff: "comparison" },
-    { angle: "we tried it for 7 days straight", diff: "experiment" },
-    { angle: "beginner's honest first impression", diff: "opinion" },
-    { angle: "the setup nobody explains properly", diff: "tutorial" },
-    { angle: "what changed in the last update", diff: "news" },
+    { angle: "the free-tier reality check", mode: "HYBRID" as PresentationMode },
+    { angle: "we tried it for 7 days straight", mode: "HYBRID" as PresentationMode },
+    { angle: "beginner's honest first impression", mode: "FACE_LED" as PresentationMode },
+    { angle: "the setup nobody explains properly", mode: "FACELESS" as PresentationMode },
+    { angle: "what changed in the last update", mode: "HYBRID" as PresentationMode },
   ];
   return base.map((b, i) => ({
     workingTitle: `${topic}: ${b.angle}`,
@@ -42,15 +43,37 @@ export function mockIdeaCandidates(topic: string): IdeaCandidate[] {
     sponsorFit: 20 + i * 5,
     proofRequirements: ["Official pricing/feature page screenshot", "Our own recorded test run"],
     overallScore: 62 + i * 5,
+    recommendedPresentationMode: b.mode,
   }));
 }
 
+/** Cycles through the three presentation modes across reference videos so the Competitor Analyst's output reflects that references come in all three - never just faceless. */
+const REFERENCE_PRESENTATION_MODES: PresentationMode[] = ["HYBRID", "FACELESS", "FACE_LED"];
+
+const REFERENCE_ON_CAMERA_SEGMENTS: Record<PresentationMode, { startSeconds: number; endSeconds: number; purpose: string }[]> = {
+  HYBRID: [
+    { startSeconds: 0, endSeconds: 12, purpose: "personal hook - states the test in first person" },
+    { startSeconds: 40, endSeconds: 52, purpose: "reaction to the first result" },
+    { startSeconds: 380, endSeconds: 410, purpose: "on-camera verdict" },
+  ],
+  FACELESS: [],
+  FACE_LED: [
+    { startSeconds: 0, endSeconds: 25, purpose: "talking-head hook and setup" },
+    { startSeconds: 25, endSeconds: 90, purpose: "explanation with screen inserts" },
+    { startSeconds: 90, endSeconds: 130, purpose: "reaction to proof" },
+    { startSeconds: 350, endSeconds: 400, purpose: "on-camera verdict and CTA" },
+  ],
+};
+
 export function mockReferenceAnalysis(topic: string, index: number): ReferenceAnalysis {
+  const presentationMode = REFERENCE_PRESENTATION_MODES[index % REFERENCE_PRESENTATION_MODES.length];
   return {
     url: `https://www.youtube.com/watch?v=mock-reference-${index}`,
     title: `${topic} - what nobody tells you`,
     channelName: index === 0 ? "Benchmark Creator Co." : `Creator ${index}`,
     role: index === 0 ? "MASTER_REFERENCE" : "SUPPORTING",
+    presentationMode,
+    onCameraSegments: REFERENCE_ON_CAMERA_SEGMENTS[presentationMode],
     titleLogic: "Uses a curiosity gap ('what nobody tells you') without over-promising a specific number.",
     thumbnailLogic: "High-contrast close-up expression plus a single bold claim word, no more than 4 words of text.",
     hookAnalysis: "Opens on the payoff moment first, then rewinds to explain how they got there.",
@@ -168,93 +191,234 @@ So is it worth using on the free tier? Here's our honest verdict, and what we'd 
   };
 }
 
-export function mockProductionScenes(topic: string): ProductionScene[] {
-  return [
-    {
-      sceneNumber: 1,
-      timeEstimateSeconds: 15,
-      narration: `You've probably seen a dozen videos claiming ${topic} is completely free.`,
-      storyPurpose: "Hook - establish the curiosity gap",
-      viewerMustSee: "A fast montage of other thumbnails/titles making the 'free' claim",
-      whyThisVisual: "Shows the viewer this is a real, common claim worth investigating",
+/**
+ * Presentation-mode-aware production plan. FACELESS keeps every beat as
+ * VOICEOVER/SCREEN_RECORDING; HYBRID opens and closes on camera around a
+ * faceless proof core; FACE_LED adds an on-camera explanation beat too and
+ * treats the screen recording as an insert that interrupts the A-roll
+ * rather than a self-contained scene. Never invents on-camera footage for a
+ * FACELESS project, and never forces the creator to stay off-camera for
+ * HYBRID/FACE_LED.
+ */
+export function mockProductionScenes(topic: string, presentationMode: PresentationMode): ProductionScene[] {
+  const scenes: ProductionScene[] = [];
+  const onCamera = presentationMode !== "FACELESS";
+
+  scenes.push(
+    onCamera
+      ? {
+          sceneNumber: 0,
+          segmentType: "ON_CAMERA",
+          timeEstimateSeconds: 10,
+          narration: `I tested seven tools that all claim to solve ${topic} - here's what actually happened.`,
+          storyPurpose: "Hook - personal, first-person framing raises the stakes before any proof is shown",
+          viewerMustSee: "Creator speaking directly to camera, high energy, no wasted words",
+          whyThisVisual: "A personal claim delivered on camera reads as more credible than a title card making the same claim",
+          claimIds: [],
+          assetType: "on_camera",
+          assetFilename: "a-roll-hook-001.mp4",
+          toolToUse: "Camera + tripod (see A-roll shot 1 for framing)",
+          captureOrGenerationSteps: "Film medium close-up, direct to lens, high energy delivery. Do not read from a script on screen.",
+          motionComponent: "TalkingHeadFrame",
+          motionIntensity: "HIGH",
+          onScreenText: `"${topic}"?`,
+          captionEmphasis: "tested",
+          sfx: "whoosh-in",
+          transition: "hard-cut",
+          fallbackIfAssetMissing: "Use HyperHook typography-only treatment with the claim as animated text instead of on-camera footage.",
+          screenInsertInterrupts: false,
+          punchIn: false,
+        }
+      : {
+          sceneNumber: 0,
+          segmentType: "VOICEOVER",
+          timeEstimateSeconds: 15,
+          narration: `You've probably seen a dozen videos claiming ${topic} is completely free.`,
+          storyPurpose: "Hook - establish the curiosity gap",
+          viewerMustSee: "A fast montage of other thumbnails/titles making the 'free' claim",
+          whyThisVisual: "Shows the viewer this is a real, common claim worth investigating",
+          claimIds: [],
+          assetType: "screen_recording",
+          assetFilename: "hook-thumbnail-montage.mp4",
+          toolToUse: "Screen recorder (browser, YouTube search results)",
+          captureOrGenerationSteps: "Search the topic on YouTube, scroll slowly through 6-8 results with 'free' in the title/thumbnail.",
+          screenRecordingInstructions: "Record at 1080p, 15-20 seconds, mouse movement smooth and slow.",
+          privacyWarnings: "Ensure no personal Google account info is visible in the browser chrome.",
+          motionComponent: "HyperHook",
+          motionIntensity: "HIGH",
+          onScreenText: "\"COMPLETELY FREE\"?",
+          captionEmphasis: "FREE",
+          sfx: "whoosh-in",
+          transition: "hard-cut",
+          fallbackIfAssetMissing: "Use HyperHook typography-only treatment with the claim as animated text.",
+          screenInsertInterrupts: false,
+          punchIn: false,
+        },
+  );
+
+  if (presentationMode === "FACE_LED") {
+    scenes.push({
+      sceneNumber: 0,
+      segmentType: "ON_CAMERA",
+      timeEstimateSeconds: 18,
+      narration: `Here's exactly how I set this test up, and why it matters for anyone using ${topic}.`,
+      storyPurpose: "Explanation - a face-led format keeps the creator present for the reasoning, not just the punchline",
+      viewerMustSee: "Creator explaining the test setup, screen inserts cutting in briefly to illustrate specific points",
+      whyThisVisual: "Keeps personality and trust front-and-center through the explanation, which a pure voiceover would flatten",
       claimIds: [],
-      assetType: "screen_recording",
-      assetFilename: "hook-thumbnail-montage.mp4",
-      toolToUse: "Screen recorder (browser, YouTube search results)",
-      captureOrGenerationSteps: "Search the topic on YouTube, scroll slowly through 6-8 results with 'free' in the title/thumbnail.",
-      screenRecordingInstructions: "Record at 1080p, 15-20 seconds, mouse movement smooth and slow.",
-      privacyWarnings: "Ensure no personal Google account info is visible in the browser chrome.",
-      motionComponent: "HyperHook",
-      motionIntensity: "HIGH",
-      onScreenText: "\"COMPLETELY FREE\"?",
-      captionEmphasis: "FREE",
-      sfx: "whoosh-in",
-      transition: "hard-cut",
-      fallbackIfAssetMissing: "Use HyperHook typography-only treatment with the claim as animated text.",
-    },
-    {
-      sceneNumber: 2,
-      timeEstimateSeconds: 20,
-      narration: "Here's what the official pricing page actually promises, word for word.",
-      storyPurpose: "Establish the primary source before making any claim",
-      viewerMustSee: "The real, current official pricing page for the product",
-      whyThisVisual: "Grounds the video in a verifiable primary source, not a secondhand claim",
-      claimIds: [],
-      proofRequired: "Official pricing page screenshot/recording",
-      assetType: "screenshot",
-      assetFilename: "official-pricing-page.png",
-      toolToUse: "Browser screenshot",
-      captureOrGenerationSteps: "Navigate to the official pricing page, capture the full free-tier section only.",
-      screenRecordingInstructions: "Full-page screenshot, crop to the relevant pricing card only.",
-      privacyWarnings: "Remove any personal account banner if logged in.",
-      motionComponent: "BrowserFrame",
-      motionIntensity: "LOW",
-      onScreenText: "Official source",
-      captionEmphasis: "official",
-      transition: "cross-dissolve",
-      fallbackIfAssetMissing: "Use WarningReveal stating the source could not be captured and cite the URL verbally only.",
-    },
-    {
-      sceneNumber: 3,
-      timeEstimateSeconds: 45,
-      narration: "We ran the same test three times, on a brand new free account, no tricks.",
-      storyPurpose: "Deliver the OUR_TEST evidence",
-      viewerMustSee: "Real screen recording of the test attempts, including the failure/limit moment",
-      whyThisVisual: "OUR_TEST claims require primary evidence, not a description",
-      claimIds: [],
-      proofRequired: "Our test recording",
-      assetType: "screen_recording",
-      assetFilename: "our-test-run.mp4",
-      toolToUse: "Screen recorder + the product itself",
-      captureOrGenerationSteps: "Follow the locked methodology exactly: same prompt, fresh account, record start to limit.",
-      screenRecordingInstructions: "Record full session unedited, note the timestamp where the limit is hit.",
-      privacyWarnings: "Use a disposable test account, not a personal one.",
-      motionComponent: "ScoreCard",
+      assetType: "on_camera",
+      assetFilename: "a-roll-explanation-002.mp4",
+      toolToUse: "Camera + tripod (see A-roll shot 2)",
+      captureOrGenerationSteps: "Film seated, conversational energy, pause naturally where a screen insert will cut in.",
+      motionComponent: "ScreenAndFaceSplit",
       motionIntensity: "MEDIUM",
-      onScreenText: "Attempt 1 / 3",
-      captionEmphasis: "test",
-      sfx: "tick",
+      onScreenText: "The setup",
+      captionEmphasis: "setup",
       transition: "cut",
-      fallbackIfAssetMissing: "Use Checklist component to describe the methodology while flagging the recording as pending.",
-    },
-  ];
+      fallbackIfAssetMissing: "Use Checklist typography-only treatment describing the setup.",
+      screenInsertInterrupts: false,
+      punchIn: false,
+    });
+  }
+
+  scenes.push({
+    sceneNumber: 0,
+    segmentType: "SCREEN_RECORDING",
+    timeEstimateSeconds: 20,
+    narration: "Here's what the official pricing page actually promises, word for word.",
+    storyPurpose: "Establish the primary source before making any claim",
+    viewerMustSee: "The real, current official pricing page for the product",
+    whyThisVisual: "Grounds the video in a verifiable primary source, not a secondhand claim",
+    claimIds: [],
+    proofRequired: "Official pricing page screenshot/recording",
+    assetType: "screenshot",
+    assetFilename: "official-pricing-page.png",
+    toolToUse: "Browser screenshot",
+    captureOrGenerationSteps: "Navigate to the official pricing page, capture the full free-tier section only.",
+    screenRecordingInstructions: "Full-page screenshot, crop to the relevant pricing card only.",
+    privacyWarnings: "Remove any personal account banner if logged in.",
+    motionComponent: "BrowserFrame",
+    motionIntensity: "LOW",
+    onScreenText: "Official source",
+    captionEmphasis: "official",
+    transition: "cross-dissolve",
+    fallbackIfAssetMissing: "Use WarningReveal stating the source could not be captured and cite the URL verbally only.",
+    screenInsertInterrupts: onCamera,
+    punchIn: false,
+  });
+
+  scenes.push({
+    sceneNumber: 0,
+    segmentType: presentationMode === "FACELESS" ? "VOICEOVER" : "PRODUCT_RESULT",
+    timeEstimateSeconds: 45,
+    narration: "We ran the same test three times, on a brand new free account, no tricks.",
+    storyPurpose: "Deliver the OUR_TEST evidence",
+    viewerMustSee: "Real screen recording of the test attempts, including the failure/limit moment",
+    whyThisVisual: "OUR_TEST claims require primary evidence, not a description",
+    claimIds: [],
+    proofRequired: "Our test recording",
+    assetType: "screen_recording",
+    assetFilename: "our-test-run.mp4",
+    toolToUse: "Screen recorder + the product itself",
+    captureOrGenerationSteps: "Follow the locked methodology exactly: same prompt, fresh account, record start to limit.",
+    screenRecordingInstructions: "Record full session unedited, note the timestamp where the limit is hit.",
+    privacyWarnings: "Use a disposable test account, not a personal one.",
+    motionComponent: "ScoreCard",
+    motionIntensity: "MEDIUM",
+    onScreenText: "Attempt 1 / 3",
+    captionEmphasis: "test",
+    sfx: "tick",
+    transition: "cut",
+    fallbackIfAssetMissing: "Use Checklist component to describe the methodology while flagging the recording as pending.",
+    screenInsertInterrupts: onCamera,
+    punchIn: false,
+  });
+
+  if (onCamera) {
+    scenes.push({
+      sceneNumber: 0,
+      segmentType: "ON_CAMERA",
+      timeEstimateSeconds: 12,
+      narration: "But one of them burned through its entire free allowance in two generations.",
+      storyPurpose: "Reaction/verdict - a genuine human reaction sells a surprising result harder than a stat card alone",
+      viewerMustSee: "Creator reacting to the actual result, then delivering the verdict straight to camera",
+      whyThisVisual: "The channel's identity is proof plus personality - the verdict is where that personality should show",
+      claimIds: [],
+      assetType: "on_camera",
+      assetFilename: "a-roll-verdict-003.mp4",
+      toolToUse: "Camera + tripod (see A-roll shot 3)",
+      captureOrGenerationSteps: "Film after reviewing the actual test footage so the reaction is genuine, not performed cold.",
+      motionComponent: "TalkingHeadFrame",
+      motionIntensity: "MEDIUM",
+      onScreenText: "2 generations. Done.",
+      captionEmphasis: "burned through",
+      transition: "cut",
+      fallbackIfAssetMissing: "Use WarningReveal typography-only treatment instead of the on-camera reaction.",
+      screenInsertInterrupts: false,
+      punchIn: true,
+    });
+  }
+
+  return scenes.map((scene, i) => ({ ...scene, sceneNumber: i + 1 }));
 }
 
-export function mockAssetRequirements(): AssetRequirement[] {
+/**
+ * A-roll shot list for the ON_CAMERA scenes above - only meaningful for
+ * FACE_LED/HYBRID projects. Filenames match the corresponding production
+ * scene's assetFilename so the two stay linked.
+ */
+export function mockArollShots(scenes: ProductionScene[]): ArollShot[] {
+  const onCameraScenes = scenes.filter((s) => s.segmentType === "ON_CAMERA");
+  return onCameraScenes.map((scene, i) => ({
+    shotNumber: i + 1,
+    narration: scene.narration,
+    shotType: i === 0 ? "Medium close-up" : "Medium shot",
+    cameraPosition: "Eye level",
+    framing: i === 0 ? "Chest-up" : "Waist-up",
+    energy: scene.storyPurpose.toLowerCase().includes("reaction") || scene.storyPurpose.toLowerCase().includes("verdict") ? "High / genuine reaction" : "High / curious",
+    durationMinSeconds: Math.max(4, scene.timeEstimateSeconds - 3),
+    durationMaxSeconds: scene.timeEstimateSeconds + 3,
+    delivery: "Direct to lens",
+    standingOrSeated: "standing",
+    backgroundSuggestion: "Clean desk / technology setup",
+    props: undefined,
+    screenInsertInterrupts: scene.screenInsertInterrupts,
+    punchIn: scene.punchIn,
+    captionsOnScreen: true,
+    cameraGuidance: "iPhone rear camera, 4K/30fps, locked exposure/focus, tripod, eye-level framing.",
+    filename: scene.assetFilename,
+  }));
+}
+
+/**
+ * Screen-recording/generative asset requirements only - A-roll (on-camera)
+ * capture requirements live in aroll_shots instead, since on-camera assets
+ * are the Production Director's responsibility per the product spec, not
+ * the Asset Planner's. The hook montage item only applies when the hook
+ * itself is a screen recording (FACELESS) rather than on-camera footage.
+ */
+export function mockAssetRequirements(presentationMode: PresentationMode): AssetRequirement[] {
+  const hookItem: AssetRequirement[] =
+    presentationMode === "FACELESS"
+      ? [
+          {
+            expectedFilename: "hook-thumbnail-montage.mp4",
+            category: "screen_recording",
+            shotType: "SCREEN_RECORDING",
+            instructions: "Record 15-20s of scrolling through competitor video thumbnails on the topic search results page.",
+            software: "OBS Studio / QuickTime",
+            shortcut: "Cmd+Shift+5 (Mac) or OBS hotkey",
+            windowSetup: "Full-screen browser, no bookmarks bar visible",
+            exactSequence: "Search topic -> scroll slowly through results -> stop on 2-3 relevant thumbnails",
+            cursorBehavior: "Smooth scroll, no clicking",
+            durationSeconds: 20,
+            exportFormat: "mp4 (H.264)",
+          },
+        ]
+      : [];
+
   return [
-    {
-      expectedFilename: "hook-thumbnail-montage.mp4",
-      category: "screen_recording",
-      shotType: "SCREEN_RECORDING",
-      instructions: "Record 15-20s of scrolling through competitor video thumbnails on the topic search results page.",
-      software: "OBS Studio / QuickTime",
-      shortcut: "Cmd+Shift+5 (Mac) or OBS hotkey",
-      windowSetup: "Full-screen browser, no bookmarks bar visible",
-      exactSequence: "Search topic -> scroll slowly through results -> stop on 2-3 relevant thumbnails",
-      cursorBehavior: "Smooth scroll, no clicking",
-      durationSeconds: 20,
-      exportFormat: "mp4 (H.264)",
-    },
+    ...hookItem,
     {
       expectedFilename: "official-pricing-page.png",
       category: "screenshot",

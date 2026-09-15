@@ -51,6 +51,7 @@ export async function runIdeaResearch({ db, projectId, topic, preferredProvider 
     sponsorFit: idea.sponsorFit,
     proofRequirements: idea.proofRequirements,
     overallScore: idea.overallScore,
+    recommendedPresentationMode: idea.recommendedPresentationMode,
     rank: i + 1,
     sourceProvider: providerUsed,
   }));

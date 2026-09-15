@@ -3,6 +3,7 @@ import { db, schema } from "@yaos/database";
 import { rerunIdeaResearch, selectIdeaAction } from "@/lib/actions/ideas";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { PresentationModeBadge } from "@/components/ui/stage-chip";
 
 export default async function IdeasPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -57,6 +58,7 @@ function IdeaCard({ idea, projectId }: { idea: typeof schema.videoIdeas.$inferSe
         <Badge variant="cyan">{idea.overallScore}/100</Badge>
       </div>
       <p className="text-sm text-text-dim italic">&ldquo;{idea.hook}&rdquo;</p>
+      <PresentationModeBadge mode={idea.recommendedPresentationMode} />
 
       <div className="grid grid-cols-3 gap-2 text-xs">
         <Stat label="Trend" value={idea.trendScore} />

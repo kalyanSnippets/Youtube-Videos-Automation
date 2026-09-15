@@ -12,6 +12,13 @@ import { Comparison } from "./components/Comparison";
 import { CTA } from "./components/CTA";
 import { EndScreen } from "./components/EndScreen";
 import { BrowserFrame } from "./components/BrowserFrame";
+import { TalkingHeadFrame } from "./components/TalkingHeadFrame";
+import { PictureInPicture } from "./components/PictureInPicture";
+import { CreatorLowerThird } from "./components/CreatorLowerThird";
+import { CreatorReaction } from "./components/CreatorReaction";
+import { ScreenAndFaceSplit } from "./components/ScreenAndFaceSplit";
+import { PunchIn } from "./components/PunchIn";
+import { ArollToDemoTransition } from "./components/ArollToDemoTransition";
 
 const FPS = 30;
 const WIDTH = 1920;
@@ -133,6 +140,45 @@ export const RemotionRoot: React.FC = () => {
         defaultProps={{ channelName: "the channel", nextVideoTitle: "We tested 5 more free AI tools" }}
       />
       <Composition<any, any> id="BrowserFrame" component={BrowserFrame} durationInFrames={150} fps={FPS} width={WIDTH} height={HEIGHT} defaultProps={{ url: "app.example.com/pricing" }} />
+      <Composition<any, any>
+        id="TalkingHeadFrame"
+        component={TalkingHeadFrame}
+        durationInFrames={90}
+        fps={FPS}
+        width={WIDTH}
+        height={HEIGHT}
+        defaultProps={{ captionText: "I tested seven tools this week." }}
+      />
+      <Composition<any, any> id="PictureInPicture" component={PictureInPicture} durationInFrames={150} fps={FPS} width={WIDTH} height={HEIGHT} defaultProps={{ position: "bottom-right", sizePercent: 22 }} />
+      <Composition<any, any>
+        id="CreatorLowerThird"
+        component={CreatorLowerThird}
+        durationInFrames={120}
+        fps={FPS}
+        width={WIDTH}
+        height={HEIGHT}
+        defaultProps={{ name: "Alex", context: "Testing free AI tools" }}
+      />
+      <Composition<any, any> id="CreatorReaction" component={CreatorReaction} durationInFrames={60} fps={FPS} width={WIDTH} height={HEIGHT} defaultProps={{ position: "bottom-right" }} />
+      <Composition<any, any>
+        id="ScreenAndFaceSplit"
+        component={ScreenAndFaceSplit}
+        durationInFrames={150}
+        fps={FPS}
+        width={WIDTH}
+        height={HEIGHT}
+        defaultProps={{ faceLabel: "Creator", screenLabel: "Live demo", facePosition: "left" }}
+      />
+      <Composition<any, any> id="PunchIn" component={PunchIn} durationInFrames={40} fps={FPS} width={WIDTH} height={HEIGHT} defaultProps={{ fromScale: 1, toScale: 1.15, startFrame: 5, durationFrames: 20 }} />
+      <Composition<any, any>
+        id="ArollToDemoTransition"
+        component={ArollToDemoTransition}
+        durationInFrames={24}
+        fps={FPS}
+        width={WIDTH}
+        height={HEIGHT}
+        defaultProps={{ fromLabel: "CREATOR", toLabel: "DEMO" }}
+      />
     </>
   );
 };

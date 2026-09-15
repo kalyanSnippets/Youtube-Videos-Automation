@@ -1,6 +1,6 @@
 import { AlertTriangle, ShieldCheck } from "lucide-react";
 import type { ProjectDetail } from "@/lib/project-detail";
-import { StageChip } from "@/components/ui/stage-chip";
+import { StageChip, PresentationModeBadge } from "@/components/ui/stage-chip";
 import { Badge } from "@/components/ui/badge";
 import { ProgressBar } from "@/components/ui/progress";
 
@@ -16,7 +16,10 @@ export function ProjectHeader({ detail }: { detail: ProjectDetail }) {
           </div>
           <p className="text-xs text-text-faint font-mono">{project.id}</p>
         </div>
-        <StageChip stage={project.currentStage} />
+        <div className="flex items-center gap-2">
+          <PresentationModeBadge mode={project.presentationMode} />
+          <StageChip stage={project.currentStage} />
+        </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">

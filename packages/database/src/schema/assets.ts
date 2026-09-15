@@ -3,6 +3,7 @@ import { projects } from "./projects";
 import { assetStatusEnum } from "./enums";
 
 export const ASSET_CATEGORIES = [
+  "on_camera",
   "screen_recording",
   "screenshot",
   "generated_result",

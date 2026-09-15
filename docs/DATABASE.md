@@ -6,7 +6,7 @@ Postgres via Drizzle ORM (`drizzle-orm/node-postgres`). Schema lives in
 (`defaultRandom()`), every table has `created_at` (and `updated_at` where the row is ever
 mutated after creation), and every project-owned table carries `project_id`.
 
-## Tables (31)
+## Tables (32)
 
 **Core / workspace**: `users`, `workspaces`, `channel_profiles`, `integration_settings`,
 `local_worker_nodes`, `jobs`
@@ -19,7 +19,7 @@ mutated after creation), and every project-owned table carries `project_id`.
 
 **Assets**: `assets`, `asset_requirements`
 
-**Script & production**: `scripts`, `production_scenes`, `shot_list_items`
+**Script & production**: `scripts`, `production_scenes`, `aroll_shots`, `shot_list_items`
 
 **Post-production**: `transcripts`, `transcript_words`, `edit_plan_scenes`, `motion_templates`,
 `qa_issues`, `render_jobs`
@@ -36,8 +36,10 @@ ledger.
 
 Defined once in `packages/database/src/schema/enums.ts`, several backed directly by the shared
 constant arrays in `@yaos/shared` (`STAGES`, `CONTENT_TYPES`, `CLAIM_TYPES`, `ASSET_STATUSES`,
-`JOB_STATUSES`, `ACTOR_TYPES`, `INTEGRATION_STATUSES`, `INTEGRATION_SERVICES`, `AGENT_NAMES`) so
-the database, the state machine, and the UI can never drift out of sync on what a valid value is.
+`JOB_STATUSES`, `ACTOR_TYPES`, `INTEGRATION_STATUSES`, `INTEGRATION_SERVICES`, `AGENT_NAMES`,
+`PRESENTATION_MODES`, `SEGMENT_TYPES`) so the database, the state machine, and the UI can never
+drift out of sync on what a valid value is. See `docs/PRESENTATION-MODES.md` for how
+`presentation_mode` and `segment_type` are used.
 
 ## Client
 

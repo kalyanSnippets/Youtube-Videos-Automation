@@ -8,16 +8,25 @@ catalog array — see `packages/seed-scripts/src/index.ts`).
 
 ## Catalog
 
-24 templates are catalogued (`MOTION_TEMPLATE_CATALOG`), each with a `category`
-(`hook | typography | evidence | structure | transition | cta`) and a `defaultIntensity`
-(`LOW | MEDIUM | HIGH`). 12 have real components today (`implemented: true`); the rest are
-reserved keys with a defined intent, visible in the Motion Templates page as "Planned":
+31 templates are catalogued (`MOTION_TEMPLATE_CATALOG`), each with a `category`
+(`hook | typography | evidence | structure | transition | cta | on_camera`) and a
+`defaultIntensity` (`LOW | MEDIUM | HIGH`). 19 have real components today (`implemented: true`);
+the rest are reserved keys with a defined intent, visible in the Motion Templates page as
+"Planned":
 
 **Implemented**: `HyperHook`, `HyperTitle`, `KeywordBurst`, `BrowserFrame`, `ScoreCard`,
-`StatCounter`, `WarningReveal`, `Comparison`, `RankingStack`, `Checklist`, `CTA`, `EndScreen`
+`StatCounter`, `WarningReveal`, `Comparison`, `RankingStack`, `Checklist`, `CTA`, `EndScreen`,
+`TalkingHeadFrame`, `PictureInPicture`, `CreatorLowerThird`, `CreatorReaction`,
+`ScreenAndFaceSplit`, `PunchIn`, `ArollToDemoTransition`
 
 **Planned**: `BrowserZoom`, `CursorCallout`, `FeatureTag`, `ProductIntro`, `PriceCard`, `Timeline`,
 `MiniChart`, `ResultReveal`, `BeforeAfter`, `SplitScreen`, `QuoteCard`, `SectionTransition`
+
+The `on_camera` category (`TalkingHeadFrame` through `PunchIn`, plus the `transition`-categorized
+`ArollToDemoTransition`) exists specifically for `FACE_LED`/`HYBRID` production — see
+`docs/PRESENTATION-MODES.md`. Every one of them accepts its video content as `children`/named
+content props rather than fabricating footage; without real content supplied they render a
+labeled placeholder frame so the composition still previews sensibly in Remotion Studio.
 
 Building one of the planned templates means adding a component under `src/components/`, adding
 its entry to `catalog.ts` with `implemented: true`, registering a `<Composition>` in `Root.tsx`,

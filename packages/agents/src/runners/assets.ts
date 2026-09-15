@@ -16,14 +16,18 @@ export interface RunAssetPlannerInput {
 }
 
 export async function runAssetPlanner({ db, projectId, topic, preferredProvider }: RunAssetPlannerInput) {
+  const [project] = await db.select().from(schema.projects).where(eq(schema.projects.id, projectId));
+  if (!project) throw new Error(`Project ${projectId} not found`);
+
   const { value } = await runAgent({
     db,
     projectId,
     agentName: "ASSET_PLANNER",
     preferredProvider,
-    userPrompt: `Produce the shot list and asset requirements for "${topic}" from the production scenes.`,
+    userPrompt: `Produce the shot list and asset requirements for "${topic}" from the production scenes (screen recordings and generated assets only - A-roll is tracked separately).`,
     inputSummary: `topic="${topic}"`,
-    build: (rawText, providerId) => (providerId === "MOCK" ? { requirements: mockAssetRequirements() } : (parseJsonLoose(rawText) as { requirements: AssetRequirement[] })),
+    build: (rawText, providerId) =>
+      providerId === "MOCK" ? { requirements: mockAssetRequirements(project.presentationMode) } : (parseJsonLoose(rawText) as { requirements: AssetRequirement[] }),
     validate: (value) => {
       for (const r of value.requirements) {
         const result = safeValidate(AssetRequirementSchema, r);

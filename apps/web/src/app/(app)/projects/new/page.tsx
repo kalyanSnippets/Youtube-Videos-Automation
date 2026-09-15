@@ -78,21 +78,25 @@ export default function NewVideoPage() {
           </Field>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <Field label="Face / Faceless">
-            <select name="faceMode" defaultValue="faceless" className="w-full rounded-lg bg-bg-raised border border-border px-3 py-2 text-sm outline-none focus:border-accent-cyan/50">
-              <option value="faceless">Faceless</option>
-              <option value="face">Face</option>
-            </select>
-          </Field>
-          <Field label="Research depth">
-            <select name="researchDepth" defaultValue="standard" className="w-full rounded-lg bg-bg-raised border border-border px-3 py-2 text-sm outline-none focus:border-accent-cyan/50">
-              <option value="quick">Quick</option>
-              <option value="standard">Standard</option>
-              <option value="deep">Deep</option>
-            </select>
-          </Field>
-        </div>
+        <Field label="Presentation mode">
+          <select name="presentationMode" defaultValue="" className="w-full rounded-lg bg-bg-raised border border-border px-3 py-2 text-sm outline-none focus:border-accent-cyan/50">
+            <option value="">Recommended for this content type</option>
+            <option value="FACE_LED">Face-led - creator on camera through most of the video</option>
+            <option value="HYBRID">Hybrid - creator on camera where it adds trust, screens carry the rest</option>
+            <option value="FACELESS">Faceless - no on-camera footage required</option>
+          </select>
+          <p className="text-xs text-text-faint mt-1.5">
+            Never locked in - change it anytime from the project&apos;s Overview tab. Never required for a faceless project, never forced off for face-led/hybrid.
+          </p>
+        </Field>
+
+        <Field label="Research depth">
+          <select name="researchDepth" defaultValue="standard" className="w-full rounded-lg bg-bg-raised border border-border px-3 py-2 text-sm outline-none focus:border-accent-cyan/50">
+            <option value="quick">Quick</option>
+            <option value="standard">Standard</option>
+            <option value="deep">Deep</option>
+          </select>
+        </Field>
 
         <button type="submit" className="w-full rounded-lg bg-accent-cyan text-bg font-medium text-sm py-2.5 hover:brightness-110 transition">
           Start Research

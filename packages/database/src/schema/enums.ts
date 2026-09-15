@@ -9,6 +9,8 @@ import {
   INTEGRATION_STATUSES,
   INTEGRATION_SERVICES,
   AGENT_NAMES,
+  PRESENTATION_MODES,
+  SEGMENT_TYPES,
 } from "@yaos/shared";
 
 export const stageEnum = pgEnum("stage", STAGES);
@@ -20,6 +22,8 @@ export const actorTypeEnum = pgEnum("actor_type", ACTOR_TYPES);
 export const integrationStatusEnum = pgEnum("integration_status", INTEGRATION_STATUSES);
 export const integrationServiceEnum = pgEnum("integration_service", INTEGRATION_SERVICES);
 export const agentNameEnum = pgEnum("agent_name", AGENT_NAMES);
+export const presentationModeEnum = pgEnum("presentation_mode", PRESENTATION_MODES);
+export const segmentTypeEnum = pgEnum("segment_type", SEGMENT_TYPES);
 
 export const jobTypeEnum = pgEnum("job_type", [
   "IDEA_RESEARCH",

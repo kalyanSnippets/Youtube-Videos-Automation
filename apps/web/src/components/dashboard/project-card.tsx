@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { AlertTriangle, Clock, ShieldCheck } from "lucide-react";
 import type { ProjectSummary } from "@/lib/project-data";
-import { StageChip } from "@/components/ui/stage-chip";
+import { StageChip, PresentationModeBadge } from "@/components/ui/stage-chip";
 import { Badge } from "@/components/ui/badge";
 import { ProgressBar } from "@/components/ui/progress";
 import { formatRelativeTime } from "@/lib/utils";
@@ -17,7 +17,10 @@ export function ProjectCard({ project }: { project: ProjectSummary }) {
           </div>
           <p className="text-xs text-text-faint font-mono">{project.id.slice(0, 8)}</p>
         </div>
-        <StageChip stage={project.currentStage} />
+        <div className="flex flex-col items-end gap-1.5">
+          <StageChip stage={project.currentStage} />
+          <PresentationModeBadge mode={project.presentationMode} />
+        </div>
       </div>
 
       <div>

@@ -23,6 +23,7 @@ export async function computeProjectSignals(db: Database, projectId: string): Pr
   const shotListItems = await db.select().from(schema.shotListItems).where(eq(schema.shotListItems.projectId, projectId));
   const assets = await db.select().from(schema.assets).where(eq(schema.assets.projectId, projectId));
   const narrationAssets = assets.filter((a) => a.category === "narration" || a.subject === "narration");
+  const arollShots = await db.select().from(schema.arollShots).where(eq(schema.arollShots.projectId, projectId));
   const transcripts = await db.select().from(schema.transcripts).where(eq(schema.transcripts.projectId, projectId));
   const editPlanScenes = await db.select().from(schema.editPlanScenes).where(eq(schema.editPlanScenes.projectId, projectId));
   const localWorkers = await db.select().from(schema.localWorkerNodes).where(eq(schema.localWorkerNodes.workspaceId, project.workspaceId));
@@ -57,6 +58,8 @@ export async function computeProjectSignals(db: Database, projectId: string): Pr
     shotListItemCount: shotListItems.length,
     totalAssetCount: assets.length,
     missingAssetCount: assets.filter((a) => a.status === "MISSING" || a.status === "NEEDS_RECAPTURE").length,
+    arollShotCount: arollShots.length,
+    missingArollShotCount: arollShots.filter((a) => a.status === "MISSING" || a.status === "NEEDS_RECAPTURE").length,
     narrationUploaded: narrationAssets.some((a) => a.status === "READY"),
     transcriptReady: transcripts.length > 0,
     editPlanReady: editPlanScenes.length > 0,

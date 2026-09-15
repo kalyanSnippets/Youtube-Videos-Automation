@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { eq } from "drizzle-orm";
 import { schema } from "@yaos/database";
 import type { Database } from "@yaos/database";
-import { canTransition, type Stage } from "@yaos/shared";
+import { canTransition, type PresentationMode, type Stage } from "@yaos/shared";
 import { logActivity } from "./run-agent";
 import { computeProjectSignals } from "./signals";
 
@@ -40,14 +40,41 @@ export async function transitionStage(
 
 export async function selectIdea(db: Database, projectId: string, ideaId: string, actorLabel = "User") {
   await db.update(schema.videoIdeas).set({ isSelected: false }).where(eq(schema.videoIdeas.projectId, projectId));
-  await db.update(schema.videoIdeas).set({ isSelected: true }).where(eq(schema.videoIdeas.id, ideaId));
-  await db.update(schema.projects).set({ selectedIdeaId: ideaId, updatedAt: new Date() }).where(eq(schema.projects.id, projectId));
+  const [idea] = await db.update(schema.videoIdeas).set({ isSelected: true }).where(eq(schema.videoIdeas.id, ideaId)).returning();
+
+  const [projectBefore] = await db.select().from(schema.projects).where(eq(schema.projects.id, projectId));
+  // Only refine the presentation mode from the idea's own recommendation while the project is
+  // still on a recommendation itself - never overwrite a mode the creator explicitly chose.
+  const shouldAdoptIdeaMode = idea && projectBefore?.presentationModeIsRecommended;
+
+  await db
+    .update(schema.projects)
+    .set({
+      selectedIdeaId: ideaId,
+      ...(shouldAdoptIdeaMode ? { presentationMode: idea.recommendedPresentationMode } : {}),
+      updatedAt: new Date(),
+    })
+    .where(eq(schema.projects.id, projectId));
 
   const [project] = await db.select().from(schema.projects).where(eq(schema.projects.id, projectId));
   if (project?.currentStage === "IDEA_RESEARCH") {
     await transitionStage(db, projectId, "IDEA_SELECTED", "USER", actorLabel);
   }
-  await logActivity(db, projectId, "USER", "IDEA_SELECTED", `User selected idea ${ideaId}.`);
+  await logActivity(
+    db,
+    projectId,
+    "USER",
+    "IDEA_SELECTED",
+    `User selected idea ${ideaId}.${shouldAdoptIdeaMode ? ` Presentation mode set to ${idea.recommendedPresentationMode} (recommended).` : ""}`,
+  );
+}
+
+export async function setPresentationMode(db: Database, projectId: string, presentationMode: PresentationMode, actorLabel = "User") {
+  await db
+    .update(schema.projects)
+    .set({ presentationMode, presentationModeIsRecommended: false, updatedAt: new Date() })
+    .where(eq(schema.projects.id, projectId));
+  await logActivity(db, projectId, "USER", "PRESENTATION_MODE_CHANGED", `${actorLabel} set the presentation mode to ${presentationMode}.`);
 }
 
 export async function verifyClaim(
@@ -124,6 +151,17 @@ export async function markAssetReady(db: Database, assetId: string, localPath?: 
   await db.update(schema.assetRequirements).set({ status: "READY", updatedAt: new Date() }).where(eq(schema.assetRequirements.assetId, assetId));
   await logActivity(db, asset.projectId, "USER", "ASSET_READY", `Asset ${asset.filename} marked ready.`);
   return asset;
+}
+
+export async function markArollShotReady(db: Database, arollShotId: string, localPath?: string) {
+  const [shot] = await db
+    .update(schema.arollShots)
+    .set({ status: "READY", localPath, updatedAt: new Date() })
+    .where(eq(schema.arollShots.id, arollShotId))
+    .returning();
+  if (!shot) throw new Error(`A-roll shot ${arollShotId} not found`);
+  await logActivity(db, shot.projectId, "USER", "AROLL_SHOT_READY", `A-roll shot ${shot.filename} marked ready.`);
+  return shot;
 }
 
 export async function approveFinalRender(db: Database, projectId: string, approvedBy = "User") {

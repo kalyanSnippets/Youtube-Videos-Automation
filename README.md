@@ -7,6 +7,11 @@ Run multiple video projects simultaneously. Each project carries its own researc
 ledger, script, production plan, assets, edit plan, QA issues, publish package, and analytics,
 and always knows exactly what's done, what's blocked, and what to do next.
 
+The channel isn't faceless-only: every project independently picks **Face-led**, **Hybrid**
+(the default), or **Faceless** presentation, and production planning, asset tracking, and the
+Remotion component catalog all adapt to that choice — see
+[`docs/PRESENTATION-MODES.md`](docs/PRESENTATION-MODES.md).
+
 See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the full system design.
 
 ## Status
@@ -106,6 +111,7 @@ pnpm lint        # next lint for the web app
 - [`docs/AGENTS.md`](docs/AGENTS.md) — every specialized agent, its contract, and its prompt
 - [`docs/DATABASE.md`](docs/DATABASE.md) — schema reference
 - [`docs/TRUST-SYSTEM.md`](docs/TRUST-SYSTEM.md) — the claim/evidence ledger, the project's core differentiator
+- [`docs/PRESENTATION-MODES.md`](docs/PRESENTATION-MODES.md) — face-led / hybrid / faceless, A-roll, and how the mode changes agent behavior
 - [`docs/LOCAL-WORKER.md`](docs/LOCAL-WORKER.md) — planned local render worker design
 - [`docs/REMOTION.md`](docs/REMOTION.md) — motion template catalog and render pipeline
 - [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md) — day-to-day dev workflow

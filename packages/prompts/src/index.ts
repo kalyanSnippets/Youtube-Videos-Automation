@@ -3,6 +3,7 @@ import { orchestratorV1 } from "./orchestrator/v1";
 import { ideaResearchV1 } from "./idea-research/v1";
 import { competitorAnalysisV1 } from "./competitor-analysis/v1";
 import { claimsV1 } from "./claims/v1";
+import { experimentDesignerV1 } from "./experiment-designer/v1";
 import { storyV1 } from "./story/v1";
 import { productionV1 } from "./production/v1";
 import { assetsV1 } from "./assets/v1";
@@ -18,6 +19,7 @@ export const PROMPT_REGISTRY: Record<string, PromptVersion[]> = {
   IDEA_RESEARCH: [ideaResearchV1],
   COMPETITOR_ANALYST: [competitorAnalysisV1],
   TRUST_CLAIMS_RESEARCHER: [claimsV1],
+  EXPERIMENT_DESIGNER: [experimentDesignerV1],
   STORY_WRITER: [storyV1],
   PRODUCTION_DIRECTOR: [productionV1],
   ASSET_PLANNER: [assetsV1],

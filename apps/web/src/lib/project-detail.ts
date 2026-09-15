@@ -15,9 +15,12 @@ export async function getProjectDetail(projectId: string) {
   const trustCoveragePercent = calculateTrustCoverage(claims);
   const requiredStages = getRequiredStages(project.contentType);
   const assets = await db.select().from(schema.assets).where(eq(schema.assets.projectId, projectId));
-  const assetsReadyPercent = assets.length === 0 ? 0 : Math.round((assets.filter((a) => a.status === "READY").length / assets.length) * 100);
+  const arollShots = await db.select().from(schema.arollShots).where(eq(schema.arollShots.projectId, projectId));
+  const totalTrackedItems = assets.length + arollShots.length;
+  const readyItems = assets.filter((a) => a.status === "READY").length + arollShots.filter((s) => s.status === "READY").length;
+  const assetsReadyPercent = totalTrackedItems === 0 ? 0 : Math.round((readyItems / totalTrackedItems) * 100);
 
-  return { project, signals, progress, nextAction, trustCoveragePercent, requiredStages, assetsReadyPercent, claims, assets };
+  return { project, signals, progress, nextAction, trustCoveragePercent, requiredStages, assetsReadyPercent, claims, assets, arollShots };
 }
 
 export type ProjectDetail = Awaited<ReturnType<typeof getProjectDetail>>;

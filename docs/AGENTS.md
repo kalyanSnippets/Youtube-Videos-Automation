@@ -13,10 +13,10 @@ they go through `@yaos/ai-providers`.
 | Idea Research | `runIdeaResearch` | channel profile, seed idea | `video_ideas` | `packages/prompts/src/idea-research` |
 | Competitor Analyst | `runCompetitorAnalysis` | selected idea | `reference_videos` | `packages/prompts/src/competitor-analysis` |
 | Trust & Claims Researcher | `runClaimsResearch` | topic | `claims`, `claim_sources` | `packages/prompts/src/claims` |
-| Experiment Designer | `runExperimentDesigner` | topic | `methodologies` (locked) | — (uses the Claims prompt's sibling; see source) |
+| Experiment Designer | `runExperimentDesigner` | topic | `methodologies` (locked) | `packages/prompts/src/experiment-designer` |
 | Story Writer | `runStoryWriter` | non-UNVERIFIED claims | `scripts` (new DRAFT version) | `packages/prompts/src/story` |
-| Production Director | `runProductionDirector` | approved script | `production_scenes` | `packages/prompts/src/production` |
-| Asset Planner | `runAssetPlanner` | production scenes | `shot_list_items`, `asset_requirements`, `assets` (MISSING) | `packages/prompts/src/assets` |
+| Production Director | `runProductionDirector` | approved script, project's `presentation_mode` | `production_scenes`, `aroll_shots` (for `ON_CAMERA` scenes) | `packages/prompts/src/production` |
+| Asset Planner | `runAssetPlanner` | production scenes | `shot_list_items`, `asset_requirements`, `assets` (MISSING) - screen recordings/generated assets only, never A-roll | `packages/prompts/src/assets` |
 
 Each of these also calls `transitionStage()` when its output completes the current stage's
 requirement (e.g. `runAssetPlanner` moves `PRODUCTION_PLAN_READY -> ASSETS_REQUESTED`) — see
@@ -25,6 +25,11 @@ requirement (e.g. `runAssetPlanner` moves `PRODUCTION_PLAN_READY -> ASSETS_REQUE
 before transitioning, so drafting a script while methodology is still required and undefined
 creates the draft but leaves the project's stage (and therefore its next action) pointed at
 "define methodology" rather than silently skipping it.
+
+`runProductionDirector` is presentation-mode-aware (see `docs/PRESENTATION-MODES.md`): it assigns
+each scene a `segmentType`, generates a matching A-roll shot for every `ON_CAMERA` scene, and its
+`validate` callback rejects any output that gives a `FACELESS` project an `ON_CAMERA` scene -
+this is enforced in code, not just prompted for.
 
 ## Orchestration model
 

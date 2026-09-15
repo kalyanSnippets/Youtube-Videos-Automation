@@ -15,17 +15,20 @@ import {
   approveScript,
   transitionStage,
   logActivity,
+  setPresentationMode,
 } from "@yaos/agents";
-import type { ContentType } from "@yaos/shared";
+import type { ContentType, PresentationMode } from "@yaos/shared";
 
 async function seedMotionTemplates() {
   const existing = await db.select().from(schema.motionTemplates);
-  if (existing.length > 0) {
-    console.log(`Motion templates already seeded (${existing.length}), skipping.`);
+  const existingKeys = new Set(existing.map((t) => t.componentKey));
+  const missing = MOTION_TEMPLATE_CATALOG.filter((t) => !existingKeys.has(t.key));
+  if (missing.length === 0) {
+    console.log(`Motion templates already up to date (${existing.length}).`);
     return;
   }
   await db.insert(schema.motionTemplates).values(
-    MOTION_TEMPLATE_CATALOG.map((t) => ({
+    missing.map((t) => ({
       id: randomUUID(),
       componentKey: t.key,
       name: t.name,
@@ -36,7 +39,7 @@ async function seedMotionTemplates() {
       isActive: t.implemented,
     })),
   );
-  console.log(`Seeded ${MOTION_TEMPLATE_CATALOG.length} motion templates.`);
+  console.log(`Seeded ${missing.length} new motion template${missing.length === 1 ? "" : "s"} (${existing.length + missing.length} total).`);
 }
 
 function slugify(title: string): string {
@@ -48,7 +51,7 @@ function slugify(title: string): string {
 
 type TargetStage = "REFERENCES_ANALYSED" | "SCRIPT_APPROVED" | "ASSETS_REQUESTED";
 
-async function seedDemoProject(opts: { workspaceId: string; title: string; contentType: ContentType; targetStage: TargetStage }) {
+async function seedDemoProject(opts: { workspaceId: string; title: string; contentType: ContentType; presentationMode: PresentationMode; targetStage: TargetStage }) {
   const existing = await db.select().from(schema.projects).where(eq(schema.projects.title, opts.title));
   if (existing.length > 0) {
     console.log(`Demo project "${opts.title}" already exists, skipping.`);
@@ -68,6 +71,10 @@ async function seedDemoProject(opts: { workspaceId: string; title: string; conte
       currentStage: "IDEA_RESEARCH",
     })
     .returning();
+
+  // Demo projects pick their presentation mode explicitly, the way a creator would in the wizard,
+  // so the seeded data shows all three modes running side by side (per the product spec's example).
+  await setPresentationMode(db, project.id, opts.presentationMode, "Seed Script");
 
   await logActivity(db, project.id, "SYSTEM", "PROJECT_CREATED", `Demo project "${opts.title}" seeded.`);
 
@@ -118,6 +125,7 @@ async function main() {
     workspaceId: workspace.id,
     title: "DEMO — ChatGPT vs Claude",
     contentType: "comparison",
+    presentationMode: "FACELESS",
     targetStage: "REFERENCES_ANALYSED",
   });
 
@@ -125,6 +133,7 @@ async function main() {
     workspaceId: workspace.id,
     title: "DEMO — Claude Editing Agent",
     contentType: "tutorial",
+    presentationMode: "FACE_LED",
     targetStage: "SCRIPT_APPROVED",
   });
 
@@ -132,6 +141,7 @@ async function main() {
     workspaceId: workspace.id,
     title: "DEMO — AI Video Generator Comparison",
     contentType: "comparison",
+    presentationMode: "HYBRID",
     targetStage: "ASSETS_REQUESTED",
   });
 

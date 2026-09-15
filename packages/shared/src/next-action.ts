@@ -18,6 +18,9 @@ export interface ProjectSignals {
   shotListItemCount: number;
   totalAssetCount: number;
   missingAssetCount: number;
+  /** 0 for a FACELESS project by construction - no A-roll shots are ever planned for one. */
+  arollShotCount: number;
+  missingArollShotCount: number;
   narrationUploaded: boolean;
   transcriptReady: boolean;
   editPlanReady: boolean;
@@ -127,16 +130,21 @@ export function resolveNextAction(
         return { kind: "run_agent", label: "Generate shot list", blocking: false, requiresApproval: false };
       }
       return { kind: "resolve_missing_assets", label: "Review shot list and asset requirements", blocking: true, requiresApproval: false };
-    case "ASSETS_REQUESTED":
-      if (s.missingAssetCount > 0) {
+    case "ASSETS_REQUESTED": {
+      const missingTotal = s.missingAssetCount + s.missingArollShotCount;
+      if (missingTotal > 0) {
+        const parts: string[] = [];
+        if (s.missingAssetCount > 0) parts.push(`${s.missingAssetCount} missing asset${s.missingAssetCount === 1 ? "" : "s"}`);
+        if (s.missingArollShotCount > 0) parts.push(`${s.missingArollShotCount} A-roll shot${s.missingArollShotCount === 1 ? "" : "s"} to film`);
         return {
           kind: "resolve_missing_assets",
-          label: `Record or generate ${s.missingAssetCount} missing asset${s.missingAssetCount === 1 ? "" : "s"}`,
+          label: `Record or generate ${parts.join(" and ")}`,
           blocking: true,
           requiresApproval: false,
         };
       }
       return { kind: "resolve_missing_assets", label: "Mark assets ready", blocking: true, requiresApproval: false };
+    }
     case "ASSETS_READY":
       if (!s.narrationUploaded) {
         return { kind: "upload_narration", label: "Upload narration recording", blocking: true, requiresApproval: false };

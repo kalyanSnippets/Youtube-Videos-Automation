@@ -4,17 +4,11 @@ import { revalidatePath } from "next/cache";
 import { eq } from "drizzle-orm";
 import { db, schema } from "@yaos/database";
 import { markAssetReady, transitionStage, logActivity } from "@yaos/agents";
+import { checkAndAdvanceToAssetsReady } from "@/lib/project-readiness";
 
 export async function markAssetReadyAction(assetId: string, projectId: string) {
   await markAssetReady(db, assetId, `local://uploaded/${assetId}`);
-
-  const [project] = await db.select().from(schema.projects).where(eq(schema.projects.id, projectId));
-  const assets = await db.select().from(schema.assets).where(eq(schema.assets.projectId, projectId));
-  const allReady = assets.length > 0 && assets.every((a) => a.status === "READY");
-
-  if (allReady && project?.currentStage === "ASSETS_REQUESTED") {
-    await transitionStage(db, projectId, "ASSETS_READY", "SYSTEM", "Next Action Engine", "All planned assets marked ready.");
-  }
+  await checkAndAdvanceToAssetsReady(projectId);
 
   revalidatePath(`/projects/${projectId}`);
   revalidatePath(`/projects/${projectId}/assets`);

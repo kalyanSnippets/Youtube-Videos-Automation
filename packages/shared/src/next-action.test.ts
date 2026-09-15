@@ -14,6 +14,8 @@ const baseSignals: ProjectSignals = {
   shotListItemCount: 0,
   totalAssetCount: 0,
   missingAssetCount: 0,
+  arollShotCount: 0,
+  missingArollShotCount: 0,
   narrationUploaded: false,
   transcriptReady: false,
   editPlanReady: false,
@@ -55,6 +57,13 @@ describe("next action engine", () => {
     const action = resolveNextAction("ASSETS_REQUESTED", "explainer", { ...baseSignals, missingAssetCount: 5 });
     expect(action.blocking).toBe(true);
     expect(action.label).toContain("5");
+  });
+
+  it("also surfaces missing A-roll shots for a HYBRID/FACE_LED project", () => {
+    const action = resolveNextAction("ASSETS_REQUESTED", "comparison", { ...baseSignals, missingAssetCount: 2, missingArollShotCount: 3 });
+    expect(action.blocking).toBe(true);
+    expect(action.label).toContain("2 missing asset");
+    expect(action.label).toContain("3 A-roll shot");
   });
 
   it("requires final render approval even when QA is clean", () => {

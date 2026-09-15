@@ -3,6 +3,7 @@ import { db, schema } from "@yaos/database";
 import { runCompetitorAnalysisAction, confirmReferencesAction } from "@/lib/actions/references";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { PresentationModeBadge } from "@/components/ui/stage-chip";
 
 export default async function ReferencesPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -51,8 +52,27 @@ export default async function ReferencesPage({ params }: { params: Promise<{ id:
                   <h3 className="font-medium text-sm">{ref.title}</h3>
                   <p className="text-xs text-text-faint">{ref.channelName}</p>
                 </div>
-                <Badge variant={ref.role === "MASTER_REFERENCE" ? "cyan" : "default"}>{ref.role.replace("_", " ")}</Badge>
+                <div className="flex items-center gap-2">
+                  <PresentationModeBadge mode={ref.presentationMode} />
+                  <Badge variant={ref.role === "MASTER_REFERENCE" ? "cyan" : "default"}>{ref.role.replace("_", " ")}</Badge>
+                </div>
               </div>
+              {ref.onCameraSegments && ref.onCameraSegments.length > 0 ? (
+                <div>
+                  <p className="text-xs text-text-dim mb-1.5">Where and why the face appears</p>
+                  <div className="space-y-1">
+                    {ref.onCameraSegments.map((seg, i) => (
+                      <p key={i} className="text-xs text-text-dim">
+                        <span className="font-mono text-text-faint">
+                          {Math.floor(seg.startSeconds / 60)}:{String(seg.startSeconds % 60).padStart(2, "0")}–
+                          {Math.floor(seg.endSeconds / 60)}:{String(seg.endSeconds % 60).padStart(2, "0")}
+                        </span>{" "}
+                        {seg.purpose}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <Field label="Title logic" value={ref.titleLogic} />
                 <Field label="Thumbnail logic" value={ref.thumbnailLogic} />

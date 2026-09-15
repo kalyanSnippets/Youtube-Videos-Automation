@@ -1,4 +1,5 @@
 import { eq } from "drizzle-orm";
+import Link from "next/link";
 import { db, schema } from "@yaos/database";
 import { markAssetReadyAction, uploadNarrationAction } from "@/lib/actions/assets";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +19,8 @@ export default async function AssetsPage({ params }: { params: Promise<{ id: str
   const assets = await db.select().from(schema.assets).where(eq(schema.assets.projectId, id));
   const missing = assets.filter((a) => a.status === "MISSING" || a.status === "NEEDS_RECAPTURE");
   const hasNarration = assets.some((a) => a.category === "narration" && a.status === "READY");
+  const arollShots = await db.select().from(schema.arollShots).where(eq(schema.arollShots.projectId, id));
+  const missingAroll = arollShots.filter((s) => s.status === "MISSING" || s.status === "NEEDS_RECAPTURE").length;
 
   async function uploadNarration() {
     "use server";
@@ -41,6 +44,21 @@ export default async function AssetsPage({ params }: { params: Promise<{ id: str
           </form>
         ) : null}
       </div>
+
+      {arollShots.length > 0 ? (
+        <Link href={`/projects/${id}/aroll`} className="block panel p-3.5 text-sm hover:border-accent-cyan/40 transition">
+          {missingAroll > 0 ? (
+            <span>
+              <Badge variant="warning">{missingAroll} A-roll shot{missingAroll === 1 ? "" : "s"} still to film</Badge>{" "}
+              <span className="text-text-dim">— see the A-Roll tab</span>
+            </span>
+          ) : (
+            <span className="text-text-dim">
+              <Badge variant="success">All A-roll shots filmed</Badge> — see the A-Roll tab
+            </span>
+          )}
+        </Link>
+      ) : null}
 
       {assets.length === 0 ? (
         <div className="panel p-10 text-center text-text-dim text-sm">No assets tracked yet - generate a production plan and shot list first.</div>

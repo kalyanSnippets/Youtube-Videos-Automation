@@ -1,13 +1,14 @@
 import { eq, and, isNull, desc } from "drizzle-orm";
 import { db, schema } from "@yaos/database";
 import { computeProjectSignals } from "@yaos/agents";
-import { calculateProgress, calculateTrustCoverage, resolveNextAction, type Stage } from "@yaos/shared";
+import { calculateProgress, calculateTrustCoverage, resolveNextAction, type PresentationMode, type Stage } from "@yaos/shared";
 
 export interface ProjectSummary {
   id: string;
   title: string;
   slug: string;
   contentType: string;
+  presentationMode: PresentationMode;
   currentStage: Stage;
   progress: number;
   nextActionLabel: string;
@@ -47,6 +48,7 @@ export async function getProjectSummaries(workspaceId: string, includeArchived =
       title: project.title,
       slug: project.slug,
       contentType: project.contentType,
+      presentationMode: project.presentationMode,
       currentStage: project.currentStage,
       progress,
       nextActionLabel: nextAction.label,

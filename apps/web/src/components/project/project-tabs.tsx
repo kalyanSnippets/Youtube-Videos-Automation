@@ -12,6 +12,7 @@ const TABS = [
   { key: "methodology", label: "Methodology" },
   { key: "script", label: "Script" },
   { key: "production", label: "Production Script" },
+  { key: "aroll", label: "A-Roll" },
   { key: "shot-list", label: "Shot List" },
   { key: "assets", label: "Assets" },
   { key: "transcript", label: "Transcript" },

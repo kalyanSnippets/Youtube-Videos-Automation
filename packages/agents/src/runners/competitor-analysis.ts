@@ -45,6 +45,8 @@ export async function runCompetitorAnalysis({ db, projectId, topic, preferredPro
     title: r.title,
     channelName: r.channelName,
     role: r.role,
+    presentationMode: r.presentationMode,
+    onCameraSegments: r.onCameraSegments,
     titleLogic: r.titleLogic,
     thumbnailLogic: r.thumbnailLogic,
     hookAnalysis: r.hookAnalysis,

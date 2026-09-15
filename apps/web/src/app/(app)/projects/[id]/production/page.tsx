@@ -3,6 +3,17 @@ import { db, schema } from "@yaos/database";
 import { runProductionDirectorAction } from "@/lib/actions/production";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { SEGMENT_TYPE_LABELS } from "@yaos/shared";
+
+const SEGMENT_VARIANTS: Record<string, "purple" | "cyan" | "default" | "warning"> = {
+  ON_CAMERA: "purple",
+  VOICEOVER: "default",
+  SCREEN_RECORDING: "cyan",
+  PRODUCT_RESULT: "cyan",
+  B_ROLL: "default",
+  MOTION_GRAPHIC: "warning",
+  SCREENSHOT: "default",
+};
 
 export default async function ProductionPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -38,6 +49,7 @@ export default async function ProductionPage({ params }: { params: Promise<{ id:
               <div className="flex items-center justify-between">
                 <h3 className="font-medium text-sm">Scene {scene.sceneNumber}</h3>
                 <div className="flex items-center gap-2">
+                  <Badge variant={SEGMENT_VARIANTS[scene.segmentType] ?? "default"}>{SEGMENT_TYPE_LABELS[scene.segmentType]}</Badge>
                   <Badge variant="purple">{scene.motionComponent}</Badge>
                   <Badge variant={scene.motionIntensity === "HIGH" ? "danger" : scene.motionIntensity === "MEDIUM" ? "warning" : "default"}>
                     {scene.motionIntensity}
@@ -58,6 +70,9 @@ export default async function ProductionPage({ params }: { params: Promise<{ id:
                 {scene.privacyWarnings ? <Field label="Privacy warnings" value={scene.privacyWarnings} /> : null}
                 <Field label="On-screen text" value={scene.onScreenText} />
                 <Field label="Transition / SFX" value={`${scene.transition ?? "—"} / ${scene.sfx ?? "—"}`} />
+                {scene.pictureInPictureLayout ? <Field label="Picture-in-picture" value={scene.pictureInPictureLayout.replace(/_/g, " ")} /> : null}
+                {scene.screenInsertInterrupts ? <Field label="Editing note" value="Interrupts the preceding on-camera shot rather than following it." /> : null}
+                {scene.punchIn ? <Field label="Editing note" value="Punch in on the creator's face for emphasis rather than cutting away." /> : null}
                 <Field label="Fallback if missing" value={scene.fallbackIfAssetMissing} />
               </div>
             </div>

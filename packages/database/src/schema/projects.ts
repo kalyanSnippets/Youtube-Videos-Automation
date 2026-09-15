@@ -1,6 +1,6 @@
 import { boolean, integer, jsonb, pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 import { workspaces } from "./core";
-import { actorTypeEnum, contentTypeEnum, stageEnum } from "./enums";
+import { actorTypeEnum, contentTypeEnum, presentationModeEnum, stageEnum } from "./enums";
 
 export const projects = pgTable("projects", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -15,7 +15,9 @@ export const projects = pgTable("projects", {
   language: varchar("language", { length: 20 }).notNull().default("en"),
   budgetTier: varchar("budget_tier", { length: 50 }).notNull().default("low_free_first"),
   evergreenOrTrend: varchar("evergreen_or_trend", { length: 20 }).notNull().default("evergreen"),
-  faceMode: varchar("face_mode", { length: 20 }).notNull().default("faceless"),
+  /** Configurable per project - never hard-coded to faceless. See packages/shared's PRESENTATION_MODES. */
+  presentationMode: presentationModeEnum("presentation_mode").notNull().default("HYBRID"),
+  presentationModeIsRecommended: boolean("presentation_mode_is_recommended").notNull().default(true),
   researchDepth: varchar("research_depth", { length: 20 }).notNull().default("standard"),
   currentStage: stageEnum("current_stage").notNull().default("IDEA_RESEARCH"),
   selectedIdeaId: uuid("selected_idea_id"),

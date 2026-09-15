@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { eq } from "drizzle-orm";
 import { db, schema } from "@yaos/database";
 import { runIdeaResearch } from "@yaos/agents";
-import type { ContentType } from "@yaos/shared";
+import { recommendPresentationMode, type ContentType, type PresentationMode } from "@yaos/shared";
 import { getCurrentUser } from "@/lib/auth";
 
 function slugify(title: string): string {
@@ -26,8 +26,15 @@ export async function createProject(formData: FormData) {
   const language = String(formData.get("language") ?? "en");
   const budgetTier = String(formData.get("budgetTier") ?? "low_free_first");
   const evergreenOrTrend = String(formData.get("evergreenOrTrend") ?? "evergreen");
-  const faceMode = String(formData.get("faceMode") ?? "faceless");
   const researchDepth = String(formData.get("researchDepth") ?? "standard");
+
+  // Empty selection means "use the recommendation for this content type" - the creator can
+  // always override later from the Overview tab, and doing so clears presentationModeIsRecommended.
+  const presentationModeChoice = String(formData.get("presentationMode") ?? "");
+  const presentationModeIsRecommended = presentationModeChoice === "";
+  const presentationMode: PresentationMode = presentationModeIsRecommended
+    ? recommendPresentationMode(contentType)
+    : (presentationModeChoice as PresentationMode);
 
   const title = seedIdea || `Untitled ${contentType} video`;
 
@@ -44,7 +51,8 @@ export async function createProject(formData: FormData) {
       language,
       budgetTier,
       evergreenOrTrend,
-      faceMode,
+      presentationMode,
+      presentationModeIsRecommended,
       researchDepth,
       currentStage: "IDEA_RESEARCH",
     })

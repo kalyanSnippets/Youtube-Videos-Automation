@@ -1,6 +1,6 @@
 import { boolean, integer, jsonb, pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 import { projects } from "./projects";
-import { referenceRoleEnum } from "./enums";
+import { presentationModeEnum, referenceRoleEnum } from "./enums";
 
 export const videoIdeas = pgTable("video_ideas", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -22,6 +22,8 @@ export const videoIdeas = pgTable("video_ideas", {
   sponsorFit: integer("sponsor_fit").notNull().default(0),
   proofRequirements: jsonb("proof_requirements").$type<string[]>().default([]),
   overallScore: integer("overall_score").notNull().default(0),
+  /** A recommendation only - the creator can override it per project at selection time or later in Settings. */
+  recommendedPresentationMode: presentationModeEnum("recommended_presentation_mode").notNull().default("HYBRID"),
   rank: integer("rank"),
   isSelected: boolean("is_selected").notNull().default(false),
   sourceProvider: varchar("source_provider", { length: 50 }).notNull().default("MOCK"),
@@ -38,6 +40,10 @@ export const referenceVideos = pgTable("reference_videos", {
   title: varchar("title", { length: 300 }).notNull(),
   channelName: varchar("channel_name", { length: 200 }),
   role: referenceRoleEnum("role").notNull().default("SUPPORTING"),
+  /** Observed presentation mode of the reference video itself - informs, but never dictates, this project's own mode. */
+  presentationMode: presentationModeEnum("presentation_mode").notNull().default("HYBRID"),
+  /** Reverse-engineered timeline of where and why the face appears, e.g. [{startSeconds:0,endSeconds:12,purpose:"personal hook"}]. Empty for a faceless reference. */
+  onCameraSegments: jsonb("on_camera_segments").$type<{ startSeconds: number; endSeconds: number; purpose: string }[]>().default([]),
   titleLogic: text("title_logic"),
   thumbnailLogic: text("thumbnail_logic"),
   hookAnalysis: text("hook_analysis"),
