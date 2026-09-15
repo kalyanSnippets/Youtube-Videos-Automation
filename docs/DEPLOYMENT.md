@@ -58,6 +58,51 @@ NEXT_PUBLIC_SUPABASE_URL=...
 NEXT_PUBLIC_SUPABASE_ANON_KEY=...
 ```
 
+### Deploying to Netlify
+
+`netlify.toml` at the repo root already configures this monorepo for Netlify — no dashboard
+build-settings overrides needed:
+
+```toml
+[build]
+  command = "pnpm --filter @yaos/web build"
+  publish = "apps/web/.next"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+```
+
+`@netlify/plugin-nextjs` (pinned in `apps/web/package.json`'s `devDependencies`) is Netlify's
+official adapter — it translates the Next.js build output (including server actions and dynamic
+routes, both of which this app relies on) into Netlify Functions, so the app is not limited to a
+static export.
+
+1. [Add a new site from Git](https://app.netlify.com/start) in the Netlify dashboard and pick this
+   repo. Leave **Base directory** empty — `netlify.toml` at the repo root already points the build
+   at `apps/web` via the `command`/`publish` paths, and Netlify needs the repo root to see the
+   pnpm workspace (`pnpm-lock.yaml`, `pnpm-workspace.yaml`) so it installs once for every package.
+   Netlify detects `pnpm-lock.yaml` automatically and runs `pnpm install` before `build.command`.
+2. Add the environment variables below in **Site configuration → Environment variables**.
+3. Provision a Postgres database reachable at deploy time — e.g. [Neon](https://neon.tech) or
+   [Supabase](https://supabase.com) (Netlify doesn't offer a managed Postgres of its own).
+4. Run the schema migration against that database **once**, from your own machine (Netlify's build
+   doesn't run migrations automatically):
+   ```bash
+   DATABASE_URL=<your production connection string> pnpm db:migrate
+   DATABASE_URL=<your production connection string> pnpm db:seed   # optional: demo data + dev owner
+   ```
+5. Deploy. Netlify gives you a `https://<site-name>.netlify.app` URL once the build finishes.
+
+Re-run step 4 (`pnpm db:migrate`) against production after any future change to
+`packages/database/src/schema/*` and a fresh `pnpm db:generate`.
+
+Deploying from the CLI instead of linking a Git repo works the same way once authenticated
+(`netlify login`, then `netlify deploy --build --prod` from the repo root) — `netlify.toml` drives
+the build either way.
+
 Build and run:
 
 ```bash
