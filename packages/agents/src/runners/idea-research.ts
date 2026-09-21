@@ -28,6 +28,9 @@ export async function runIdeaResearch({ db, projectId, topic, preferredProvider 
     preferredProvider,
     userPrompt: `Research 20-30 video ideas for the topic/seed: "${topic}".${researchContext}`,
     inputSummary: `topic="${topic}"`,
+    // 20-30 fully detailed idea objects is the single largest structured output in the app -
+    // the 8192 default has been observed truncating mid-response for this agent specifically.
+    maxOutputTokens: 16000,
     build: (rawText, providerId) => {
       if (providerId === "MOCK") return { ideas: mockIdeaCandidates(topic) };
       return parseJsonLoose(rawText) as { ideas: IdeaCandidate[] };

@@ -15,5 +15,13 @@ For every idea return: workingTitle, hook, referenceCreator, referenceVideoUrl (
 scores 0-100 for trendScore, evergreenScore, clickPotential, evidenceStrength, novelty, productionDifficulty, sponsorFit,
 plus proofRequirements (what would need to be verified or captured to make claims in this video credible) and an
 overallScore synthesizing all of the above. Do not fabricate a specific reference video URL you are not confident exists;
-omit it instead. Output strictly the IdeaResearchOutput JSON schema you are given - no prose outside the JSON.`,
+omit it instead.
+
+Also return recommendedPresentationMode for every idea, as exactly one of these three literal string values (no others
+are valid):
+- "FACE_LED": creator appears on camera through most of the video - talking-head hook, explanation, reactions, verdict.
+- "HYBRID": creator appears where human presence adds trust or personality; screen recordings and graphics carry the rest.
+- "FACELESS": no on-camera footage required - narration, screen recordings, product outputs, and graphics carry the video.
+
+Output strictly the IdeaResearchOutput JSON schema you are given - no prose outside the JSON.`,
 };
