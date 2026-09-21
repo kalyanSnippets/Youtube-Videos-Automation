@@ -110,9 +110,9 @@ information-first layout per the product's "premium production dashboard" brief.
 
 ## Auth
 
-Supabase Auth via `@supabase/ssr` when `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-are set. Every table that's user/workspace-scoped carries `workspace_id`, and `workspaces.owner_user_id`
-points at `users.id`, so multi-user workspaces are a schema-level given even though the product
-currently only exposes a single owner. Without Supabase configured, the app runs in a local
-single-owner dev mode (`apps/web/src/lib/auth.ts`) against a seeded dev owner account — this is
-surfaced in the UI, never silently treated as a real session.
+There is no sign-in flow — this is a single-owner tool. `apps/web/src/lib/auth.ts`'s
+`getCurrentUser()` auto-provisions the owner user and workspace on first access (via
+`seedBaseline()` in `packages/database/src/seed/index.ts`), so the dashboard is usable
+immediately with no login step. Every table that's user/workspace-scoped still carries
+`workspace_id`, and `workspaces.owner_user_id` points at `users.id`, so multi-user workspaces
+remain a schema-level given even though the product only exposes a single owner today.

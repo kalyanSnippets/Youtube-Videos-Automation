@@ -2,7 +2,6 @@ import Link from "next/link";
 import { Plus } from "lucide-react";
 import { getAllProviders } from "@yaos/ai-providers";
 import { Badge } from "./ui/badge";
-import { signOut } from "@/lib/actions/auth";
 import type { CurrentUser } from "@/lib/auth";
 
 export function Topbar({ user }: { user: CurrentUser }) {
@@ -16,7 +15,6 @@ export function Topbar({ user }: { user: CurrentUser }) {
         ) : (
           <Badge variant="success">LIVE PROVIDERS CONNECTED</Badge>
         )}
-        {user.isDevMode ? <Badge variant="default">Local dev owner</Badge> : null}
       </div>
       <div className="flex items-center gap-3">
         <Link
@@ -27,11 +25,6 @@ export function Topbar({ user }: { user: CurrentUser }) {
           Start New Video
         </Link>
         <div className="text-sm text-text-dim">{user.email}</div>
-        {!user.isDevMode ? (
-          <form action={signOut}>
-            <button className="text-xs text-text-dim hover:text-text">Sign out</button>
-          </form>
-        ) : null}
       </div>
     </header>
   );

@@ -2,9 +2,8 @@
 
 ## Database
 
-Any managed Postgres works (Supabase, RDS, Neon, Fly Postgres, Netlify DB, ...). This project
-was built against Supabase in mind (the spec calls for Supabase Auth + Postgres), but nothing in
-`packages/database` is Supabase-specific beyond the connection string.
+Any managed Postgres works (Supabase, RDS, Neon, Fly Postgres, Netlify DB, ...) — nothing in
+`packages/database` is provider-specific beyond the connection string.
 
 `packages/database/src/client.ts` resolves its connection string in this order:
 `NETLIFY_DB_URL` (auto-injected by Netlify — see "Deploying to Netlify" below) → `DATABASE_URL`
@@ -12,9 +11,9 @@ was built against Supabase in mind (the spec calls for Supabase Auth + Postgres)
 
 1. Provision a Postgres instance, get its connection string.
 2. `DATABASE_URL=<connection string> pnpm db:migrate` from a machine with network access to it.
-3. Optionally `pnpm db:seed` for a fresh environment's demo data (skip in a real production
-   workspace — it seeds a `owner@local.dev` dev account, which is meant for local development
-   only when Supabase Auth isn't configured).
+3. Optionally `pnpm db:seed` for a fresh environment's demo data. Note the app itself
+   auto-provisions its single owner user + workspace on first request regardless (see
+   `docs/ARCHITECTURE.md`'s Auth section) — `db:seed` only adds the 3 demo projects on top.
 
 ## Web app
 
@@ -53,13 +52,11 @@ Required environment variables:
 DATABASE_URL=postgresql://...
 ```
 
-Optional (enables real agent runs / real auth instead of MOCK / local dev mode):
+Optional (enables real agent runs instead of MOCK):
 
 ```
 OPENAI_API_KEY=...
 ANTHROPIC_API_KEY=...
-NEXT_PUBLIC_SUPABASE_URL=...
-NEXT_PUBLIC_SUPABASE_ANON_KEY=...
 ```
 
 ### Deploying to Netlify
@@ -148,10 +145,7 @@ pnpm start
 
 - `OPENAI_API_KEY` / `ANTHROPIC_API_KEY` are read server-side only (`packages/ai-providers`) —
   never exposed to the client bundle.
-- `DATABASE_URL` is read server-side only (`packages/database/src/client.ts`).
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY` is, by Supabase's own design, safe to expose client-side (it's
-  the public anon key, not a service-role key) — never put a Supabase **service-role** key in a
-  `NEXT_PUBLIC_*` variable.
+- `DATABASE_URL` / `NETLIFY_DB_URL` are read server-side only (`packages/database/src/client.ts`).
 
 ## Local worker (Phase 5, planned)
 
@@ -165,7 +159,5 @@ network rather than talking to Postgres directly.
 - `pnpm build` succeeds with zero type errors (`pnpm typecheck` is part of `next build`'s type
   check step).
 - `pnpm db:migrate` has been run against the target database.
-- A real owner has signed in via Supabase Auth (or, for an internal/demo deployment, dev mode is
-  acceptable but should say so — see the sign-in page's own messaging).
 - Settings → Integrations accurately reflects what's actually connected; nothing shows
   `CONNECTED` that isn't.

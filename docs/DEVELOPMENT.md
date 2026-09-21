@@ -16,8 +16,8 @@ echo "DATABASE_URL=$DATABASE_URL" > apps/web/.env.local
 pnpm dev           # http://localhost:3000
 ```
 
-Sign in via "Continue as Dev Owner" (Supabase isn't configured by default — see
-`docs/ARCHITECTURE.md`'s Auth section).
+No sign-in step — the app lands straight on the dashboard, auto-provisioning the owner user and
+workspace on first request (see `docs/ARCHITECTURE.md`'s Auth section).
 
 ## Adding a new agent runner
 

@@ -78,13 +78,6 @@ OPENAI_API_KEY=...
 ANTHROPIC_API_KEY=...
 ```
 
-Optional (enables real Supabase Auth instead of local single-owner dev mode):
-
-```
-NEXT_PUBLIC_SUPABASE_URL=...
-NEXT_PUBLIC_SUPABASE_ANON_KEY=...
-```
-
 ## Run
 
 ```bash
@@ -93,8 +86,8 @@ pnpm build    # production build of apps/web
 pnpm start    # serve the production build
 ```
 
-Without a Supabase project configured, the sign-in page offers "Continue as Dev Owner",
-which uses the single seeded owner account — the UI clearly labels this as local dev mode.
+There's no sign-in step — it's a single-owner tool, so the app lands straight on the dashboard,
+auto-provisioning the owner user and workspace on first request.
 
 ## Test / typecheck / lint
 
