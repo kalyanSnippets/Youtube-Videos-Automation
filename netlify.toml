@@ -3,7 +3,12 @@
   publish = "apps/web/.next"
 
 [build.environment]
-  NODE_VERSION = "20"
+  NODE_VERSION = "22"
+  # NEXT_PUBLIC_* vars are inlined into client-reachable bundles by design (Next.js's own
+  # convention) and Supabase's anon key is explicitly meant to be public (access is gated by
+  # RLS, not by keeping this key secret) - Netlify's generic secret scanner otherwise flags
+  # their presence in the built middleware bundle as a false positive and fails the build.
+  SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
