@@ -8,6 +8,15 @@ import { parseJsonLoose } from "../parse-json";
 import { runAgent, logActivity } from "../run-agent";
 import { buildWebSearchContext } from "../research-context";
 
+function isValidUrl(value: string): boolean {
+  try {
+    new URL(value);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export interface RunIdeaResearchInput {
   db: Database;
   projectId: string;
@@ -33,7 +42,16 @@ export async function runIdeaResearch({ db, projectId, topic, preferredProvider 
     maxOutputTokens: 16000,
     build: (rawText, providerId) => {
       if (providerId === "MOCK") return { ideas: mockIdeaCandidates(topic) };
-      return parseJsonLoose(rawText) as { ideas: IdeaCandidate[] };
+      const parsed = parseJsonLoose(rawText) as { ideas: IdeaCandidate[] };
+      // Despite being told to omit referenceVideoUrl when unsure, real providers sometimes
+      // fill it with a non-URL placeholder instead of leaving it out - drop anything that
+      // isn't an actual URL rather than fail validation over a field the schema treats as optional.
+      for (const idea of parsed.ideas) {
+        if (idea.referenceVideoUrl && !isValidUrl(idea.referenceVideoUrl)) {
+          delete idea.referenceVideoUrl;
+        }
+      }
+      return parsed;
     },
     validate: (value) => {
       const result = safeValidate(IdeaResearchOutputSchema, value);

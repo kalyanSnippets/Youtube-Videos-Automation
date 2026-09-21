@@ -29,38 +29,45 @@ export async function getProjectSummaries(workspaceId: string, includeArchived =
     .where(includeArchived ? eq(schema.projects.workspaceId, workspaceId) : and(eq(schema.projects.workspaceId, workspaceId), isNull(schema.projects.archivedAt)))
     .orderBy(desc(schema.projects.updatedAt));
 
-  const summaries: ProjectSummary[] = [];
-  for (const project of projects) {
-    const signals = await computeProjectSignals(db, project.id);
-    const progress = calculateProgress(project.currentStage, project.contentType);
-    const nextAction = resolveNextAction(project.currentStage, project.contentType, signals);
-    const claims = await db.select().from(schema.claims).where(eq(schema.claims.projectId, project.id));
-    const trustCoveragePercent = calculateTrustCoverage(claims);
-    const [lastActivity] = await db
-      .select()
-      .from(schema.projectActivity)
-      .where(eq(schema.projectActivity.projectId, project.id))
-      .orderBy(desc(schema.projectActivity.createdAt))
-      .limit(1);
+  // Every project's signals/claims/last-activity are independent of every other project's, and of
+  // nothing else in this function, so compute all projects concurrently rather than one at a time -
+  // this was previously a fully sequential loop and the dominant source of page latency for any
+  // workspace with more than one or two projects.
+  const summaries = await Promise.all(
+    projects.map(async (project) => {
+      const [signals, claims, [lastActivity]] = await Promise.all([
+        computeProjectSignals(db, project.id),
+        db.select().from(schema.claims).where(eq(schema.claims.projectId, project.id)),
+        db
+          .select()
+          .from(schema.projectActivity)
+          .where(eq(schema.projectActivity.projectId, project.id))
+          .orderBy(desc(schema.projectActivity.createdAt))
+          .limit(1),
+      ]);
+      const progress = calculateProgress(project.currentStage, project.contentType);
+      const nextAction = resolveNextAction(project.currentStage, project.contentType, signals);
+      const trustCoveragePercent = calculateTrustCoverage(claims);
 
-    summaries.push({
-      id: project.id,
-      title: project.title,
-      slug: project.slug,
-      contentType: project.contentType,
-      presentationMode: project.presentationMode,
-      currentStage: project.currentStage,
-      progress,
-      nextActionLabel: nextAction.label,
-      isBlocked: nextAction.blocking,
-      requiresApproval: nextAction.requiresApproval,
-      missingAssetCount: signals.missingAssetCount,
-      trustCoveragePercent,
-      isDemo: project.isDemo,
-      updatedAt: project.updatedAt,
-      lastActivitySummary: lastActivity?.summary ?? null,
-      lastActivityAt: lastActivity?.createdAt ?? null,
-    });
-  }
+      return {
+        id: project.id,
+        title: project.title,
+        slug: project.slug,
+        contentType: project.contentType,
+        presentationMode: project.presentationMode,
+        currentStage: project.currentStage,
+        progress,
+        nextActionLabel: nextAction.label,
+        isBlocked: nextAction.blocking,
+        requiresApproval: nextAction.requiresApproval,
+        missingAssetCount: signals.missingAssetCount,
+        trustCoveragePercent,
+        isDemo: project.isDemo,
+        updatedAt: project.updatedAt,
+        lastActivitySummary: lastActivity?.summary ?? null,
+        lastActivityAt: lastActivity?.createdAt ?? null,
+      };
+    }),
+  );
   return summaries;
 }

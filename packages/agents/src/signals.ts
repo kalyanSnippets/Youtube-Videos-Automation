@@ -14,24 +14,48 @@ export async function computeProjectSignals(db: Database, projectId: string): Pr
   const [project] = await db.select().from(schema.projects).where(eq(schema.projects.id, projectId));
   if (!project) throw new Error(`Project ${projectId} not found`);
 
-  const ideas = await db.select().from(schema.videoIdeas).where(eq(schema.videoIdeas.projectId, projectId));
-  const references = await db.select().from(schema.referenceVideos).where(eq(schema.referenceVideos.projectId, projectId));
-  const claims = await db.select().from(schema.claims).where(eq(schema.claims.projectId, projectId));
-  const [methodology] = await db.select().from(schema.methodologies).where(eq(schema.methodologies.projectId, projectId));
-  const scripts = await db.select().from(schema.scripts).where(eq(schema.scripts.projectId, projectId));
-  const productionScenes = await db.select().from(schema.productionScenes).where(eq(schema.productionScenes.projectId, projectId));
-  const shotListItems = await db.select().from(schema.shotListItems).where(eq(schema.shotListItems.projectId, projectId));
-  const assets = await db.select().from(schema.assets).where(eq(schema.assets.projectId, projectId));
+  // Every table here is keyed by projectId (or, for localWorkers, workspaceId) and none of these
+  // reads depend on each other's results, so they run concurrently instead of one round trip at a
+  // time - sequential awaits here were the single biggest source of page latency in the app, since
+  // this function runs once per project shown on the dashboard/projects list.
+  const [
+    ideas,
+    references,
+    claims,
+    [methodology],
+    scripts,
+    productionScenes,
+    shotListItems,
+    assets,
+    arollShots,
+    transcripts,
+    editPlanScenes,
+    localWorkers,
+    roughRenders,
+    finalRenders,
+    qaIssues,
+    [publishPackage],
+    analyticsSnapshots,
+  ] = await Promise.all([
+    db.select().from(schema.videoIdeas).where(eq(schema.videoIdeas.projectId, projectId)),
+    db.select().from(schema.referenceVideos).where(eq(schema.referenceVideos.projectId, projectId)),
+    db.select().from(schema.claims).where(eq(schema.claims.projectId, projectId)),
+    db.select().from(schema.methodologies).where(eq(schema.methodologies.projectId, projectId)),
+    db.select().from(schema.scripts).where(eq(schema.scripts.projectId, projectId)),
+    db.select().from(schema.productionScenes).where(eq(schema.productionScenes.projectId, projectId)),
+    db.select().from(schema.shotListItems).where(eq(schema.shotListItems.projectId, projectId)),
+    db.select().from(schema.assets).where(eq(schema.assets.projectId, projectId)),
+    db.select().from(schema.arollShots).where(eq(schema.arollShots.projectId, projectId)),
+    db.select().from(schema.transcripts).where(eq(schema.transcripts.projectId, projectId)),
+    db.select().from(schema.editPlanScenes).where(eq(schema.editPlanScenes.projectId, projectId)),
+    db.select().from(schema.localWorkerNodes).where(eq(schema.localWorkerNodes.workspaceId, project.workspaceId)),
+    db.select().from(schema.renderJobs).where(and(eq(schema.renderJobs.projectId, projectId), eq(schema.renderJobs.renderType, "ROUGH"))),
+    db.select().from(schema.renderJobs).where(and(eq(schema.renderJobs.projectId, projectId), eq(schema.renderJobs.renderType, "FINAL"))),
+    db.select().from(schema.qaIssues).where(eq(schema.qaIssues.projectId, projectId)),
+    db.select().from(schema.publishPackages).where(eq(schema.publishPackages.projectId, projectId)),
+    db.select().from(schema.analyticsSnapshots).where(eq(schema.analyticsSnapshots.projectId, projectId)),
+  ]);
   const narrationAssets = assets.filter((a) => a.category === "narration" || a.subject === "narration");
-  const arollShots = await db.select().from(schema.arollShots).where(eq(schema.arollShots.projectId, projectId));
-  const transcripts = await db.select().from(schema.transcripts).where(eq(schema.transcripts.projectId, projectId));
-  const editPlanScenes = await db.select().from(schema.editPlanScenes).where(eq(schema.editPlanScenes.projectId, projectId));
-  const localWorkers = await db.select().from(schema.localWorkerNodes).where(eq(schema.localWorkerNodes.workspaceId, project.workspaceId));
-  const roughRenders = await db.select().from(schema.renderJobs).where(and(eq(schema.renderJobs.projectId, projectId), eq(schema.renderJobs.renderType, "ROUGH")));
-  const finalRenders = await db.select().from(schema.renderJobs).where(and(eq(schema.renderJobs.projectId, projectId), eq(schema.renderJobs.renderType, "FINAL")));
-  const qaIssues = await db.select().from(schema.qaIssues).where(eq(schema.qaIssues.projectId, projectId));
-  const [publishPackage] = await db.select().from(schema.publishPackages).where(eq(schema.publishPackages.projectId, projectId));
-  const analyticsSnapshots = await db.select().from(schema.analyticsSnapshots).where(eq(schema.analyticsSnapshots.projectId, projectId));
 
   function mapRenderStatus(status?: string): "none" | "queued" | "running" | "completed" | "failed" {
     if (!status) return "none";
