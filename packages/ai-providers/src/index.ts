@@ -14,12 +14,21 @@ const providers: Record<AIProviderId, AIProvider> = {
   ANTHROPIC: new AnthropicProvider(),
 };
 
-/** Resolve the provider to use: the requested one if configured, otherwise MOCK (never silently fabricate under a real provider's name). */
+/**
+ * Resolve the provider to use: the requested one if configured; otherwise the first
+ * configured real provider (Anthropic, then OpenAI); otherwise MOCK. A configured API
+ * key is meant to be used automatically - nothing in the app lets a user pick a
+ * "preferred provider" per call, so defaulting to MOCK whenever one isn't explicitly
+ * requested would silently ignore a real key. MOCK is the true no-op fallback, only
+ * reached when no real provider is configured at all.
+ */
 export function resolveAIProvider(preferred?: AIProviderId): AIProvider {
   if (preferred && providers[preferred].isAvailable()) {
     return providers[preferred];
   }
-  return providers.MOCK;
+  const fallbackOrder: AIProviderId[] = ["ANTHROPIC", "OPENAI"];
+  const firstAvailable = fallbackOrder.find((id) => providers[id].isAvailable());
+  return firstAvailable ? providers[firstAvailable] : providers.MOCK;
 }
 
 export function getAllProviders(): AIProvider[] {
