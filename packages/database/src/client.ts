@@ -2,7 +2,13 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import * as schema from "./schema/index";
 
-const connectionString = process.env.DATABASE_URL ?? "postgresql://yaos:yaos_dev_password@localhost:5432/yaos_dev";
+// NETLIFY_DB_URL is auto-provisioned and injected by Netlify's build pipeline once
+// @netlify/database is a dependency of the deployed app (apps/web) - see docs/DEPLOYMENT.md.
+// DATABASE_URL remains the override for local dev or any non-Netlify host (Supabase, Neon, ...).
+const connectionString =
+  process.env.NETLIFY_DB_URL ??
+  process.env.DATABASE_URL ??
+  "postgresql://yaos:yaos_dev_password@localhost:5432/yaos_dev";
 
 const isLocalConnection = /(^|@)(localhost|127\.0\.0\.1)(:|\/)/.test(connectionString);
 

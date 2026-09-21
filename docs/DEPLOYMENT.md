@@ -2,9 +2,13 @@
 
 ## Database
 
-Any managed Postgres works (Supabase, RDS, Neon, Fly Postgres, ...). This project was built
-against Supabase in mind (the spec calls for Supabase Auth + Postgres), but nothing in
+Any managed Postgres works (Supabase, RDS, Neon, Fly Postgres, Netlify DB, ...). This project
+was built against Supabase in mind (the spec calls for Supabase Auth + Postgres), but nothing in
 `packages/database` is Supabase-specific beyond the connection string.
+
+`packages/database/src/client.ts` resolves its connection string in this order:
+`NETLIFY_DB_URL` (auto-injected by Netlify — see "Deploying to Netlify" below) → `DATABASE_URL`
+(any other provider, or local dev) → a local-dev default. Only one needs to be set.
 
 1. Provision a Postgres instance, get its connection string.
 2. `DATABASE_URL=<connection string> pnpm db:migrate` from a machine with network access to it.
@@ -80,20 +84,49 @@ official adapter — it translates the Next.js build output (including server ac
 routes, both of which this app relies on) into Netlify Functions, so the app is not limited to a
 static export.
 
+### Database: Netlify DB (recommended) vs. an external Postgres
+
+`apps/web/package.json` lists `@netlify/database` as a dependency. Netlify's build pipeline
+detects that automatically and, on accounts where the feature is enabled, provisions a managed
+Postgres database for the site with no dashboard steps at all — it injects the connection string
+as `NETLIFY_DB_URL`, which `packages/database/src/client.ts` reads with top priority (see above).
+Watch the deploy log for a **"Netlify Database setup"** step to confirm this ran; if it's absent,
+the feature isn't enabled for your account/site and you need an external Postgres instead (see
+below).
+
+Schema migrations for Netlify DB live in `netlify/database/migrations/` at the repo root — a
+flat copy of the same SQL files generated into `packages/database/drizzle/` by `pnpm db:generate`
+(Netlify's own build step only reads the former location, Drizzle's tooling only reads/writes the
+latter, so **after generating a new migration, copy the new `.sql` file into both places**).
+Netlify's build pipeline copies these into an internal directory during the build; whether it
+also executes them against the live database automatically is not fully documented, so treat the
+manual path below as the reliable fallback regardless — once `NETLIFY_DB_URL` exists (check
+Site configuration → Environment variables after your first deploy with the dependency present),
+run:
+```bash
+DATABASE_URL=<the NETLIFY_DB_URL value from the dashboard> pnpm db:migrate
+DATABASE_URL=<the NETLIFY_DB_URL value from the dashboard> pnpm db:seed   # optional: demo data
+```
+
+If Netlify DB isn't available for your account, use any other Postgres provider instead — e.g.
+[Neon](https://neon.tech) or [Supabase](https://supabase.com) — and set `DATABASE_URL` (not
+`NETLIFY_DB_URL`) as a site environment variable:
+
 1. [Add a new site from Git](https://app.netlify.com/start) in the Netlify dashboard and pick this
    repo. Leave **Base directory** empty — `netlify.toml` at the repo root already points the build
    at `apps/web` via the `command`/`publish` paths, and Netlify needs the repo root to see the
    pnpm workspace (`pnpm-lock.yaml`, `pnpm-workspace.yaml`) so it installs once for every package.
    Netlify detects `pnpm-lock.yaml` automatically and runs `pnpm install` before `build.command`.
 2. Add the environment variables below in **Site configuration → Environment variables**.
-3. Provision a Postgres database reachable at deploy time — e.g. [Neon](https://neon.tech) or
-   [Supabase](https://supabase.com) (Netlify doesn't offer a managed Postgres of its own).
+3. Provision a Postgres database reachable at deploy time.
 4. Run the schema migration against that database **once**, from your own machine (Netlify's build
-   doesn't run migrations automatically):
+   doesn't run migrations automatically for a `DATABASE_URL`-based external Postgres):
    ```bash
    DATABASE_URL=<your production connection string> pnpm db:migrate
    DATABASE_URL=<your production connection string> pnpm db:seed   # optional: demo data + dev owner
    ```
+   The connection string must request SSL for any hosted provider (Supabase, Neon, RDS, ...) —
+   `client.ts` enables it automatically for any non-`localhost` host.
 5. Deploy. Netlify gives you a `https://<site-name>.netlify.app` URL once the build finishes.
 
 Re-run step 4 (`pnpm db:migrate`) against production after any future change to
