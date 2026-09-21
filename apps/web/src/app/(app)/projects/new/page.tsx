@@ -20,7 +20,8 @@ export default function NewVideoPage() {
     <div className="p-6 max-w-2xl">
       <h1 className="text-xl font-semibold mb-1">Start New Video</h1>
       <p className="text-sm text-text-dim mb-6">
-        We&apos;ll kick off Idea Research immediately based on what you enter here. You can change direction after reviewing the ranked ideas.
+        We&apos;ll kick off Idea Research immediately based on what you enter here. It recommends one idea rather than a
+        list - re-run it anytime for a different angle.
       </p>
 
       <form action={createProject} className="panel p-6 space-y-5">

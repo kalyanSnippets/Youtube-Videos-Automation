@@ -35,11 +35,8 @@ export async function runIdeaResearch({ db, projectId, topic, preferredProvider 
     projectId,
     agentName: "IDEA_RESEARCH",
     preferredProvider,
-    userPrompt: `Research 20-30 video ideas for the topic/seed: "${topic}".${researchContext}`,
+    userPrompt: `Research and recommend the single best video idea for the topic/seed: "${topic}".${researchContext}`,
     inputSummary: `topic="${topic}"`,
-    // 20-30 fully detailed idea objects is the single largest structured output in the app -
-    // the 8192 default has been observed truncating mid-response for this agent specifically.
-    maxOutputTokens: 16000,
     build: (rawText, providerId) => {
       if (providerId === "MOCK") return { ideas: mockIdeaCandidates(topic) };
       const parsed = parseJsonLoose(rawText) as { ideas: IdeaCandidate[] };
@@ -57,7 +54,7 @@ export async function runIdeaResearch({ db, projectId, topic, preferredProvider 
       const result = safeValidate(IdeaResearchOutputSchema, value);
       return result.success ? { success: true } : { success: false, error: result.error };
     },
-    outputSummaryOf: (value) => `${value.ideas.length} idea candidates generated`,
+    outputSummaryOf: (value) => `${value.ideas.length} idea candidate${value.ideas.length === 1 ? "" : "s"} generated`,
   });
 
   const rows = value.ideas.map((idea, i) => ({
@@ -85,7 +82,13 @@ export async function runIdeaResearch({ db, projectId, topic, preferredProvider 
 
   const inserted = await db.insert(schema.videoIdeas).values(rows).returning();
 
-  await logActivity(db, projectId, "AGENT", "IDEA_RESEARCH_COMPLETED", `Idea Research completed - ${inserted.length} ideas generated (${providerUsed}).`);
+  await logActivity(
+    db,
+    projectId,
+    "AGENT",
+    "IDEA_RESEARCH_COMPLETED",
+    `Idea Research completed - ${inserted.length} idea${inserted.length === 1 ? "" : "s"} generated (${providerUsed}).`,
+  );
 
   return inserted;
 }

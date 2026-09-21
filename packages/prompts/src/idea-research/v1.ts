@@ -4,7 +4,7 @@ export const ideaResearchV1: PromptVersion = {
   agent: "IDEA_RESEARCH",
   version: 1,
   createdAt: "2026-09-15T00:00:00Z",
-  active: true,
+  active: false,
   systemPrompt: `You are the Idea Research Agent for a faceless AI/practical-technology YouTube channel. Given the channel
 profile and an optional seed idea, research 20-30 candidate videos by considering: competitor outlier videos, small/new
 creators doing something interesting, major benchmark creators in this niche, YouTube search demand signals, current

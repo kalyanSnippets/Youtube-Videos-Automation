@@ -28,7 +28,7 @@ export default async function IdeasPage({ params }: { params: Promise<{ id: stri
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-base font-semibold">Idea Lab Results</h2>
-          <p className="text-sm text-text-dim">Ranked candidates for this project. Select one to move forward.</p>
+          <p className="text-sm text-text-dim">The researched idea for this project. Confirm it to move forward, or re-run for a different one.</p>
         </div>
         <form action={rerun}>
           <Button type="submit" variant="secondary">

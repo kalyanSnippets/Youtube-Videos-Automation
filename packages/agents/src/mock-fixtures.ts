@@ -20,31 +20,28 @@ import type { ContentType, PresentationMode } from "@yaos/shared";
  * sourceProvider/providerUsed = "MOCK" and the UI renders a MOCK badge.
  */
 
+/** Matches the real IDEA_RESEARCH agent's v2 behavior of committing to one recommended idea
+ * rather than returning a ranked list - see packages/prompts/src/idea-research/v2.ts. */
 export function mockIdeaCandidates(topic: string): IdeaCandidate[] {
-  const base = [
-    { angle: "the free-tier reality check", mode: "HYBRID" as PresentationMode },
-    { angle: "we tried it for 7 days straight", mode: "HYBRID" as PresentationMode },
-    { angle: "beginner's honest first impression", mode: "FACE_LED" as PresentationMode },
-    { angle: "the setup nobody explains properly", mode: "FACELESS" as PresentationMode },
-    { angle: "what changed in the last update", mode: "HYBRID" as PresentationMode },
+  return [
+    {
+      workingTitle: `${topic}: the free-tier reality check`,
+      hook: `Most videos about ${topic} skip the part that actually matters - so we went and checked it ourselves.`,
+      referenceCreator: "Benchmark Creator Co.",
+      whyNow: `Search interest and community discussion around "${topic}" has picked up in the last few weeks.`,
+      audienceProblem: `Viewers can't tell if claims about ${topic} are still accurate after recent changes.`,
+      trendScore: 61,
+      evergreenScore: 70,
+      clickPotential: 65,
+      evidenceStrength: 48,
+      novelty: 53,
+      productionDifficulty: 40,
+      sponsorFit: 25,
+      proofRequirements: ["Official pricing/feature page screenshot", "Our own recorded test run"],
+      overallScore: 67,
+      recommendedPresentationMode: "HYBRID" as PresentationMode,
+    },
   ];
-  return base.map((b, i) => ({
-    workingTitle: `${topic}: ${b.angle}`,
-    hook: `Most videos about ${topic} skip the part that actually matters - so we went and checked it ourselves.`,
-    referenceCreator: i % 2 === 0 ? "Benchmark Creator Co." : undefined,
-    whyNow: `Search interest and community discussion around "${topic}" has picked up in the last few weeks.`,
-    audienceProblem: `Viewers can't tell if claims about ${topic} are still accurate after recent changes.`,
-    trendScore: 55 + i * 6,
-    evergreenScore: 70 - i * 4,
-    clickPotential: 60 + i * 5,
-    evidenceStrength: 40 + i * 8,
-    novelty: 50 + i * 3,
-    productionDifficulty: 30 + i * 10,
-    sponsorFit: 20 + i * 5,
-    proofRequirements: ["Official pricing/feature page screenshot", "Our own recorded test run"],
-    overallScore: 62 + i * 5,
-    recommendedPresentationMode: b.mode,
-  }));
 }
 
 /** Cycles through the three presentation modes across reference videos so the Competitor Analyst's output reflects that references come in all three - never just faceless. */

@@ -67,8 +67,8 @@ export async function createProject(formData: FormData) {
     summary: `Project created${seedIdea ? ` from seed idea "${seedIdea}"` : ""}.`,
   });
 
-  // Deferred: a real Claude call for 20-30 detailed ideas can take well over a minute, far past
-  // what any serverless function would tolerate blocking a request/redirect on. The user is sent
+  // Deferred: even a single-idea real Claude call can take a while, far past what any
+  // serverless function would tolerate blocking a request/redirect on. The user is sent
   // straight to the ideas tab, which polls for results while this finishes in the background.
   after(async () => {
     try {

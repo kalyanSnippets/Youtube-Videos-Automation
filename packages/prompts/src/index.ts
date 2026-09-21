@@ -1,6 +1,7 @@
 export * from "./types";
 import { orchestratorV1 } from "./orchestrator/v1";
 import { ideaResearchV1 } from "./idea-research/v1";
+import { ideaResearchV2 } from "./idea-research/v2";
 import { competitorAnalysisV1 } from "./competitor-analysis/v1";
 import { claimsV1 } from "./claims/v1";
 import { experimentDesignerV1 } from "./experiment-designer/v1";
@@ -16,7 +17,7 @@ import { getActivePrompt } from "./types";
 
 export const PROMPT_REGISTRY: Record<string, PromptVersion[]> = {
   ORCHESTRATOR: [orchestratorV1],
-  IDEA_RESEARCH: [ideaResearchV1],
+  IDEA_RESEARCH: [ideaResearchV1, ideaResearchV2],
   COMPETITOR_ANALYST: [competitorAnalysisV1],
   TRUST_CLAIMS_RESEARCHER: [claimsV1],
   EXPERIMENT_DESIGNER: [experimentDesignerV1],
