@@ -1,5 +1,6 @@
 "use server";
 
+import { after } from "next/server";
 import { revalidatePath } from "next/cache";
 import { eq } from "drizzle-orm";
 import { db, schema } from "@yaos/database";
@@ -8,12 +9,18 @@ import { runCompetitorAnalysis, transitionStage, logActivity } from "@yaos/agent
 export async function runCompetitorAnalysisAction(projectId: string) {
   const [project] = await db.select().from(schema.projects).where(eq(schema.projects.id, projectId));
   if (!project) throw new Error("Project not found");
-  await runCompetitorAnalysis({ db, projectId, topic: project.seedIdea || project.title });
-  if (project.currentStage === "IDEA_SELECTED") {
-    await transitionStage(db, projectId, "REFERENCES_ANALYSED", "AGENT", "Competitor Analyst");
-  }
-  revalidatePath(`/projects/${projectId}`);
-  revalidatePath(`/projects/${projectId}/references`);
+  after(async () => {
+    try {
+      await runCompetitorAnalysis({ db, projectId, topic: project.seedIdea || project.title });
+      if (project.currentStage === "IDEA_SELECTED") {
+        await transitionStage(db, projectId, "REFERENCES_ANALYSED", "AGENT", "Competitor Analyst");
+      }
+    } catch (err) {
+      console.error(`Background COMPETITOR_ANALYST failed for project ${projectId}:`, err);
+    }
+    revalidatePath(`/projects/${projectId}`);
+    revalidatePath(`/projects/${projectId}/references`);
+  });
 }
 
 export async function confirmReferencesAction(projectId: string) {

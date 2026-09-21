@@ -1,9 +1,15 @@
 import { eq, asc } from "drizzle-orm";
 import { db, schema } from "@yaos/database";
 import { runProductionDirectorAction } from "@/lib/actions/production";
+import { getLatestAgentRun } from "@/lib/agent-status";
+import { AgentPendingPanel } from "@/components/agent-pending-panel";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SEGMENT_TYPE_LABELS } from "@yaos/shared";
+
+// The generate trigger fires the agent in the background via after() rather than blocking on it -
+// this extends how long that background work may keep running.
+export const maxDuration = 300;
 
 const SEGMENT_VARIANTS: Record<string, "purple" | "cyan" | "default" | "warning"> = {
   ON_CAMERA: "purple",
@@ -20,6 +26,7 @@ export default async function ProductionPage({ params }: { params: Promise<{ id:
   const scenes = await db.select().from(schema.productionScenes).where(eq(schema.productionScenes.projectId, id)).orderBy(asc(schema.productionScenes.sceneNumber));
   const allScripts = await db.select().from(schema.scripts).where(eq(schema.scripts.projectId, id));
   const approvedScript = allScripts.find((s) => s.status === "APPROVED");
+  const latestRun = await getLatestAgentRun(id, "PRODUCTION_DIRECTOR");
 
   async function run() {
     "use server";
@@ -41,7 +48,7 @@ export default async function ProductionPage({ params }: { params: Promise<{ id:
       </div>
 
       {scenes.length === 0 ? (
-        <div className="panel p-10 text-center text-text-dim text-sm">No production scenes generated yet.</div>
+        <AgentPendingPanel run={latestRun} emptyLabel="No production scenes generated yet." />
       ) : (
         <div className="space-y-4">
           {scenes.map((scene) => (

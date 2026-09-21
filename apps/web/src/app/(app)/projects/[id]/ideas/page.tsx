@@ -1,17 +1,22 @@
 import { eq, desc } from "drizzle-orm";
 import { db, schema } from "@yaos/database";
 import { rerunIdeaResearch, selectIdeaAction } from "@/lib/actions/ideas";
+import { getLatestAgentRun } from "@/lib/agent-status";
+import { AgentPendingPanel } from "@/components/agent-pending-panel";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PresentationModeBadge } from "@/components/ui/stage-chip";
 
+// The re-run trigger fires the agent in the background via after() rather than blocking on it -
+// this extends how long that background work may keep running.
+export const maxDuration = 300;
+
 export default async function IdeasPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const ideas = await db
-    .select()
-    .from(schema.videoIdeas)
-    .where(eq(schema.videoIdeas.projectId, id))
-    .orderBy(desc(schema.videoIdeas.overallScore));
+  const [ideas, latestRun] = await Promise.all([
+    db.select().from(schema.videoIdeas).where(eq(schema.videoIdeas.projectId, id)).orderBy(desc(schema.videoIdeas.overallScore)),
+    getLatestAgentRun(id, "IDEA_RESEARCH"),
+  ]);
 
   async function rerun() {
     "use server";
@@ -33,7 +38,7 @@ export default async function IdeasPage({ params }: { params: Promise<{ id: stri
       </div>
 
       {ideas.length === 0 ? (
-        <div className="panel p-10 text-center text-text-dim text-sm">No ideas generated yet.</div>
+        <AgentPendingPanel run={latestRun} emptyLabel="No ideas generated yet." />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {ideas.map((idea) => (

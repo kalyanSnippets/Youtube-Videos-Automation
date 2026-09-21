@@ -1,13 +1,20 @@
 import { eq } from "drizzle-orm";
 import { db, schema } from "@yaos/database";
 import { runAssetPlannerAction } from "@/lib/actions/production";
+import { getLatestAgentRun } from "@/lib/agent-status";
+import { AgentPendingPanel } from "@/components/agent-pending-panel";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+
+// The generate trigger fires the agent in the background via after() rather than blocking on it -
+// this extends how long that background work may keep running.
+export const maxDuration = 300;
 
 export default async function ShotListPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const items = await db.select().from(schema.shotListItems).where(eq(schema.shotListItems.projectId, id));
   const hasScenes = (await db.select().from(schema.productionScenes).where(eq(schema.productionScenes.projectId, id))).length > 0;
+  const latestRun = await getLatestAgentRun(id, "ASSET_PLANNER");
 
   async function run() {
     "use server";
@@ -29,7 +36,7 @@ export default async function ShotListPage({ params }: { params: Promise<{ id: s
       </div>
 
       {items.length === 0 ? (
-        <div className="panel p-10 text-center text-text-dim text-sm">No shot list yet.</div>
+        <AgentPendingPanel run={latestRun} emptyLabel="No shot list yet." />
       ) : (
         <div className="space-y-3">
           {items.map((item) => (

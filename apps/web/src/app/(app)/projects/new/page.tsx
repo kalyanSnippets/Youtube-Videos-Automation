@@ -1,5 +1,9 @@
 import { createProject } from "@/lib/actions/projects";
 
+// createProject fires idea research in the background via after() rather than blocking the
+// redirect on it - this extends how long that background work may keep running.
+export const maxDuration = 300;
+
 const CONTENT_TYPES = [
   { value: "experiment", label: "Experiment" },
   { value: "comparison", label: "Comparison" },

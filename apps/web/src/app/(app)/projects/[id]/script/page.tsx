@@ -2,13 +2,20 @@ import { eq, desc } from "drizzle-orm";
 import { db, schema } from "@yaos/database";
 import { runStoryWriterAction } from "@/lib/actions/scripts";
 import { approveScriptAction } from "@/lib/actions/scripts";
+import { getLatestAgentRun } from "@/lib/agent-status";
+import { AgentPendingPanel } from "@/components/agent-pending-panel";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+
+// The draft trigger fires the agent in the background via after() rather than blocking on it -
+// this extends how long that background work may keep running.
+export const maxDuration = 300;
 
 export default async function ScriptPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const scripts = await db.select().from(schema.scripts).where(eq(schema.scripts.projectId, id)).orderBy(desc(schema.scripts.version));
   const claims = await db.select().from(schema.claims).where(eq(schema.claims.projectId, id));
+  const latestRun = await getLatestAgentRun(id, "STORY_WRITER");
   const unverifiedCount = claims.filter((c) => c.claimType === "UNVERIFIED").length;
   const latest = scripts[0];
 
@@ -32,7 +39,7 @@ export default async function ScriptPage({ params }: { params: Promise<{ id: str
       </div>
 
       {!latest ? (
-        <div className="panel p-10 text-center text-text-dim text-sm">No script drafted yet.</div>
+        <AgentPendingPanel run={latestRun} emptyLabel="No script drafted yet." />
       ) : (
         <div className="panel p-6 space-y-4">
           <div className="flex items-center justify-between">

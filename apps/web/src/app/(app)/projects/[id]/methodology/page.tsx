@@ -1,7 +1,13 @@
 import { eq } from "drizzle-orm";
 import { db, schema } from "@yaos/database";
 import { runExperimentDesignerAction } from "@/lib/actions/methodology";
+import { getLatestAgentRun } from "@/lib/agent-status";
+import { AgentPendingPanel } from "@/components/agent-pending-panel";
 import { Button } from "@/components/ui/button";
+
+// The define trigger fires the agent in the background via after() rather than blocking on it -
+// this extends how long that background work may keep running.
+export const maxDuration = 300;
 
 export default async function MethodologyPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -24,9 +30,14 @@ export default async function MethodologyPage({ params }: { params: Promise<{ id
   }
 
   if (!methodology) {
+    const latestRun = await getLatestAgentRun(id, "EXPERIMENT_DESIGNER");
     return (
       <div className="panel p-10 text-center space-y-4">
-        <p className="text-text-dim text-sm">No methodology defined yet. It must be locked before any test results are entered.</p>
+        {latestRun && latestRun.status !== "COMPLETED" ? (
+          <AgentPendingPanel run={latestRun} emptyLabel="No methodology defined yet." />
+        ) : (
+          <p className="text-text-dim text-sm">No methodology defined yet. It must be locked before any test results are entered.</p>
+        )}
         <form action={run}>
           <Button type="submit">Define Methodology</Button>
         </form>

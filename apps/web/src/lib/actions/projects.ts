@@ -2,6 +2,7 @@
 
 import { randomUUID } from "node:crypto";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { revalidatePath } from "next/cache";
 import { eq } from "drizzle-orm";
 import { db, schema } from "@yaos/database";
@@ -66,7 +67,19 @@ export async function createProject(formData: FormData) {
     summary: `Project created${seedIdea ? ` from seed idea "${seedIdea}"` : ""}.`,
   });
 
-  await runIdeaResearch({ db, projectId: project.id, topic: title });
+  // Deferred: a real Claude call for 20-30 detailed ideas can take well over a minute, far past
+  // what any serverless function would tolerate blocking a request/redirect on. The user is sent
+  // straight to the ideas tab, which polls for results while this finishes in the background.
+  after(async () => {
+    try {
+      await runIdeaResearch({ db, projectId: project.id, topic: title });
+    } catch (err) {
+      console.error(`Background IDEA_RESEARCH failed for project ${project.id}:`, err);
+    }
+    revalidatePath("/dashboard");
+    revalidatePath("/projects");
+    revalidatePath(`/projects/${project.id}/ideas`);
+  });
 
   revalidatePath("/dashboard");
   revalidatePath("/projects");

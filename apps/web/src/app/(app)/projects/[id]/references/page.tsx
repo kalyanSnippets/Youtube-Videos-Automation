@@ -1,13 +1,20 @@
 import { eq } from "drizzle-orm";
 import { db, schema } from "@yaos/database";
 import { runCompetitorAnalysisAction, confirmReferencesAction } from "@/lib/actions/references";
+import { getLatestAgentRun } from "@/lib/agent-status";
+import { AgentPendingPanel } from "@/components/agent-pending-panel";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PresentationModeBadge } from "@/components/ui/stage-chip";
 
+// The analyse trigger fires the agent in the background via after() rather than blocking on it -
+// this extends how long that background work may keep running.
+export const maxDuration = 300;
+
 export default async function ReferencesPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const references = await db.select().from(schema.referenceVideos).where(eq(schema.referenceVideos.projectId, id));
+  const latestRun = await getLatestAgentRun(id, "COMPETITOR_ANALYST");
 
   async function run() {
     "use server";
@@ -42,7 +49,7 @@ export default async function ReferencesPage({ params }: { params: Promise<{ id:
       </div>
 
       {references.length === 0 ? (
-        <div className="panel p-10 text-center text-text-dim text-sm">No reference videos analysed yet.</div>
+        <AgentPendingPanel run={latestRun} emptyLabel="No reference videos analysed yet." />
       ) : (
         <div className="space-y-4">
           {references.map((ref) => (
