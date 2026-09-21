@@ -16,6 +16,7 @@
     "@yaos/ai-providers": "workspace:*",
     "@yaos/database": "workspace:*",
     "@yaos/prompts": "workspace:*",
+    "@yaos/research": "workspace:*",
     "@yaos/shared": "workspace:*",
     "drizzle-orm": "^0.36.4"
   },

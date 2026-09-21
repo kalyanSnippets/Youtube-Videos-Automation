@@ -6,6 +6,7 @@ import type { AIProviderId } from "@yaos/ai-providers";
 import { mockClaims } from "../mock-fixtures";
 import { parseJsonLoose } from "../parse-json";
 import { runAgent, logActivity } from "../run-agent";
+import { buildWebSearchContext } from "../research-context";
 
 export interface RunClaimsResearchInput {
   db: Database;
@@ -15,12 +16,17 @@ export interface RunClaimsResearchInput {
 }
 
 export async function runClaimsResearch({ db, projectId, topic, preferredProvider }: RunClaimsResearchInput) {
+  const researchContext = await buildWebSearchContext(
+    topic,
+    "you may ONLY cite a source (title+url) if it appears in this list; if no listed source supports a claim, mark it UNVERIFIED rather than citing anything not in this list",
+  );
+
   const { value, providerUsed } = await runAgent({
     db,
     projectId,
     agentName: "TRUST_CLAIMS_RESEARCHER",
     preferredProvider,
-    userPrompt: `Build the claim ledger for topic "${topic}".`,
+    userPrompt: `Build the claim ledger for topic "${topic}".${researchContext}`,
     inputSummary: `topic="${topic}"`,
     build: (rawText, providerId) => {
       if (providerId === "MOCK") return { claims: mockClaims(topic) };

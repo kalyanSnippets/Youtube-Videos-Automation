@@ -78,10 +78,14 @@ async function seedDemoProject(opts: { workspaceId: string; title: string; conte
 
   await logActivity(db, project.id, "SYSTEM", "PROJECT_CREATED", `Demo project "${opts.title}" seeded.`);
 
-  const ideas = await runIdeaResearch({ db, projectId: project.id, topic: opts.title });
+  // Force MOCK regardless of what real providers are configured in this environment - a demo
+  // project must always be free, instant, and deterministic, never billed against a real API key.
+  const preferredProvider = "MOCK" as const;
+
+  const ideas = await runIdeaResearch({ db, projectId: project.id, topic: opts.title, preferredProvider });
   await selectIdea(db, project.id, ideas[0].id, "Seed Script");
 
-  await runCompetitorAnalysis({ db, projectId: project.id, topic: opts.title });
+  await runCompetitorAnalysis({ db, projectId: project.id, topic: opts.title, preferredProvider });
   await transitionStage(db, project.id, "REFERENCES_ANALYSED", "AGENT", "Competitor Analyst");
 
   if (opts.targetStage === "REFERENCES_ANALYSED") {
@@ -89,7 +93,7 @@ async function seedDemoProject(opts: { workspaceId: string; title: string; conte
     return;
   }
 
-  const claims = await runClaimsResearch({ db, projectId: project.id, topic: opts.title });
+  const claims = await runClaimsResearch({ db, projectId: project.id, topic: opts.title, preferredProvider });
   for (const claim of claims) {
     if (claim.claimType === "UNVERIFIED") {
       await verifyClaim(db, claim.id, "OPINION", "Seed Script");
@@ -97,10 +101,10 @@ async function seedDemoProject(opts: { workspaceId: string; title: string; conte
   }
 
   if (opts.contentType === "comparison" || opts.contentType === "experiment" || opts.contentType === "case_study") {
-    await runExperimentDesigner({ db, projectId: project.id, topic: opts.title });
+    await runExperimentDesigner({ db, projectId: project.id, topic: opts.title, preferredProvider });
   }
 
-  const script = await runStoryWriter({ db, projectId: project.id, topic: opts.title });
+  const script = await runStoryWriter({ db, projectId: project.id, topic: opts.title, preferredProvider });
   await approveScript(db, project.id, script.id, "Seed Script", false);
 
   if (opts.targetStage === "SCRIPT_APPROVED") {
@@ -108,10 +112,10 @@ async function seedDemoProject(opts: { workspaceId: string; title: string; conte
     return;
   }
 
-  await runProductionDirector({ db, projectId: project.id, scriptId: script.id, topic: opts.title });
+  await runProductionDirector({ db, projectId: project.id, scriptId: script.id, topic: opts.title, preferredProvider });
   await transitionStage(db, project.id, "PRODUCTION_PLAN_READY", "AGENT", "Production Director");
 
-  await runAssetPlanner({ db, projectId: project.id, topic: opts.title });
+  await runAssetPlanner({ db, projectId: project.id, topic: opts.title, preferredProvider });
   await transitionStage(db, project.id, "ASSETS_REQUESTED", "AGENT", "Asset Planner");
 
   console.log(`Seeded "${opts.title}" at ASSETS_REQUESTED.`);
@@ -121,22 +125,8 @@ async function main() {
   const { workspace } = await seedBaseline();
   await seedMotionTemplates();
 
-  await seedDemoProject({
-    workspaceId: workspace.id,
-    title: "DEMO — ChatGPT vs Claude",
-    contentType: "comparison",
-    presentationMode: "FACELESS",
-    targetStage: "REFERENCES_ANALYSED",
-  });
-
-  await seedDemoProject({
-    workspaceId: workspace.id,
-    title: "DEMO — Claude Editing Agent",
-    contentType: "tutorial",
-    presentationMode: "FACE_LED",
-    targetStage: "SCRIPT_APPROVED",
-  });
-
+  // Exactly one demo project - enough to show every tab and feature (Hybrid mode covers both
+  // screen-recording and A-roll UI) without cluttering a real workspace with sample data.
   await seedDemoProject({
     workspaceId: workspace.id,
     title: "DEMO — AI Video Generator Comparison",

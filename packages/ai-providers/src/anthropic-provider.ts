@@ -31,7 +31,8 @@ export class AnthropicProvider implements AIProvider {
       body: JSON.stringify({
         model,
         max_tokens: request.maxOutputTokens ?? 4096,
-        temperature: request.temperature ?? 0.4,
+        // `temperature` is rejected outright by claude-sonnet-5 ("deprecated for this
+        // model") - omit it rather than pin a value the API will 400 on.
         system: request.systemPrompt,
         messages: [
           {

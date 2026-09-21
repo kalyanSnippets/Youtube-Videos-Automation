@@ -6,6 +6,7 @@ import type { AIProviderId } from "@yaos/ai-providers";
 import { mockIdeaCandidates } from "../mock-fixtures";
 import { parseJsonLoose } from "../parse-json";
 import { runAgent, logActivity } from "../run-agent";
+import { buildWebSearchContext } from "../research-context";
 
 export interface RunIdeaResearchInput {
   db: Database;
@@ -15,12 +16,17 @@ export interface RunIdeaResearchInput {
 }
 
 export async function runIdeaResearch({ db, projectId, topic, preferredProvider }: RunIdeaResearchInput) {
+  const researchContext = await buildWebSearchContext(
+    topic,
+    "Use these to ground trendScore, whyNow, and evergreenScore - do not ignore them",
+  );
+
   const { value, providerUsed } = await runAgent({
     db,
     projectId,
     agentName: "IDEA_RESEARCH",
     preferredProvider,
-    userPrompt: `Research 20-30 video ideas for the topic/seed: "${topic}".`,
+    userPrompt: `Research 20-30 video ideas for the topic/seed: "${topic}".${researchContext}`,
     inputSummary: `topic="${topic}"`,
     build: (rawText, providerId) => {
       if (providerId === "MOCK") return { ideas: mockIdeaCandidates(topic) };

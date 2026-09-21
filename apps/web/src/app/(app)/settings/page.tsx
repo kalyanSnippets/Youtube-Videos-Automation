@@ -29,8 +29,8 @@ export default async function SettingsPage() {
   const integrationStatus: Record<string, "CONNECTED" | "NOT_CONNECTED" | "COMING_SOON"> = {
     OPENAI: providers.find((p) => p.id === "OPENAI")?.isAvailable() ? "CONNECTED" : "NOT_CONNECTED",
     ANTHROPIC: providers.find((p) => p.id === "ANTHROPIC")?.isAvailable() ? "CONNECTED" : "NOT_CONNECTED",
-    WEB_RESEARCH: "NOT_CONNECTED",
-    YOUTUBE_DATA: "NOT_CONNECTED",
+    WEB_RESEARCH: process.env.TAVILY_API_KEY ? "CONNECTED" : "NOT_CONNECTED",
+    YOUTUBE_DATA: process.env.YOUTUBE_API_KEY ? "CONNECTED" : "NOT_CONNECTED",
     YOUTUBE_ANALYTICS: "NOT_CONNECTED",
     FILE_STORAGE: "NOT_CONNECTED",
     LOCAL_WORKER: localWorkers.some((w) => w.isOnline) ? "CONNECTED" : "NOT_CONNECTED",

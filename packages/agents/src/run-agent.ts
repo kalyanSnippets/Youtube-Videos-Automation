@@ -14,6 +14,11 @@ export interface AgentRunContext<T> {
   preferredProvider?: AIProviderId;
   userPrompt: string;
   jsonSchemaHint?: string;
+  /** Defaults to 8192. Raise for agents whose output is a large array of detailed objects
+   * (e.g. 20-30 idea candidates) - the default is enough for a handful of objects but a real
+   * model's response silently truncates mid-JSON past its token budget, which surfaces as a
+   * confusing "Unexpected end of JSON input" parse error rather than an obvious length error. */
+  maxOutputTokens?: number;
   /** Builds the final structured result. Receives the raw provider text - MOCK's rawText carries a `_mock` flag your builder can ignore, since MOCK runners should build fixtures directly rather than parse it. */
   build: (rawText: string, providerId: AIProviderId) => T;
   /** Validates the built object; return {success:false} to trigger a retry-with-repair (real providers only - MOCK never fails validation). */
@@ -68,6 +73,7 @@ export async function runAgent<T>(ctx: AgentRunContext<T>): Promise<AgentRunOutc
         systemPrompt: prompt.systemPrompt,
         userPrompt: attempt === 0 ? ctx.userPrompt : `${ctx.userPrompt}\n\nYour previous output failed validation: ${lastError}\nFix it and respond again with valid JSON only.`,
         jsonSchemaHint: ctx.jsonSchemaHint,
+        maxOutputTokens: ctx.maxOutputTokens ?? 8192,
       });
       const value = ctx.build(result.rawText, provider.id);
       const validation = ctx.validate(value);

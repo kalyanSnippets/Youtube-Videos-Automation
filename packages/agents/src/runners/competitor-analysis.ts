@@ -3,6 +3,7 @@ import { schema } from "@yaos/database";
 import type { Database } from "@yaos/database";
 import { ReferenceAnalysisSchema, safeValidate } from "@yaos/agent-schemas";
 import type { AIProviderId } from "@yaos/ai-providers";
+import { resolveResearchProvider, type YouTubeCompetitorVideo } from "@yaos/research";
 import { mockReferenceAnalysis } from "../mock-fixtures";
 import { parseJsonLoose } from "../parse-json";
 import { runAgent, logActivity } from "../run-agent";
@@ -16,14 +17,32 @@ export interface RunCompetitorAnalysisInput {
 
 export async function runCompetitorAnalysis({ db, projectId, topic, preferredProvider }: RunCompetitorAnalysisInput) {
   const count = 3;
+
+  let realVideos: YouTubeCompetitorVideo[] = [];
+  const researchProvider = resolveResearchProvider();
+  if (researchProvider.isAvailable()) {
+    try {
+      realVideos = await researchProvider.youtubeCompetitorSearch(topic);
+    } catch (err) {
+      console.warn(`YouTube competitor search failed, falling back to model-generated references: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
+
   const results = [];
   for (let i = 0; i < count; i++) {
+    const realVideo = realVideos[i];
+    // Even with a real video, there's no transcript/frame access - the qualitative analysis
+    // (hook, pacing, tension) is still the model's inference from title/channel/metadata, not
+    // literal viewing. Only url/title/channelName are guaranteed accurate (overridden below).
+    const videoContext = realVideo
+      ? `\n\nThis is a REAL video found via YouTube search - title="${realVideo.title}", channel="${realVideo.channelName}", url=${realVideo.url}${realVideo.viewCount ? `, views=${realVideo.viewCount}` : ""}. You cannot watch it; infer likely structure from the title, channel style, and topic conventions.`
+      : "";
     const { value } = await runAgent({
       db,
       projectId,
       agentName: "COMPETITOR_ANALYST",
       preferredProvider,
-      userPrompt: `Analyse reference video #${i + 1} of ${count} for topic "${topic}".`,
+      userPrompt: `Analyse reference video #${i + 1} of ${count} for topic "${topic}".${videoContext}`,
       inputSummary: `topic="${topic}" index=${i}`,
       build: (rawText, providerId) => {
         if (providerId === "MOCK") return mockReferenceAnalysis(topic, i);
@@ -35,7 +54,7 @@ export async function runCompetitorAnalysis({ db, projectId, topic, preferredPro
       },
       outputSummaryOf: (value) => `Analysed "${value.title}" (${value.role})`,
     });
-    results.push(value);
+    results.push(realVideo ? { ...value, url: realVideo.url, title: realVideo.title, channelName: realVideo.channelName } : value);
   }
 
   const rows = results.map((r) => ({
