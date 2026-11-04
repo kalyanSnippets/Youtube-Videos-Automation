@@ -167,6 +167,7 @@ export const Aroll: React.FC<{
       <OffthreadVideo
         src={staticFile(src)}
         muted
+        startFrom={offset}
         style={{ position: "absolute", left, top, width: box.w * z, height: vh }}
       />
     </div>
