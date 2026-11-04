@@ -13,7 +13,7 @@ const C = {
   bg: "#F5F5F3", grid: "#E7E7E2", orange: "#CC785C", terra: "#DE6C52", dark: "#1E1E1E", green: "#34C759", red: "#FF3B30",
   ink: "#1A1A1A", mute: "#6E6E68",
 };
-const GAP0 = 24.975, GAP1 = 30.475;
+const GAP0 = (data as any).gap[0] as number, GAP1 = (data as any).gap[1] as number;
 const YT = "b/rea_yt.mp4";
 const RT = { timer: 22, checks: 35.4, side: 51.5, cards: 72.5, drag: 116.5 }; // 4:15-6:40 of the REA YouTube video (local 0 = 4:15)
 
@@ -422,19 +422,25 @@ const YTShot: React.FC<{ at: number; label: string; rate?: number; zoom?: number
 
 /** "Here is what happened" — 5.5s of real footage from the full video. */
 const ResultMontage: React.FC = () => {
-  const frame = useCurrentFrame();
-  const shots: [number, number, React.ReactNode][] = [
-    [0, 30, <YTShot full at={RT.timer} rate={4} label="⏱ 18 MIN LATER…" tag="real run · sped up" zoom={1.6} origin="0% 75%" />],
-    [30, 60, <YTShot full at={RT.checks} label="✓ ALL 50 CHECKS PASS" zoom={1.9} origin="0% 46%" />],
-    [60, 105, <YTShot full at={RT.side} label="ORIGINAL vs REA BOARD" />],
-    [105, 165, <YTShot full at={RT.drag} rate={1.5} label="✓ DRAG & DROP WORKS" />],
-  ];
+  const sh = (data as any).shots as { at: number; start: number; dur: number }[];
+  const labels = ["⏱ 18 MINUTES LATER", "✓ ALL 50 CHECKS PASSED", "ORIGINAL ⇄ REA BOARD", "✓ DRAG & DROP WORKS"];
+  const tags = ["Claude Code built it on its own · sped up", "Claude tested everything itself", "left: Wekan · right: my REA Board", "live test with a real mouse"];
   return (
     <AbsoluteFill style={{ background: C.dark }}>
-      {shots.map(([a, b, el], i) => (
-        <Sequence key={i} from={a} durationInFrames={b - a}>{el}<Flash dur={4} /></Sequence>
+      {sh.map((x, i) => (
+        <Sequence key={i} from={f(x.start)} durationInFrames={f(x.dur) + 1}>
+          {i === 0 ? (
+            <YTShot full at={RT.timer} rate={4} label={labels[0]} tag={tags[0]} zoom={1.6} origin="0% 75%" />
+          ) : i === 1 ? (
+            <YTShot full at={x.at} label={labels[1]} tag={tags[1]} zoom={1.9} origin="0% 46%" />
+          ) : (
+            <YTShot full at={x.at} label={labels[i]} tag={tags[i]} />
+          )}
+          <Flash dur={4} />
+        </Sequence>
       ))}
-      {frame < 165 && <div style={{ position: "absolute", left: 0, right: 0, bottom: 300, textAlign: "center", fontFamily: MONO, fontWeight: 700, fontSize: 28, color: "#888" }}>From my full REA video · AI with Kalyan</div>}
+      <div style={{ position: "absolute", left: 0, right: 0, top: 150, textAlign: "center", fontFamily: MONO, fontWeight: 800, fontSize: 44, color: "#fff" }}>HERE'S WHAT HAPPENED 👇</div>
+      <div style={{ position: "absolute", left: 0, right: 0, bottom: 120, textAlign: "center", fontFamily: MONO, fontWeight: 700, fontSize: 26, color: "#888" }}>Clips from my full REA video · AI with Kalyan</div>
     </AbsoluteFill>
   );
 };
@@ -447,27 +453,27 @@ const RealCardZoom: React.FC = () => (
 );
 
 const SCENES: Scene[] = [
-  { a: 0, b: 1.3, mode: "split", top: HookA },
-  { a: 1.3, b: 2.62, mode: "split", top: Scanner },
-  { a: 2.62, b: 4.0, mode: "split", top: HookC },
-  { a: 4.0, b: 4.94, mode: "face" },
-  { a: 4.94, b: 6.8, mode: "split", top: ReaRepo },
-  { a: 6.8, b: 8.3, mode: "full", top: () => <BigWord words={["REVERSE", "ENGINEER", "ANYTHING"]} every={9} /> },
-  { a: 8.3, b: 10.55, mode: "split", top: () => <BigWord words={["DOES IT", "WORK?"]} every={12} /> },
-  { a: 10.55, b: 13.3, mode: "full", top: HypeMeter },
-  { a: 13.3, b: 15.85, mode: "split", top: WekanCard },
-  { a: 15.85, b: 17.5, mode: "split", top: ClaudePlusRea },
-  { a: 17.5, b: 19.5, mode: "split", top: Terminal },
-  { a: 19.5, b: 23.7, mode: "full", top: ThreeStep },
-  { a: 23.7, b: GAP0, mode: "face" },
+  { a: 0.0, b: 1.39, mode: "split", top: HookA },
+  { a: 1.39, b: 2.81, mode: "split", top: Scanner },
+  { a: 2.81, b: 4.29, mode: "split", top: HookC },
+  { a: 4.29, b: 5.3, mode: "face" },
+  { a: 5.3, b: 7.29, mode: "split", top: ReaRepo },
+  { a: 7.29, b: 8.9, mode: "full", top: () => <BigWord words={["REVERSE", "ENGINEER", "ANYTHING"]} every={9} /> },
+  { a: 8.9, b: 11.32, mode: "split", top: () => <BigWord words={["DOES IT", "WORK?"]} every={12} /> },
+  { a: 11.32, b: 14.27, mode: "full", top: HypeMeter },
+  { a: 14.27, b: 17.0, mode: "split", top: WekanCard },
+  { a: 17.0, b: 18.77, mode: "split", top: ClaudePlusRea },
+  { a: 18.77, b: 20.92, mode: "split", top: Terminal },
+  { a: 20.92, b: 25.42, mode: "full", top: ThreeStep },
+  { a: 25.42, b: GAP0, mode: "face" },
   { a: GAP0, b: GAP1, mode: "full", top: ResultMontage },
-  { a: GAP1, b: 32.35, mode: "split", top: RealSideBySide },
-  { a: 32.35, b: 34.3, mode: "split", top: RealCardZoom },
-  { a: 34.3, b: 36.5, mode: "split", top: AppGrid },
-  { a: 36.5, b: 37.8, mode: "face" },
-  { a: 37.8, b: 40.1, mode: "split", top: Checklist },
-  { a: 40.1, b: 43.0, mode: "split", top: VideoCard },
-  { a: 43.0, b: D.duration, mode: "split", top: Subscribe },
+  { a: GAP1, b: 37.03, mode: "split", top: RealSideBySide },
+  { a: 37.03, b: 39.12, mode: "split", top: RealCardZoom },
+  { a: 39.12, b: 41.48, mode: "split", top: AppGrid },
+  { a: 41.48, b: 42.88, mode: "face" },
+  { a: 42.88, b: 45.35, mode: "split", top: Checklist },
+  { a: 45.35, b: 48.46, mode: "split", top: VideoCard },
+  { a: 48.46, b: D.duration, mode: "split", top: Subscribe },
 ];
 
 
@@ -476,7 +482,6 @@ const chunks = chunkWords(D.words, 3, 16);
 const Captions: React.FC = () => {
   const frame = useCurrentFrame();
   const t = frame / FPS;
-  if (t >= GAP0 && t < GAP1) return null;
   const c = activeChunk(chunks, t);
   if (!c) return null;
   const sc = SCENES.find((s) => t >= s.a && t < s.b);
@@ -493,7 +498,7 @@ const Captions: React.FC = () => {
 /* ---------------- main ---------------- */
 export const Reel1: React.FC = () => {
   const sfx: [number, string, number?][] = [
-    [0, "whoosh", 0.4], [1.3, "swish", 0.4], [2.62, "whoosh", 0.4], [4.0, "swish", 0.4], [4.94, "whoosh", 0.4], [6.8, "swish", 0.4], [8.3, "whoosh", 0.4], [10.55, "swish", 0.4], [13.3, "whoosh", 0.4], [15.85, "swish", 0.4], [17.5, "whoosh", 0.4], [19.5, "swish", 0.4], [23.7, "whoosh", 0.4], [30.475, "swish", 0.4], [32.35, "whoosh", 0.4], [34.3, "swish", 0.4], [36.5, "whoosh", 0.4], [37.8, "swish", 0.4], [40.1, "whoosh", 0.4], [43.0, "swish", 0.4], [0.2, "pop"], [1.5, "click", 0.35], [2.0, "blip", 0.3], [2.8, "ding", 0.25], [4.0, "impact", 0.45], [6.1, "ding", 0.22], [6.8, "impact", 0.35], [7.1, "pop"], [7.4, "pop"], [8.4, "pop"], [8.8, "pop"], [11.0, "pop"], [12.6, "pop"], [13.6, "pop", 0.3], [16.1, "pop"], [16.4, "pop"], [16.6, "pop"], [17.6, "typing", 0.35], [18.6, "typing", 0.3], [19.7, "pop"], [20.1, "pop"], [20.5, "pop"], [22.0, "blip", 0.3], [22.3, "blip", 0.3], [22.6, "blip", 0.3], [23.7, "riser", 0.4], [24.975, "impact", 0.55], [25.975, "shutter", 0.4], [26.975, "ding", 0.3], [28.475, "shutter", 0.4], [30.0, "ding", 0.3], [34.4, "blip", 0.25], [34.55, "blip", 0.25], [34.7, "blip", 0.25], [36.5, "impact", 0.3], [37.9, "ding", 0.18], [38.15, "ding", 0.18], [38.4, "ding", 0.18], [38.65, "ding", 0.2], [43.65, "click", 0.6], [43.7, "notify", 0.35],
+    [0.0, "whoosh", 0.4], [1.39, "swish", 0.4], [2.81, "whoosh", 0.4], [4.29, "swish", 0.4], [5.3, "whoosh", 0.4], [7.29, "swish", 0.4], [8.9, "whoosh", 0.4], [11.32, "swish", 0.4], [14.27, "whoosh", 0.4], [17.0, "swish", 0.4], [18.77, "whoosh", 0.4], [20.92, "swish", 0.4], [25.42, "whoosh", 0.4], [35.02, "swish", 0.4], [37.03, "whoosh", 0.4], [39.12, "swish", 0.4], [41.48, "whoosh", 0.4], [42.88, "swish", 0.4], [45.35, "whoosh", 0.4], [48.46, "swish", 0.4], [0.21, "pop"], [1.61, "click", 0.35], [2.15, "blip", 0.3], [3.0, "ding", 0.25], [4.29, "impact", 0.45], [6.54, "ding", 0.22], [7.29, "impact", 0.35], [7.62, "pop"], [7.94, "pop"], [9.01, "pop"], [9.44, "pop"], [11.8, "pop"], [13.52, "pop"], [14.59, "pop", 0.3], [17.27, "pop"], [17.59, "pop"], [17.81, "pop"], [18.88, "typing", 0.35], [19.95, "typing", 0.3], [21.13, "pop"], [21.56, "pop"], [21.99, "pop"], [23.6, "blip", 0.3], [23.92, "blip", 0.3], [24.24, "blip", 0.3], [25.42, "riser", 0.4], [26.79, "impact", 0.55], [28.29, "shutter", 0.4], [29.78, "ding", 0.3], [32.03, "shutter", 0.4], [34.31, "ding", 0.3], [39.23, "blip", 0.25], [39.39, "blip", 0.25], [39.55, "blip", 0.25], [41.48, "impact", 0.3], [42.99, "ding", 0.18], [43.25, "ding", 0.18], [43.52, "ding", 0.18], [43.79, "ding", 0.2], [49.15, "click", 0.6], [49.21, "notify", 0.35],
   ];
   return (
     <AbsoluteFill style={{ background: C.bg }}>
@@ -527,7 +532,7 @@ export const Reel1: React.FC = () => {
       })}
       <Captions />
       <Audio src={staticFile("r/r1f_aroll.mp4")} />
-      <Music src="r/r1_music.wav" total={D.duration} base={0.13} boosts={[[GAP0, GAP1, 0.5]]} />
+      <Music src="r/r1_music.wav" total={D.duration} base={0.13} boosts={[]} />
       {sfx.map(([t, n, v], i) => <Sfx key={i} at={t} name={n} vol={v ?? 0.45} />)}
     </AbsoluteFill>
   );
