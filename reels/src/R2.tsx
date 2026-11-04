@@ -9,7 +9,8 @@ import {
 /* Reel 2 v2: every line is matched to a Genie 4 demo that shows exactly that thing,
    with the prompt Google typed shown big on screen. Voice at 1.1x. */
 const D = data as ReelData;
-export const R2_FRAMES = Math.ceil(D.duration * FPS);
+const END = D.duration + 0.8; // short tail so the last word is never clipped
+export const R2_FRAMES = Math.ceil(END * FPS);
 
 const C = { dark: "#0D0D0D", darkLine: "rgba(255,255,255,0.06)", light: "#FAFAFA", lightLine: "#ECECEC", blue: "#3B82F6", green: "#22C55E", coral: "#EF4444", ink: "#111", gray: "#8A8F98" };
 const DM = "Genie 4 demo · Google DeepMind";
@@ -91,7 +92,7 @@ const Chip: React.FC<{ children: React.ReactNode; bg?: string; delay?: number; t
 const S = {
   world: () => <><Footage src="b/g_mirage.mp4" at={1} rate={1.5} label="Real Genie 4 demo" /><Chip delay={f(1.4)}>🌍 a whole world</Chip></>,
   prompt: () => <><Footage src="b/g_city.mp4" at={0} label="Typed prompt → world" /><PromptBar text="People in varied outfits walk the street" delay={3} cps={32} /></>,
-  walk: () => <><Footage src="b/g_ski.mp4" at={3} label="You control it" /><WASD delay={4} /></>,
+  walk: () => <><Footage src="b/g_walk.mp4" at={0.5} rate={1.2} label="Walking inside a Genie 4 world" /><WASD delay={4} /></>,
   announce: () => {
     const frame = useCurrentFrame();
     return (
@@ -109,22 +110,27 @@ const S = {
       </AbsoluteFill>
     );
   },
-  regular: () => <><Footage src="b/g_glass.mp4" gray label="Regular AI video" credit="" /><Chip bg="#52525b">▶ you can only watch</Chip></>,
+  regular: () => <><Footage src="b/g_maple.mp4" gray label="Regular AI video" credit="" /><Chip bg="#52525b">▶ you can only watch</Chip></>,
   explore: () => <><Footage src="b/g_fox.mp4" at={1} label="Genie 4 · interactive" /><WASD delay={3} /></>,
   cityPrompt: () => {
     const frame = useCurrentFrame();
     const show = frame >= f(2.4); // "flying cars"
+    const phase = frame < f(5.1) ? 0 : frame < f(6.9) ? 1 : 2; // typing -> generated -> exploring
     return (
       <AbsoluteFill style={{ background: C.dark }}>
         <GridBg bg={C.dark} line={C.darkLine} glow="rgba(59,130,246,0.2)" />
-        {show && <Sequence from={f(2.4)}><Footage src="b/gen_city.mp4" label="AI illustration · not Genie 4 footage" credit="Illustration generated for this reel" /></Sequence>}
-        {show && <Sequence from={f(2.4)}><Flash dur={5} /></Sequence>}
-        <PromptBar text="create a futuristic city with flying cars, skyscrapers and neon lights" delay={f(0.6)} cps={17.5} top={show ? VY + VH + 50 : 760} big />
+        {show && (
+          <Sequence from={f(2.4)}>
+            <Footage src="b/gen_city.mp4" rate={0.77} label={phase < 2 ? "AI illustration · not Genie 4 footage" : "Exploring the world you created (illustration)"} credit="Illustration generated for this reel" />
+          </Sequence>
+        )}
+        {show && <Sequence from={f(2.4)} durationInFrames={6}><Flash dur={5} /></Sequence>}
+        {phase === 0 && <PromptBar text="create a futuristic city with flying cars, skyscrapers and neon lights" delay={f(0.85)} cps={17.5} top={show ? VY + VH + 50 : 760} big />}
+        {phase === 1 && <Sequence from={f(5.1)}><Chip>⚡ world generated from your prompt</Chip></Sequence>}
+        {phase === 2 && <Sequence from={f(6.9)}><WASD delay={0} /></Sequence>}
       </AbsoluteFill>
     );
   },
-  generate: () => <><Footage src="b/g_mirage.mp4" at={5} label="Real Genie 4: prompt → neon city" /><Chip delay={4}>⚡ generated live</Chip></>,
-  keyboard: () => <><Footage src="b/g_fox.mp4" at={8} label="Explore with your keyboard" /><WASD delay={2} /></>,
   weather: () => <><Footage src="b/g_snow.mp4" at={4.5} rate={1.5} label="Weather change · real demo" /><PromptBar text="It starts to snow ❄️" delay={0} cps={40} /></>,
   character: () => <><Footage src="b/g_deer.mp4" at={4.6} rate={1.5} label="New character · real demo" /><PromptBar text="A stained-glass deer walks through the river" delay={0} cps={40} /></>,
   crazy: () => (
@@ -161,7 +167,7 @@ const S = {
   gaming: () => <><Footage src="b/g_dragon.mp4" at={5} label="The future of gaming?" /><Chip delay={6}>🎮 games you can just describe</Chip></>,
   dream: () => {
     const frame = useCurrentFrame();
-    const clips: [string, number][] = [["b/g_fox.mp4", 3], ["b/g_magic.mp4", 2], ["b/g_ski.mp4", 6], ["b/g_dragon.mp4", 12]];
+    const clips: [string, number][] = [["b/g_magic.mp4", 2], ["b/g_balloon.mp4", 3], ["b/g_ski.mp4", 4], ["b/g_train.mp4", 1]];
     const i = Math.min(3, Math.floor(frame / 28));
     return (
       <>
@@ -204,9 +210,7 @@ const SCENES: Scene[] = [
   { a: 6.65, b: 10.85, body: S.announce, face: true, light: true },
   { a: 10.85, b: 12.95, body: S.regular, face: true },
   { a: 12.95, b: 16.0, body: S.explore, face: true },
-  { a: 16.0, b: 21.1, body: S.cityPrompt, face: true },
-  { a: 21.1, b: 22.95, body: S.generate, face: true },
-  { a: 22.95, b: 25.0, body: S.keyboard, face: true },
+  { a: 16.0, b: 25.0, body: S.cityPrompt, face: true },
   { a: 25.0, b: 26.45, body: S.weather, face: true },
   { a: 26.45, b: 28.75, body: S.character, face: true },
   { a: 28.75, b: 31.9, body: S.crazy },
@@ -216,7 +220,7 @@ const SCENES: Scene[] = [
   { a: 38.45, b: 41.1, body: S.gaming, face: true },
   { a: 41.1, b: 44.8, body: S.dream, face: true },
   { a: 44.8, b: 46.2, body: S.whatType, face: true },
-  { a: 46.2, b: D.duration, body: S.cta, face: true, light: true },
+  { a: 46.2, b: END, body: S.cta, face: true, light: true },
 ];
 
 /* ---------- captions: upper third, grey base, white active, blue box on keywords ---------- */
@@ -281,7 +285,7 @@ export const Reel2: React.FC = () => {
       })}
       <Captions />
       <Audio src={staticFile("r/r2f_aroll.mp4")} />
-      <Music src="r/r2_music.wav" total={D.duration} base={0.13} boosts={[]} />
+      <Music src="r/r2_music.wav" total={END} base={0.13} boosts={[]} />
       {sfx.map(([t, n, v], i) => <Sfx key={i} at={t} name={n} vol={v ?? 0.45} />)}
     </AbsoluteFill>
   );

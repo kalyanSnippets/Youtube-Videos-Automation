@@ -7,7 +7,8 @@ import {
 } from "./lib";
 
 const D = data as ReelData;
-export const R1_FRAMES = Math.ceil(D.duration * FPS);
+const END = D.duration + 0.8; // short tail so the last word is never clipped
+export const R1_FRAMES = Math.ceil(END * FPS);
 
 const C = {
   bg: "#F5F5F3", grid: "#E7E7E2", orange: "#CC785C", terra: "#DE6C52", dark: "#1E1E1E", green: "#34C759", red: "#FF3B30",
@@ -467,13 +468,13 @@ const SCENES: Scene[] = [
   { a: 20.92, b: 25.42, mode: "full", top: ThreeStep },
   { a: 25.42, b: GAP0, mode: "face" },
   { a: GAP0, b: GAP1, mode: "full", top: ResultMontage },
-  { a: GAP1, b: 37.03, mode: "split", top: RealSideBySide },
-  { a: 37.03, b: 39.12, mode: "split", top: RealCardZoom },
-  { a: 39.12, b: 41.48, mode: "split", top: AppGrid },
-  { a: 41.48, b: 42.88, mode: "face" },
-  { a: 42.88, b: 45.35, mode: "split", top: Checklist },
-  { a: 45.35, b: 48.46, mode: "split", top: VideoCard },
-  { a: 48.46, b: D.duration, mode: "split", top: Subscribe },
+  { a: GAP1, b: 34.8, mode: "split", top: RealSideBySide },
+  { a: 34.8, b: 36.89, mode: "split", top: RealCardZoom },
+  { a: 36.89, b: 39.25, mode: "split", top: AppGrid },
+  { a: 39.25, b: 40.65, mode: "face" },
+  { a: 40.65, b: 43.12, mode: "split", top: Checklist },
+  { a: 43.12, b: 46.23, mode: "split", top: VideoCard },
+  { a: 46.23, b: END, mode: "split", top: Subscribe },
 ];
 
 
@@ -498,7 +499,7 @@ const Captions: React.FC = () => {
 /* ---------------- main ---------------- */
 export const Reel1: React.FC = () => {
   const sfx: [number, string, number?][] = [
-    [0.0, "whoosh", 0.4], [1.39, "swish", 0.4], [2.81, "whoosh", 0.4], [4.29, "swish", 0.4], [5.3, "whoosh", 0.4], [7.29, "swish", 0.4], [8.9, "whoosh", 0.4], [11.32, "swish", 0.4], [14.27, "whoosh", 0.4], [17.0, "swish", 0.4], [18.77, "whoosh", 0.4], [20.92, "swish", 0.4], [25.42, "whoosh", 0.4], [35.02, "swish", 0.4], [37.03, "whoosh", 0.4], [39.12, "swish", 0.4], [41.48, "whoosh", 0.4], [42.88, "swish", 0.4], [45.35, "whoosh", 0.4], [48.46, "swish", 0.4], [0.21, "pop"], [1.61, "click", 0.35], [2.15, "blip", 0.3], [3.0, "ding", 0.25], [4.29, "impact", 0.45], [6.54, "ding", 0.22], [7.29, "impact", 0.35], [7.62, "pop"], [7.94, "pop"], [9.01, "pop"], [9.44, "pop"], [11.8, "pop"], [13.52, "pop"], [14.59, "pop", 0.3], [17.27, "pop"], [17.59, "pop"], [17.81, "pop"], [18.88, "typing", 0.35], [19.95, "typing", 0.3], [21.13, "pop"], [21.56, "pop"], [21.99, "pop"], [23.6, "blip", 0.3], [23.92, "blip", 0.3], [24.24, "blip", 0.3], [25.42, "riser", 0.4], [26.79, "impact", 0.55], [28.29, "shutter", 0.4], [29.78, "ding", 0.3], [32.03, "shutter", 0.4], [34.31, "ding", 0.3], [39.23, "blip", 0.25], [39.39, "blip", 0.25], [39.55, "blip", 0.25], [41.48, "impact", 0.3], [42.99, "ding", 0.18], [43.25, "ding", 0.18], [43.52, "ding", 0.18], [43.79, "ding", 0.2], [49.15, "click", 0.6], [49.21, "notify", 0.35],
+    [0.0, "whoosh", 0.4], [0.21, "pop"], [1.61, "click", 0.35], [2.15, "blip", 0.3], [3.0, "ding", 0.25], [4.29, "impact", 0.45],[6.54, "ding", 0.22], [7.29, "impact", 0.35], [7.62, "pop"], [7.94, "pop"], [9.01, "pop"], [9.44, "pop"], [11.8, "pop"], [13.52, "pop"], [14.59, "pop", 0.3], [17.27, "pop"], [17.59, "pop"], [17.81, "pop"], [18.88, "typing", 0.35], [19.95, "typing", 0.3], [21.13, "pop"], [21.56, "pop"], [21.99, "pop"], [23.6, "blip", 0.3], [23.92, "blip", 0.3], [24.24, "blip", 0.3], [26.79, "impact", 0.55], [26.79, "whoosh", 0.4], [28.29, "shutter", 0.4], [29.78, "ding", 0.3], [32.03, "shutter", 0.4], [32.79, "whoosh", 0.35],[34.31, "ding", 0.3], [37.0, "blip", 0.25], [37.16, "blip", 0.25], [37.32, "blip", 0.25], [39.25, "impact", 0.3], [40.76, "ding", 0.18], [41.02, "ding", 0.18], [41.29, "ding", 0.18], [41.56, "ding", 0.2], [46.92, "click", 0.6], [46.98, "notify", 0.35],
   ];
   return (
     <AbsoluteFill style={{ background: C.bg }}>
@@ -532,7 +533,7 @@ export const Reel1: React.FC = () => {
       })}
       <Captions />
       <Audio src={staticFile("r/r1f_aroll.mp4")} />
-      <Music src="r/r1_music.wav" total={D.duration} base={0.13} boosts={[]} />
+      <Music src="r/r1_music.wav" total={END} base={0.13} boosts={[[GAP0, GAP1, 0.45]]} />
       {sfx.map(([t, n, v], i) => <Sfx key={i} at={t} name={n} vol={v ?? 0.45} />)}
     </AbsoluteFill>
   );
