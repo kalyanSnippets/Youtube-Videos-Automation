@@ -163,7 +163,7 @@ const PromptCard: React.FC = () => (
       <div style={{ width: 900, background: "#0f1a14", borderRadius: 30, padding: 44, boxShadow: "0 30px 70px rgba(0,0,0,0.35)" }}>
         <div style={{ fontFamily: MONO, fontSize: 30, color: C.mute }}>PROMPT → Gemma 4 (in orbit)</div>
         <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: 52, color: "#fff", marginTop: 26, lineHeight: 1.3 }}>
-          <Typewriter text="Write a poem about being in space." delay={f(1.0)} cps={17} caretColor={C.amber} />
+          <Typewriter text="Write a poem about being in space." delay={f(0.9)} cps={19} caretColor={C.amber} />
         </div>
       </div>
     </PopIn>
