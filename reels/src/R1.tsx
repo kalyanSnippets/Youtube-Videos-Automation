@@ -1,6 +1,6 @@
 import React from "react";
 import { AbsoluteFill, Audio, interpolate, Sequence, staticFile, useCurrentFrame, Easing } from "remotion";
-import data from "../public/r/r1_words.json";
+import data from "../public/r/r1f_words.json";
 import {
   Aroll, chunkWords, activeChunk, Clip, Cursor, f, FPS, GridBg, INTER, MacWindow, MONO, Music, Pic, PopIn, ReelData,
   Sfx, SubscribeCard, Typewriter, Counter, Credit, Flash,
@@ -13,7 +13,9 @@ const C = {
   bg: "#F5F5F3", grid: "#E7E7E2", orange: "#CC785C", terra: "#DE6C52", dark: "#1E1E1E", green: "#34C759", red: "#FF3B30",
   ink: "#1A1A1A", mute: "#6E6E68",
 };
-const GAP0 = 29.47, GAP1 = 32.67;
+const GAP0 = 24.975, GAP1 = 30.475;
+const YT = "b/rea_yt.mp4";
+const RT = { timer: 12, checks: 35.2, side: 51.5, cards: 74, drag: 117 }; // 4:15-6:40 of the REA YouTube video (local 0 = 4:15)
 
 type Mode = "split" | "face" | "full";
 type Scene = { a: number; b: number; mode: Mode; top?: React.FC };
@@ -172,7 +174,7 @@ const Terminal: React.FC = () => (
           <PopIn delay={8} from="left"><div style={{ margin: "14px 0", display: "inline-block", background: "#2a1f1a", border: `1px solid ${C.orange}`, color: C.orange, borderRadius: 12, padding: "6px 16px", fontWeight: 700 }}>✻ Claude Code  ·  REA skill + MCP connected</div></PopIn>
           <div style={{ color: "#fff" }}>
             <span style={{ color: C.orange }}>&gt; </span>
-            <Typewriter text={PROMPT1} delay={16} cps={42} caretColor={C.orange} />
+            <Typewriter text={PROMPT1} delay={6} cps={75} caretColor={C.orange} />
           </div>
         </div>
       </MacWindow>
@@ -189,7 +191,7 @@ const ThreeStep: React.FC = () => {
       <PopIn><div style={{ fontFamily: MONO, fontWeight: 800, fontSize: 58, color: C.ink }}>THE GOAL</div></PopIn>
       <div style={{ display: "flex", flexDirection: "column", gap: 26, marginTop: 50 }}>
         {steps.map(([e, t, s], i) => (
-          <PopIn key={t} delay={8 + i * 18} from="left" dist={200}>
+          <PopIn key={t} delay={4 + i * 12} from="left" dist={200}>
             <div style={{ width: 860, display: "flex", alignItems: "center", gap: 30, background: "#fff", borderRadius: 28, padding: "26px 34px", boxShadow: "0 12px 30px rgba(0,0,0,0.07)", border: "1px solid #e6e6e0" }}>
               <div style={{ width: 92, height: 92, borderRadius: 22, background: i === 2 ? C.orange : C.dark, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 50 }}>{e}</div>
               <div>
@@ -311,7 +313,7 @@ const Checklist: React.FC = () => {
     <AbsoluteFill style={{ alignItems: "center", justifyContent: "center" }}>
       <MacWindow title="test-log.md" dark style={{ width: 880 }}>
         {items.map((t, i) => (
-          <PopIn key={t} delay={4 + i * 12} from="left">
+          <PopIn key={t} delay={2 + i * 7} from="left">
             <div style={{ display: "flex", gap: 22, alignItems: "center", fontFamily: MONO, fontSize: 38, color: "#eee", padding: "12px 0" }}>
               <div style={{ width: 52, height: 52, borderRadius: 14, background: C.green, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800 }}>✓</div>
               {t}
@@ -331,14 +333,14 @@ const VideoCard: React.FC = () => {
       <PopIn>
         <div style={{ width: 900, background: "#fff", borderRadius: 34, overflow: "hidden", boxShadow: "0 24px 60px rgba(0,0,0,0.18)" }}>
           <div style={{ height: 420, background: C.dark, position: "relative", display: "flex", alignItems: "center", justifyContent: "center", gap: 30 }}>
-            <MiniBoard label="Wekan" dim />
+            <div style={{ position: "absolute", inset: 0 }}><Pic src="img/yt_thumb.jpg" /></div>
             <div style={{ position: "absolute", width: 150, height: 104, borderRadius: 28, background: "#FF0033", display: "flex", alignItems: "center", justifyContent: "center", transform: `scale(${pulse})` }}>
               <div style={{ width: 0, height: 0, borderTop: "26px solid transparent", borderBottom: "26px solid transparent", borderLeft: "44px solid #fff", marginLeft: 8 }} />
             </div>
             <div style={{ position: "absolute", right: 18, bottom: 16, background: "rgba(0,0,0,.8)", color: "#fff", fontFamily: INTER, fontWeight: 700, fontSize: 26, padding: "4px 10px", borderRadius: 8 }}>FULL VIDEO</div>
           </div>
           <div style={{ padding: 28 }}>
-            <div style={{ fontFamily: INTER, fontWeight: 800, fontSize: 40, color: C.ink, lineHeight: 1.2 }}>I Rebuilt a Kanban App with REA in 3 Prompts</div>
+            <div style={{ fontFamily: INTER, fontWeight: 800, fontSize: 40, color: C.ink, lineHeight: 1.2 }}>Is REA Worth the Hype? I Tested It on a Kanban App</div>
             <div style={{ fontFamily: INTER, fontWeight: 600, fontSize: 30, color: C.mute, marginTop: 10 }}>AI with Kalyan · YouTube</div>
           </div>
         </div>
@@ -349,27 +351,125 @@ const VideoCard: React.FC = () => {
 
 const Subscribe: React.FC = () => (
   <AbsoluteFill style={{ alignItems: "center", justifyContent: "center" }}>
-    <PopIn from="up"><SubscribeCard clickAt={30} sub="Real AI experiments, tested honestly" /></PopIn>
-    <Cursor path={[[0, 900, 860], [26, 560, 610], [60, 580, 620]]} clicks={[30]} />
+    <PopIn from="up"><SubscribeCard clickAt={20} sub="Real AI experiments, tested honestly" /></PopIn>
+    <Cursor path={[[0, 900, 860], [16, 560, 610], [40, 580, 620]]} clicks={[30]} />
   </AbsoluteFill>
 );
 
+/* ---------- fast-cut additions (v2) ---------- */
+const BigWord: React.FC<{ words: string[]; every?: number; color?: string }> = ({ words, every = 10, color = C.ink }) => {
+  const frame = useCurrentFrame();
+  return (
+    <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 10 }}>
+      {words.map((w, i) => {
+        const d = i * every;
+        const p = interpolate(frame - d, [0, 5], [2.2, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) });
+        return (
+          <div key={w} style={{ opacity: frame >= d ? 1 : 0, transform: `scale(${p})`, fontFamily: MONO, fontWeight: 800, fontSize: 120, color: i === words.length - 1 ? C.orange : color, letterSpacing: -2, lineHeight: 1 }}>{w}</div>
+        );
+      })}
+    </AbsoluteFill>
+  );
+};
+
+const HookA: React.FC = () => (
+  <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", gap: 30 }}>
+    <PopIn><Pixel size={22} color={C.orange} /></PopIn>
+    <PopIn delay={6}><div style={{ fontFamily: MONO, fontWeight: 800, fontSize: 92, color: C.ink, textAlign: "center", lineHeight: 1.05 }}>AI STUDIES<br /><span style={{ color: C.orange }}>A REAL APP</span></div></PopIn>
+  </AbsoluteFill>
+);
+
+const HookC: React.FC = () => (
+  <AbsoluteFill style={{ alignItems: "center", justifyContent: "center" }}>
+    <div style={{ position: "relative", width: 1000, height: 562, borderRadius: 28, overflow: "hidden", boxShadow: "0 24px 60px rgba(0,0,0,0.25)" }}>
+      <Pic src="img/yt_thumb.jpg" pos="100% 50%" />
+    </div>
+    <div style={{ position: "absolute", bottom: 60 }}><PopIn delay={6}><div style={{ background: C.dark, color: "#fff", fontFamily: MONO, fontWeight: 800, fontSize: 52, padding: "14px 30px", borderRadius: 18 }}>…AND REBUILD IT ✓</div></PopIn></div>
+  </AbsoluteFill>
+);
+
+const ClaudePlusRea: React.FC = () => (
+  <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", gap: 30 }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 34 }}>
+      <PopIn from="left" dist={300}><div style={{ background: C.dark, color: C.orange, fontFamily: MONO, fontWeight: 800, fontSize: 64, padding: "26px 36px", borderRadius: 26 }}>✻ Claude Code</div></PopIn>
+      <PopIn delay={8}><div style={{ fontFamily: MONO, fontWeight: 800, fontSize: 90, color: C.ink }}>+</div></PopIn>
+      <PopIn from="right" dist={300} delay={12}><div style={{ background: "#fff", border: `4px solid ${C.ink}`, color: C.ink, fontFamily: MONO, fontWeight: 800, fontSize: 64, padding: "22px 36px", borderRadius: 26 }}>REA</div></PopIn>
+    </div>
+    <PopIn delay={22}><div style={{ fontFamily: MONO, fontWeight: 800, fontSize: 46, color: C.mute }}>→ reverse engineer Wekan</div></PopIn>
+  </AbsoluteFill>
+);
+
+/** One real shot from the YouTube video, in a browser frame with a label. */
+const YTShot: React.FC<{ at: number; label: string; rate?: number; zoom?: number; origin?: string; full?: boolean; tag?: string }> = ({ at, label, rate = 1, zoom = 1, origin = "50% 50%", full, tag }) => {
+  const frame = useCurrentFrame();
+  const z = zoom + interpolate(frame, [0, 60], [0, 0.06], { extrapolateRight: "clamp" });
+  const w = full ? 1080 : 1000;
+  const h = full ? 1920 : 562;
+  return (
+    <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", background: full ? C.dark : undefined }}>
+      <div style={{ position: "relative", width: w, height: full ? 608 : h, borderRadius: full ? 0 : 26, overflow: "hidden", boxShadow: full ? undefined : "0 24px 60px rgba(0,0,0,0.25)", border: full ? undefined : `4px solid ${C.dark}` }}>
+        <div style={{ width: "100%", height: "100%", transform: `scale(${z})`, transformOrigin: origin }}>
+          <Clip src={YT} startFrom={at} rate={rate} kenBurns={0} durFrames={90} style={{ width: "100%", height: "100%" }} />
+        </div>
+      </div>
+      <div style={{ position: "absolute", top: full ? 470 : 70, display: "flex", justifyContent: "center", width: "100%" }}>
+        <div style={{ background: C.orange, color: "#fff", fontFamily: MONO, fontWeight: 800, fontSize: full ? 64 : 48, padding: "12px 28px", borderRadius: 16, transform: `scale(${interpolate(frame, [0, 5], [1.6, 1], { extrapolateRight: "clamp" })})` }}>{label}</div>
+      </div>
+      {tag && <div style={{ position: "absolute", bottom: full ? 470 : 40, fontFamily: MONO, fontWeight: 700, fontSize: 30, color: full ? "#fff" : C.mute }}>{tag}</div>}
+    </AbsoluteFill>
+  );
+};
+
+/** "Here is what happened" — 5.5s of real footage from the full video. */
+const ResultMontage: React.FC = () => {
+  const frame = useCurrentFrame();
+  const shots: [number, number, React.ReactNode][] = [
+    [0, 30, <YTShot full at={RT.timer} rate={4} label="⏱ 18 MIN LATER…" tag="real run · sped up" />],
+    [30, 60, <YTShot full at={RT.checks} label="✓ ALL 50 CHECKS PASS" zoom={1.25} origin="30% 70%" />],
+    [60, 105, <YTShot full at={RT.side} label="ORIGINAL vs REA BOARD" />],
+    [105, 165, <YTShot full at={RT.drag} rate={1.5} label="✓ DRAG & DROP WORKS" />],
+  ];
+  return (
+    <AbsoluteFill style={{ background: C.dark }}>
+      {shots.map(([a, b, el], i) => (
+        <Sequence key={i} from={a} durationInFrames={b - a}>{el}<Flash dur={4} /></Sequence>
+      ))}
+      {frame < 165 && <div style={{ position: "absolute", left: 0, right: 0, bottom: 300, textAlign: "center", fontFamily: MONO, fontWeight: 700, fontSize: 28, color: "#888" }}>From my full REA video · AI with Kalyan</div>}
+    </AbsoluteFill>
+  );
+};
+
+const RealSideBySide: React.FC = () => (
+  <YTShot at={RT.side + 2} label="USEFUL? OR JUST SIMILAR?" tag="real side-by-side from my test" />
+);
+const RealCardZoom: React.FC = () => (
+  <YTShot at={RT.cards} label="LOOKS THE SAME…" zoom={1.1} tag="but does it work? → full video" />
+);
+
 const SCENES: Scene[] = [
-  { a: 0, b: 4.71, mode: "split", top: Scanner },
-  { a: 4.71, b: 5.83, mode: "face" },
-  { a: 5.83, b: 9.75, mode: "split", top: ReaRepo },
-  { a: 9.75, b: 15.6, mode: "full", top: HypeMeter },
-  { a: 15.6, b: 18.75, mode: "split", top: WekanCard },
-  { a: 18.75, b: 22.95, mode: "split", top: Terminal },
-  { a: 22.95, b: 28.0, mode: "full", top: ThreeStep },
-  { a: 28.0, b: GAP0, mode: "split", top: WhatHappened },
-  { a: GAP0, b: GAP1, mode: "full", top: GapMontage },
-  { a: GAP1, b: 37.15, mode: "split", top: Useful },
-  { a: 37.15, b: 41.3, mode: "split", top: AppGrid },
-  { a: 41.3, b: 43.95, mode: "split", top: Checklist },
-  { a: 43.95, b: 47.4, mode: "split", top: VideoCard },
-  { a: 47.4, b: D.duration, mode: "split", top: Subscribe },
+  { a: 0, b: 1.3, mode: "split", top: HookA },
+  { a: 1.3, b: 2.62, mode: "split", top: Scanner },
+  { a: 2.62, b: 4.0, mode: "split", top: HookC },
+  { a: 4.0, b: 4.94, mode: "face" },
+  { a: 4.94, b: 6.8, mode: "split", top: ReaRepo },
+  { a: 6.8, b: 8.3, mode: "full", top: () => <BigWord words={["REVERSE", "ENGINEER", "ANYTHING"]} every={9} /> },
+  { a: 8.3, b: 10.55, mode: "split", top: () => <BigWord words={["DOES IT", "WORK?"]} every={12} /> },
+  { a: 10.55, b: 13.3, mode: "full", top: HypeMeter },
+  { a: 13.3, b: 15.85, mode: "split", top: WekanCard },
+  { a: 15.85, b: 17.5, mode: "split", top: ClaudePlusRea },
+  { a: 17.5, b: 19.5, mode: "split", top: Terminal },
+  { a: 19.5, b: 23.7, mode: "full", top: ThreeStep },
+  { a: 23.7, b: GAP0, mode: "face" },
+  { a: GAP0, b: GAP1, mode: "full", top: ResultMontage },
+  { a: GAP1, b: 32.35, mode: "split", top: RealSideBySide },
+  { a: 32.35, b: 34.3, mode: "split", top: RealCardZoom },
+  { a: 34.3, b: 36.5, mode: "split", top: AppGrid },
+  { a: 36.5, b: 37.8, mode: "face" },
+  { a: 37.8, b: 40.1, mode: "split", top: Checklist },
+  { a: 40.1, b: 43.0, mode: "split", top: VideoCard },
+  { a: 43.0, b: D.duration, mode: "split", top: Subscribe },
 ];
+
 
 /* ---------------- captions ---------------- */
 const chunks = chunkWords(D.words, 3, 16);
@@ -393,12 +493,7 @@ const Captions: React.FC = () => {
 /* ---------------- main ---------------- */
 export const Reel1: React.FC = () => {
   const sfx: [number, string, number?][] = [
-    [0.05, "whoosh"], [0.9, "swish", 0.3], [2.4, "click", 0.4], [3.4, "pop"], [4.71, "swish"], [5.83, "whoosh"], [8.2, "pop"], [8.35, "ding", 0.25],
-    [9.75, "whoosh"], [10.1, "pop"], [11.75, "pop"], [15.6, "swish"], [16.2, "pop", 0.3], [18.75, "whoosh"], [19.3, "typing", 0.35], [20.7, "typing", 0.35],
-    [22.95, "whoosh"], [23.3, "pop"], [23.9, "pop"], [24.5, "pop"], [25.3, "blip", 0.3], [25.55, "blip", 0.3], [25.8, "blip", 0.3], [28.0, "swish"],
-    [GAP0, "riser", 0.4], [GAP0 + 0.73, "shutter", 0.4], [GAP0 + 1.47, "shutter", 0.4], [GAP0 + 1.6, "impact", 0.5],
-    [GAP1, "whoosh"], [33.0, "pop"], [34.7, "pop"], [37.15, "swish"], [37.3, "blip", 0.25], [37.5, "blip", 0.25], [37.7, "blip", 0.25], [38.8, "typing", 0.3],
-    [41.3, "swish"], [41.5, "ding", 0.18], [41.9, "ding", 0.18], [42.3, "ding", 0.18], [42.7, "ding", 0.22], [43.95, "whoosh"], [47.4, "whoosh"], [48.4, "click", 0.6], [48.45, "notify", 0.35],
+    [0, "whoosh", 0.4], [1.3, "swish", 0.4], [2.62, "whoosh", 0.4], [4.0, "swish", 0.4], [4.94, "whoosh", 0.4], [6.8, "swish", 0.4], [8.3, "whoosh", 0.4], [10.55, "swish", 0.4], [13.3, "whoosh", 0.4], [15.85, "swish", 0.4], [17.5, "whoosh", 0.4], [19.5, "swish", 0.4], [23.7, "whoosh", 0.4], [30.475, "swish", 0.4], [32.35, "whoosh", 0.4], [34.3, "swish", 0.4], [36.5, "whoosh", 0.4], [37.8, "swish", 0.4], [40.1, "whoosh", 0.4], [43.0, "swish", 0.4], [0.2, "pop"], [1.5, "click", 0.35], [2.0, "blip", 0.3], [2.8, "ding", 0.25], [4.0, "impact", 0.45], [6.1, "ding", 0.22], [6.8, "impact", 0.35], [7.1, "pop"], [7.4, "pop"], [8.4, "pop"], [8.8, "pop"], [11.0, "pop"], [12.6, "pop"], [13.6, "pop", 0.3], [16.1, "pop"], [16.4, "pop"], [16.6, "pop"], [17.6, "typing", 0.35], [18.6, "typing", 0.3], [19.7, "pop"], [20.1, "pop"], [20.5, "pop"], [22.0, "blip", 0.3], [22.3, "blip", 0.3], [22.6, "blip", 0.3], [23.7, "riser", 0.4], [24.975, "impact", 0.55], [25.975, "shutter", 0.4], [26.975, "ding", 0.3], [28.475, "shutter", 0.4], [30.0, "ding", 0.3], [34.4, "blip", 0.25], [34.55, "blip", 0.25], [34.7, "blip", 0.25], [36.5, "impact", 0.3], [37.9, "ding", 0.18], [38.15, "ding", 0.18], [38.4, "ding", 0.18], [38.65, "ding", 0.2], [43.65, "click", 0.6], [43.7, "notify", 0.35],
   ];
   return (
     <AbsoluteFill style={{ background: C.bg }}>
@@ -412,12 +507,12 @@ export const Reel1: React.FC = () => {
             {s.mode === "split" && (
               <>
                 <AbsoluteFill style={{ height: 960 }}>{Top && <Top />}</AbsoluteFill>
-                <Aroll data={D} src="r/r1_aroll.mp4" box={{ x: 0, y: 960, w: 1080, h: 960 }} focusY={900} offset={from} />
+                <Aroll data={D} src="r/r1f_aroll.mp4" box={{ x: 0, y: 960, w: 1080, h: 960 }} focusY={900} offset={from} />
               </>
             )}
             {s.mode === "face" && (
               <>
-                <Aroll data={D} src="r/r1_aroll.mp4" box={{ x: 0, y: 0, w: 1080, h: 1920 }} focusY={920} zoom={1.35} alternate={false} offset={from} />
+                <Aroll data={D} src="r/r1f_aroll.mp4" box={{ x: 0, y: 0, w: 1080, h: 1920 }} focusY={920} zoom={1.35} alternate={false} offset={from} />
                 <Flash dur={5} />
               </>
             )}
@@ -431,7 +526,7 @@ export const Reel1: React.FC = () => {
         );
       })}
       <Captions />
-      <Audio src={staticFile("r/r1_aroll.mp4")} />
+      <Audio src={staticFile("r/r1f_aroll.mp4")} />
       <Music src="r/r1_music.wav" total={D.duration} base={0.13} boosts={[[GAP0, GAP1, 0.5]]} />
       {sfx.map(([t, n, v], i) => <Sfx key={i} at={t} name={n} vol={v ?? 0.45} />)}
     </AbsoluteFill>
