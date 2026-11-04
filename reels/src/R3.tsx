@@ -1,5 +1,5 @@
 import React from "react";
-import { AbsoluteFill, Audio, interpolate, Sequence, staticFile, useCurrentFrame, Easing } from "remotion";
+import { AbsoluteFill, Audio, interpolate, Sequence, staticFile, useCurrentFrame, Easing, OffthreadVideo } from "remotion";
 import data from "../public/r/r3_words.json";
 import {
   Aroll, Clip, Cursor, f, FPS, INTER, MONO, SERIF, Music, Pic, PopIn, ReelData, Sfx, SubscribeCard, Typewriter, Credit, Flash,
@@ -7,10 +7,12 @@ import {
 } from "./lib";
 
 const D = data as ReelData;
-export const R3_FRAMES = Math.ceil(D.duration * FPS);
+const END = D.duration + 0.8;
+export const R3_FRAMES = Math.ceil(END * FPS);
 
 const C = { navy: "#070B14", sage: "#4D7A5E", sageDark: "#2F4D3B", amber: "#F2B84B", white: "#FFFFFF", mute: "#9FB0A6" };
-const TOP_H = 1344;
+const TOP_H = 1920; // footage is full-screen; Kalyan is a cut-out overlaid at the bottom
+const CUT = { w: 780, left: 150, top: 1920 - Math.round(780 * 1280 / 720) + 40 };
 const NASA = "Footage: NASA (public domain)";
 
 const Stars: React.FC<{ n?: number }> = ({ n = 140 }) => {
@@ -38,6 +40,44 @@ const Chip: React.FC<{ children: React.ReactNode; bg?: string; color?: string }>
   <div style={{ background: bg, color, border: "1.5px solid rgba(255,255,255,0.25)", backdropFilter: "blur(6px)", fontFamily: INTER, fontWeight: 700, fontSize: 34, padding: "12px 24px", borderRadius: 999 }}>{children}</div>
 );
 
+/* Curiosity card: a big question that pops and wobbles. */
+const QCard: React.FC<{ children: React.ReactNode; top: number; delay?: number }> = ({ children, top, delay = 0 }) => {
+  const frame = useCurrentFrame();
+  const wob = Math.sin((frame - delay) / 3) * Math.max(0, 1 - (frame - delay) / 18) * 4;
+  return (
+    <div style={{ position: "absolute", top, left: 60, right: 60, display: "flex", justifyContent: "center", zIndex: 4 }}>
+      <PopIn delay={delay}>
+        <div style={{ background: "#fff", color: "#111", borderRadius: 26, padding: "18px 30px", fontFamily: SERIF, fontStyle: "italic", fontWeight: 800, fontSize: 54, textAlign: "center", boxShadow: "0 20px 60px rgba(0,0,0,0.5)", transform: `rotate(${wob}deg)` }}>{children}</div>
+      </PopIn>
+    </div>
+  );
+};
+
+/* Mystery beat before the poem: blurred lines + incoming-signal countdown. */
+const Mystery: React.FC = () => {
+  const frame = useCurrentFrame();
+  const n = 3 - Math.min(2, Math.floor(frame / 20));
+  const ring = (frame % 20) / 20;
+  return (
+    <AbsoluteFill>
+      <Stars />
+      <SerifTitle size={84}>What did the AI write<br />from orbit? 👀</SerifTitle>
+      <div style={{ position: "absolute", top: 420, left: 90, right: 90, display: "flex", flexDirection: "column", gap: 22, filter: "blur(14px)", opacity: 0.85 }}>
+        {["Blue marble below", "Data streams in silent grace", "Starlight feeds my core."].map((l) => (
+          <div key={l} style={{ fontFamily: SERIF, fontStyle: "italic", fontWeight: 700, fontSize: 80, color: "#fff" }}>{l}</div>
+        ))}
+      </div>
+      <div style={{ position: "absolute", top: 760, left: 0, right: 0, display: "flex", justifyContent: "center", alignItems: "center", gap: 26 }}>
+        <div style={{ position: "relative", width: 90, height: 90 }}>
+          <div style={{ position: "absolute", inset: 0, borderRadius: 45, border: `4px solid ${C.amber}`, transform: `scale(${0.4 + ring})`, opacity: 1 - ring }} />
+          <div style={{ position: "absolute", left: 33, top: 33, width: 24, height: 24, borderRadius: 12, background: C.amber }} />
+        </div>
+        <div style={{ fontFamily: MONO, fontWeight: 800, fontSize: 44, color: C.amber, letterSpacing: 3 }}>INCOMING SIGNAL · {n}</div>
+      </div>
+    </AbsoluteFill>
+  );
+};
+
 /* ---------- scenes ---------- */
 const Open: React.FC = () => {
   const frame = useCurrentFrame();
@@ -45,13 +85,13 @@ const Open: React.FC = () => {
   return (
     <AbsoluteFill>
       <div style={{ transform: `scale(${punch ? 1.25 : 1})`, width: 1080, height: TOP_H }}>
-        <Clip src="b/n_window.mp4" pos="78% 35%" durFrames={120} kenBurns={0.12} style={{ width: 1080, height: TOP_H }} />
+        <Clip src="b/n_window.mp4" pos="78% 35%" durFrames={120} kenBurns={0.2} style={{ width: 1080, height: TOP_H }} />
       </div>
       <AbsoluteFill style={{ background: "linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0) 40%)" }} />
       {!punch && <SerifTitle delay={4}>Google just made AI<br />work in space.</SerifTitle>}
       {punch && <SerifTitle size={120} top={160}>Yes, <span style={{ color: C.amber }}>actual</span> space.</SerifTitle>}
       {punch && <Sequence from={f(2.52)}><Flash dur={5} /></Sequence>}
-      <Credit text={NASA} top={TOP_H - 70} />
+      <Credit text={NASA} top={34} />
     </AbsoluteFill>
   );
 };
@@ -61,23 +101,24 @@ const Launch: React.FC = () => {
   const hw = frame >= f(2.0);
   return (
     <AbsoluteFill>
-      <Clip src="b/n_launchset.mp4" startFrom={44} durFrames={120} kenBurns={0.15} style={{ width: 1080, height: TOP_H }} />
+      <Clip src="b/n_launchset.mp4" startFrom={44} durFrames={120} kenBurns={0.22} style={{ width: 1080, height: TOP_H }} />
       <AbsoluteFill style={{ background: "linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0) 35%)" }} />
       <div style={{ position: "absolute", top: 110, left: 0, right: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
         <PopIn><Chip bg="rgba(77,122,94,0.85)">🛰 Project Suncatcher</Chip></PopIn>
         <PopIn delay={6}><Chip>Prototype launched Oct 1, 2026</Chip></PopIn>
       </div>
       {hw && (
-        <div style={{ position: "absolute", left: 90, right: 90, top: 470 }}>
+        <div style={{ position: "absolute", left: 90, right: 90, top: 300 }}>
           <PopIn from="up" dist={120}>
             <div style={{ borderRadius: 30, overflow: "hidden", border: "3px solid rgba(255,255,255,0.8)", boxShadow: "0 30px 80px rgba(0,0,0,0.6)", position: "relative" }}>
-              <Pic src="img/suncatcher_hero.png" style={{ height: 500 }} pos="50% 50%" />
+              <Pic src="img/suncatcher_hero.png" style={{ height: 470 }} pos="50% 50%" />
               <div style={{ position: "absolute", left: 20, bottom: 20, background: C.amber, color: "#111", fontFamily: INTER, fontWeight: 800, fontSize: 36, padding: "10px 20px", borderRadius: 14 }}>4 × Google TPU AI chips on board</div>
             </div>
           </PopIn>
         </div>
       )}
-      <Credit text={hw ? "Image: Google · Launch: NASA archive (not the Suncatcher launch)" : "Archival launch footage: NASA (not the Suncatcher launch)"} top={TOP_H - 70} />
+      {frame >= f(2.4) && <QCard top={830}>An AI chip… in <span style={{ color: C.amber }}>ORBIT</span>? 🛰</QCard>}
+      <Credit text={hw ? "Image: Google · Launch: NASA archive (not the Suncatcher launch)" : "Archival launch footage: NASA (not the Suncatcher launch)"} top={34} />
     </AbsoluteFill>
   );
 };
@@ -116,17 +157,18 @@ const Uplink: React.FC = () => {
 };
 
 const PromptCard: React.FC = () => (
-  <AbsoluteFill style={{ background: C.sage, alignItems: "center", justifyContent: "center" }}>
-    <div style={{ position: "absolute", top: 140, fontFamily: MONO, fontWeight: 800, fontSize: 40, color: "#E6F0E9", letterSpacing: 4 }}>▲ UPLINK</div>
+  <AbsoluteFill style={{ background: C.sage, alignItems: "center", paddingTop: 300 }}>
+    <div style={{ position: "absolute", top: 160, fontFamily: MONO, fontWeight: 800, fontSize: 40, color: "#E6F0E9", letterSpacing: 4 }}>▲ UPLINK</div>
     <PopIn>
       <div style={{ width: 900, background: "#0f1a14", borderRadius: 30, padding: 44, boxShadow: "0 30px 70px rgba(0,0,0,0.35)" }}>
         <div style={{ fontFamily: MONO, fontSize: 30, color: C.mute }}>PROMPT → Gemma 4 (in orbit)</div>
         <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: 52, color: "#fff", marginTop: 26, lineHeight: 1.3 }}>
-          <Typewriter text="Write a haiku about being in space." delay={f(1.0)} cps={20} caretColor={C.amber} />
+          <Typewriter text="Write a poem about being in space." delay={f(1.0)} cps={17} caretColor={C.amber} />
         </div>
       </div>
     </PopIn>
-    <Credit text="Prompt as described on blog.google" top={TOP_H - 70} />
+    <div style={{ position: "absolute", top: 640, left: 90, right: 90, textAlign: "center" }}><PopIn delay={f(2.6)}><div style={{ fontFamily: INTER, fontWeight: 600, fontSize: 32, color: "#E6F0E9" }}>(Google asked for a haiku: a 3-line poem)</div></PopIn></div>
+    <Credit text="Prompt as described on blog.google" top={34} />
   </AbsoluteFill>
 );
 
@@ -134,17 +176,17 @@ const Haiku: React.FC = () => {
   const lines = ["Blue marble below", "Data streams in silent grace", "Starlight feeds my core."];
   return (
     <AbsoluteFill>
-      <Clip src="b/n_airglow.mp4" pos="78% 35%" durFrames={130} kenBurns={0.06} style={{ width: 1080, height: TOP_H, filter: "brightness(0.55)" }} />
+      <Clip src="b/n_airglow.mp4" pos="78% 35%" durFrames={130} kenBurns={0.14} style={{ width: 1080, height: TOP_H, filter: "brightness(0.55)" }} />
       <div style={{ position: "absolute", top: 120, width: "100%", textAlign: "center", fontFamily: MONO, fontWeight: 800, fontSize: 40, color: C.amber, letterSpacing: 4 }}>▼ DOWNLINK · RECEIVED</div>
       <div style={{ position: "absolute", top: 330, left: 80, right: 80, display: "flex", flexDirection: "column", gap: 30 }}>
         {lines.map((l, i) => (
           <div key={l} style={{ fontFamily: SERIF, fontStyle: "italic", fontWeight: 700, fontSize: 84, color: "#fff", textShadow: "0 6px 30px rgba(0,0,0,0.8)", lineHeight: 1.1 }}>
-            <Typewriter text={l} delay={f(0.5 + i * 1.15)} cps={24} caret={false} />
+            <Typewriter text={l} delay={f(0.15 + i * 0.75)} cps={34} caret={false} />
           </div>
         ))}
-        <PopIn delay={f(3.6)}><div style={{ fontFamily: INTER, fontWeight: 600, fontSize: 32, color: C.mute, marginTop: 20 }}>— Gemma 4, written in orbit · received as the satellite passed Svalbard, Norway</div></PopIn>
+        <PopIn delay={f(2.2)}><div style={{ fontFamily: INTER, fontWeight: 600, fontSize: 32, color: C.mute, marginTop: 20 }}>— Gemma 4, written in orbit · received as the satellite passed Svalbard, Norway</div></PopIn>
       </div>
-      <Credit text="Haiku: blog.google (Project Suncatcher) · Footage: NASA" top={TOP_H - 70} />
+      <Credit text="Haiku: blog.google (Project Suncatcher) · Footage: NASA" top={34} />
     </AbsoluteFill>
   );
 };
@@ -154,7 +196,7 @@ const Constellation: React.FC = () => {
   const sats = new Array(9).fill(0).map((_, i) => ({ x: 200 + (i % 3) * 340, y: 470 + Math.floor(i / 3) * 230 }));
   return (
     <AbsoluteFill>
-      <Clip src="b/n_nz.mp4" pos="78% 35%" durFrames={140} kenBurns={0.05} style={{ width: 1080, height: TOP_H, filter: "brightness(0.45)" }} />
+      <Clip src="b/n_nz.mp4" pos="78% 35%" durFrames={140} kenBurns={0.12} style={{ width: 1080, height: TOP_H, filter: "brightness(0.45)" }} />
       <SerifTitle size={82}>AI data centers…<br /><span style={{ color: C.amber }}>in orbit?</span></SerifTitle>
       <svg width={1080} height={TOP_H} style={{ position: "absolute" }}>
         {sats.map((a, i) => sats.slice(i + 1).filter((b) => Math.abs(a.x - b.x) + Math.abs(a.y - b.y) < 400).map((b, k) => (
@@ -172,10 +214,10 @@ const Constellation: React.FC = () => {
           </PopIn>
         </div>
       ))}
-      <div style={{ position: "absolute", top: 1010, left: 0, right: 0, display: "flex", justifyContent: "center" }}>
+      <div style={{ position: "absolute", top: 940, left: 0, right: 0, display: "flex", justifyContent: "center" }}>
         <PopIn delay={50}><Chip bg="rgba(77,122,94,0.85)">☀️ solar-powered TPU satellites</Chip></PopIn>
       </div>
-      <Credit text={NASA} top={TOP_H - 70} />
+      <Credit text={NASA} top={34} />
     </AbsoluteFill>
   );
 };
@@ -183,18 +225,19 @@ const Constellation: React.FC = () => {
 const Article: React.FC = () => {
   const frame = useCurrentFrame();
   return (
-    <AbsoluteFill style={{ background: C.sage, alignItems: "center", paddingTop: 200 }}>
+    <AbsoluteFill style={{ background: C.sage, alignItems: "center", paddingTop: 260 }}>
+      <QCard top={90} delay={f(0.5)}>Wait… Google is <i>actually</i> researching this? 🤔</QCard>
       <PopIn>
         <div style={{ width: 960, borderRadius: 26, overflow: "hidden", background: "#fff", boxShadow: "0 30px 70px rgba(0,0,0,0.3)", transform: `scale(${interpolate(frame, [0, 80], [1, 1.06])})` }}>
           <Pic src="img/sun_head.png" fit="contain" style={{ height: 260 }} />
         </div>
       </PopIn>
       <PopIn delay={14} from="up" style={{ marginTop: 40 }}>
-        <div style={{ width: 960, borderRadius: 26, overflow: "hidden", background: "#fff", boxShadow: "0 30px 70px rgba(0,0,0,0.3)", height: 620 }}>
+        <div style={{ width: 960, borderRadius: 26, overflow: "hidden", background: "#fff", boxShadow: "0 30px 70px rgba(0,0,0,0.3)", height: 420 }}>
           <Pic src="img/sun_haiku.png" pos="0% 0%" />
         </div>
       </PopIn>
-      <Credit text="Source: blog.google · Google Research" top={TOP_H - 70} />
+      <Credit text="Source: blog.google · Google Research" top={34} />
     </AbsoluteFill>
   );
 };
@@ -221,11 +264,11 @@ const Roadmap: React.FC = () => {
         ))}
       </div>
       {frame > f(1.6) && (
-        <div style={{ position: "absolute", top: 1010, width: "100%", display: "flex", justifyContent: "center" }}>
+        <div style={{ position: "absolute", top: 900, width: "100%", display: "flex", justifyContent: "center" }}>
           <div style={{ transform: `rotate(-6deg) scale(${stamp})`, border: `6px solid ${C.amber}`, color: C.amber, fontFamily: SERIF, fontStyle: "italic", fontWeight: 800, fontSize: 70, padding: "6px 30px", borderRadius: 14 }}>fascinating idea</div>
         </div>
       )}
-      <Credit text="Plans per blog.google / The Next Web" top={TOP_H - 70} />
+      <Credit text="Plans per blog.google / The Next Web" top={34} />
     </AbsoluteFill>
   );
 };
@@ -236,7 +279,7 @@ const Poll: React.FC = () => {
   const u = interpolate(frame, [f(2.9), f(3.7)], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) });
   return (
     <AbsoluteFill>
-      <Clip src="b/n_earthmoon.mp4" pos="78% 35%" durFrames={140} kenBurns={0.05} style={{ width: 1080, height: TOP_H, filter: "brightness(0.4) blur(2px)" }} />
+      <Clip src="b/n_earthmoon.mp4" pos="78% 35%" durFrames={140} kenBurns={0.12} style={{ width: 1080, height: TOP_H, filter: "brightness(0.4) blur(2px)" }} />
       <SerifTitle size={84}>Genius… or<br />completely unnecessary?</SerifTitle>
       <div style={{ position: "absolute", top: 520, left: 110, right: 110, display: "flex", flexDirection: "column", gap: 34 }}>
         {[["🚀  Genius", g, C.amber], ["🙄  Unnecessary", u, "#94a3b8"]].map(([t, p, c]) => (
@@ -247,7 +290,7 @@ const Poll: React.FC = () => {
           </div>
         ))}
       </div>
-      <Credit text={NASA} top={TOP_H - 70} />
+      <Credit text={NASA} top={34} />
     </AbsoluteFill>
   );
 };
@@ -258,7 +301,7 @@ const Engage: React.FC = () => {
   const hs = heart ? interpolate(frame - f(1.6), [0, 6, 12], [0.6, 1.35, 1], { extrapolateRight: "clamp" }) : 1;
   return (
     <AbsoluteFill>
-      <Clip src="b/n_moonrise.mp4" pos="78% 35%" durFrames={160} kenBurns={0.06} style={{ width: 1080, height: TOP_H, filter: "brightness(0.55)" }} />
+      <Clip src="b/n_moonrise.mp4" pos="78% 35%" durFrames={160} kenBurns={0.14} style={{ width: 1080, height: TOP_H, filter: "brightness(0.55)" }} />
       <div style={{ position: "absolute", top: 260, left: 90, right: 90 }}>
         <PopIn from="up">
           <div style={{ background: "#fff", borderRadius: 30, padding: 30, display: "flex", gap: 22 }}>
@@ -270,20 +313,20 @@ const Engage: React.FC = () => {
       <div style={{ position: "absolute", top: 640, width: "100%", display: "flex", justifyContent: "center", gap: 60 }}>
         <div style={{ width: 220, height: 220, borderRadius: 110, background: heart ? "#ff2d55" : "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 120, transform: `scale(${hs})` }}>♥</div>
       </div>
-      <SerifTitle size={70} top={980}>More space × AI discoveries</SerifTitle>
-      <Credit text={NASA} top={TOP_H - 70} />
+      <SerifTitle size={70} top={900}>More space × AI discoveries</SerifTitle>
+      <Credit text={NASA} top={34} />
     </AbsoluteFill>
   );
 };
 
 const End: React.FC = () => (
   <AbsoluteFill>
-    <Clip src="b/n_earthmoon.mp4" pos="78% 35%" startFrom={2} durFrames={140} kenBurns={0.08} style={{ width: 1080, height: TOP_H, filter: "brightness(0.5)" }} />
+    <Clip src="b/n_earthmoon.mp4" pos="78% 35%" startFrom={2} durFrames={140} kenBurns={0.14} style={{ width: 1080, height: TOP_H, filter: "brightness(0.5)" }} />
     <div style={{ position: "absolute", top: 330, width: "100%", display: "flex", justifyContent: "center" }}>
       <PopIn from="up"><SubscribeCard clickAt={f(1.2)} dark accent={C.sage} sub="The biggest AI updates, explained simply" /></PopIn>
     </div>
     <Cursor path={[[0, 900, 1100], [f(1.0), 560, 760], [f(1.6), 580, 770]]} clicks={[f(1.2)]} color="#fff" />
-    <Credit text={NASA} top={TOP_H - 70} />
+    <Credit text={NASA} top={34} />
   </AbsoluteFill>
 );
 
@@ -292,24 +335,25 @@ const SCENES: { a: number; b: number; body: React.FC }[] = [
   { a: 3.75, b: 7.45, body: Launch },
   { a: 7.45, b: 13.91, body: Uplink },
   { a: 13.91, b: 17.07, body: PromptCard },
-  { a: 17.07, b: 21.6, body: Haiku },
-  { a: 21.6, b: 25.8, body: Constellation },
+  { a: 17.07, b: 19.1, body: Mystery },
+  { a: 19.1, b: 22.3, body: Haiku },
+  { a: 22.3, b: 25.8, body: Constellation },
   { a: 25.8, b: 28.45, body: Article },
   { a: 28.45, b: 32.27, body: Roadmap },
   { a: 32.27, b: 36.7, body: Poll },
-  { a: 36.7, b: 42.0, body: Engage },
-  { a: 42.0, b: D.duration, body: End },
+  { a: 36.7, b: 41.6, body: Engage },
+  { a: 41.6, b: END, body: End },
 ];
 
 const chunks = chunkWords(D.words, 4, 22);
 const Captions: React.FC = () => {
   const frame = useCurrentFrame();
   const t = frame / FPS;
-  if (t >= 17.07 && t < 21.0) return null; // haiku on screen
+  if (t >= 19.1 && t < 21.2) return null; // poem on screen
   const c = activeChunk(chunks, t);
   if (!c) return null;
   return (
-    <div style={{ position: "absolute", top: TOP_H - 190, left: 50, right: 50, display: "flex", justifyContent: "center", flexWrap: "wrap", gap: "0 16px" }}>
+    <div style={{ position: "absolute", top: 1560, left: 60, right: 60, display: "flex", justifyContent: "center", flexWrap: "wrap", gap: "0 16px", background: "rgba(7,11,20,0.72)", borderRadius: 24, padding: "14px 22px" }}>
       {c.words.map((w, i) => (
         <span key={i} style={{ fontFamily: INTER, fontWeight: 800, fontSize: 60, color: t >= w.s - 0.03 ? (i === c.words.map((x) => t >= x.s - 0.03).lastIndexOf(true) ? C.amber : "#fff") : "rgba(255,255,255,0.55)", textShadow: "0 4px 24px rgba(0,0,0,0.85)" }}>
           {w.w.replace(/[,.]$/, "")}
@@ -321,11 +365,12 @@ const Captions: React.FC = () => {
 
 export const Reel3: React.FC = () => {
   const sfx: [number, string, number?][] = [
-    [0, "impact", 0.5], [0.15, "whoosh", 0.35], [2.52, "impact", 0.6], [3.75, "whoosh"], [3.9, "pop", 0.3], [4.1, "pop", 0.3], [5.75, "whoosh"], [6.0, "shutter", 0.3],
-    [7.45, "riser", 0.35], [8.85, "uplink", 0.4], [11.45, "pop"], [13.91, "whoosh"], [14.2, "uplink", 0.4], [14.9, "typing", 0.35], [16.0, "typing", 0.3],
-    [17.07, "impact", 0.45], [17.4, "uplink", 0.35], [17.6, "typing", 0.2], [18.75, "typing", 0.2], [19.9, "typing", 0.2], [21.6, "whoosh"], [22.0, "blip", 0.2], [22.3, "blip", 0.2], [22.6, "blip", 0.2],
-    [25.8, "swish"], [26.2, "shutter", 0.35], [28.45, "whoosh"], [28.6, "pop"], [28.9, "pop"], [29.2, "pop"], [30.1, "impact", 0.45],
-    [32.27, "whoosh"], [34.1, "pop"], [35.2, "pop"], [36.7, "swish"], [38.3, "pop", 0.6], [38.3, "ding", 0.25], [42.0, "whoosh"], [43.2, "click", 0.6], [43.25, "notify", 0.35],
+    [0, "impact", 0.5], [2.52, "impact", 0.6], [3.75, "whoosh", 0.35], [6.15, "pop"], [6.4, "heartbeat", 0.5],
+    [7.45, "riser", 0.3], [8.85, "uplink", 0.4], [11.45, "pop"], [14.2, "uplink", 0.4], [14.9, "typing", 0.35], [16.0, "typing", 0.3],
+    [17.07, "signal", 0.45], [17.2, "heartbeat", 0.6], [17.87, "heartbeat", 0.6], [18.54, "heartbeat", 0.65], [19.1, "impact", 0.55],
+    [19.3, "typing", 0.2], [20.0, "typing", 0.2], [22.3, "whoosh", 0.3], [26.3, "pop"], [26.35, "heartbeat", 0.45], [28.45, "whoosh", 0.3],
+    [30.1, "impact", 0.4], [32.27, "whoosh", 0.3], [34.1, "pop"], [35.2, "pop"], [38.3, "pop", 0.6], [38.3, "ding", 0.25], [41.6, "whoosh", 0.3],
+    [42.8, "click", 0.6], [42.85, "notify", 0.35],
   ];
   return (
     <AbsoluteFill style={{ background: C.navy }}>
@@ -338,11 +383,12 @@ export const Reel3: React.FC = () => {
           </Sequence>
         );
       })}
-      <div style={{ position: "absolute", top: TOP_H, left: 0, right: 0, height: 6, background: C.amber, zIndex: 5 }} />
-      <Aroll data={D} src="r/r3_aroll.mp4" box={{ x: 0, y: TOP_H + 6, w: 1080, h: 1920 - TOP_H - 6 }} focusY={820} zoom={1.0} />
+      <AbsoluteFill style={{ background: "linear-gradient(rgba(7,11,20,0) 55%, rgba(7,11,20,0.85) 100%)" }} />
+      <OffthreadVideo src={staticFile("r/r3_cutout.webm")} transparent muted style={{ position: "absolute", left: CUT.left, top: CUT.top, width: CUT.w, filter: "drop-shadow(0 0 30px rgba(0,0,0,0.6))" }} />
       <Captions />
       <Audio src={staticFile("r/r3_aroll.mp4")} />
-      <Music src="r/r3_music.wav" total={D.duration} base={0.18} boosts={[[17.07, 21.0, 0.32]]} />
+      <Music src="r/r3_music.wav" total={END} base={0.15} boosts={[[19.1, 21.2, 0.3]]} />
+      <Sequence from={0} durationInFrames={f(32.3)}><Audio src={staticFile("sfx/drone.wav")} volume={0.22} /></Sequence>
       {sfx.map(([t, n, v], i) => <Sfx key={i} at={t} name={n} vol={v ?? 0.45} />)}
     </AbsoluteFill>
   );
