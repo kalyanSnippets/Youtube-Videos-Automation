@@ -15,7 +15,7 @@ const C = {
 };
 const GAP0 = 24.975, GAP1 = 30.475;
 const YT = "b/rea_yt.mp4";
-const RT = { timer: 12, checks: 35.2, side: 51.5, cards: 74, drag: 117 }; // 4:15-6:40 of the REA YouTube video (local 0 = 4:15)
+const RT = { timer: 22, checks: 35.4, side: 51.5, cards: 72.5, drag: 116.5 }; // 4:15-6:40 of the REA YouTube video (local 0 = 4:15)
 
 type Mode = "split" | "face" | "full";
 type Scene = { a: number; b: number; mode: Mode; top?: React.FC };
@@ -400,7 +400,7 @@ const ClaudePlusRea: React.FC = () => (
 );
 
 /** One real shot from the YouTube video, in a browser frame with a label. */
-const YTShot: React.FC<{ at: number; label: string; rate?: number; zoom?: number; origin?: string; full?: boolean; tag?: string }> = ({ at, label, rate = 1, zoom = 1, origin = "50% 50%", full, tag }) => {
+const YTShot: React.FC<{ at: number; label: string; rate?: number; zoom?: number; origin?: string; full?: boolean; tag?: string }> = ({ at, label, rate = 1, zoom = 1.25, origin = "50% 100%", full, tag }) => {
   const frame = useCurrentFrame();
   const z = zoom + interpolate(frame, [0, 60], [0, 0.06], { extrapolateRight: "clamp" });
   const w = full ? 1080 : 1000;
@@ -412,10 +412,10 @@ const YTShot: React.FC<{ at: number; label: string; rate?: number; zoom?: number
           <Clip src={YT} startFrom={at} rate={rate} kenBurns={0} durFrames={90} style={{ width: "100%", height: "100%" }} />
         </div>
       </div>
-      <div style={{ position: "absolute", top: full ? 470 : 70, display: "flex", justifyContent: "center", width: "100%" }}>
+      <div style={{ position: "absolute", top: full ? 460 : 70, display: "flex", justifyContent: "center", width: "100%" }}>
         <div style={{ background: C.orange, color: "#fff", fontFamily: MONO, fontWeight: 800, fontSize: full ? 64 : 48, padding: "12px 28px", borderRadius: 16, transform: `scale(${interpolate(frame, [0, 5], [1.6, 1], { extrapolateRight: "clamp" })})` }}>{label}</div>
       </div>
-      {tag && <div style={{ position: "absolute", bottom: full ? 470 : 40, fontFamily: MONO, fontWeight: 700, fontSize: 30, color: full ? "#fff" : C.mute }}>{tag}</div>}
+      {tag && <div style={{ position: "absolute", bottom: full ? 460 : 40, fontFamily: MONO, fontWeight: 700, fontSize: 30, color: full ? "#fff" : C.mute }}>{tag}</div>}
     </AbsoluteFill>
   );
 };
@@ -424,8 +424,8 @@ const YTShot: React.FC<{ at: number; label: string; rate?: number; zoom?: number
 const ResultMontage: React.FC = () => {
   const frame = useCurrentFrame();
   const shots: [number, number, React.ReactNode][] = [
-    [0, 30, <YTShot full at={RT.timer} rate={4} label="⏱ 18 MIN LATER…" tag="real run · sped up" />],
-    [30, 60, <YTShot full at={RT.checks} label="✓ ALL 50 CHECKS PASS" zoom={1.25} origin="30% 70%" />],
+    [0, 30, <YTShot full at={RT.timer} rate={4} label="⏱ 18 MIN LATER…" tag="real run · sped up" zoom={1.6} origin="0% 75%" />],
+    [30, 60, <YTShot full at={RT.checks} label="✓ ALL 50 CHECKS PASS" zoom={1.9} origin="0% 46%" />],
     [60, 105, <YTShot full at={RT.side} label="ORIGINAL vs REA BOARD" />],
     [105, 165, <YTShot full at={RT.drag} rate={1.5} label="✓ DRAG & DROP WORKS" />],
   ];
@@ -443,7 +443,7 @@ const RealSideBySide: React.FC = () => (
   <YTShot at={RT.side + 2} label="USEFUL? OR JUST SIMILAR?" tag="real side-by-side from my test" />
 );
 const RealCardZoom: React.FC = () => (
-  <YTShot at={RT.cards} label="LOOKS THE SAME…" zoom={1.1} tag="but does it work? → full video" />
+  <YTShot at={RT.cards} label="LOOKS THE SAME…" tag="but does it work? → full video" />
 );
 
 const SCENES: Scene[] = [
