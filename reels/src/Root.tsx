@@ -6,6 +6,7 @@ import { Reel3, R3_FRAMES } from "./R3";
 import { Reel4, R4_FRAMES } from "./R4";
 import { Cover } from "./Cover";
 import { Cover2 } from "./Cover2";
+import { Cover3 } from "./Cover3";
 
 const common = { fps: 30, width: 1080, height: 1920 } as const;
 export const RemotionRoot: React.FC = () => (
@@ -22,5 +23,9 @@ export const RemotionRoot: React.FC = () => (
     <Composition id="NewCover2" component={Cover2} durationInFrames={1} {...common} defaultProps={{ bg: "img/cf_top2.png", card: "img/cf_top2.png", face: "img/cut_face2.png", tag: "GOOGLE GENIE 4", line1: "Type a prompt.", hl: "WALK inside it", accent: "#3B82F6", emoji: "🎮" }} />
     <Composition id="NewCover3" component={Cover2} durationInFrames={1} {...common} defaultProps={{ bg: "img/cf_top3.png", bgPos: "90% 40%", card: "img/cf_top3.png", cardPos: "85% 30%", cardZoom: 1.2, face: "img/cut_face3.png", faceW: 1150, faceX: -230, faceY: 150, tag: "GEMMA 4 IN ORBIT", line1: "Google put AI", hl: "in SPACE", accent: "#F2B84B", emoji: "🛰️" }} />
     <Composition id="NewCover4" component={Cover2} durationInFrames={1} {...common} defaultProps={{ bg: "img/cf_top4.png", card: "img/cf_top4.png", cardPos: "50% 45%", cardZoom: 1.35, face: "img/cut_face4.png", faceW: 1150, faceX: -230, faceY: 150, tag: "OPENAI GPT-6.1 TERRA", line1: "This AI reviews", hl: "a WHOLE movie", accent: "#7C3AED", emoji: "🎬" }} />
+    <Composition id="VCover1" component={Cover3} durationInFrames={1} {...common} defaultProps={{ portrait: "img/portrait1.png", pill: "REA + Claude Code", pillIcon: "🧊", line1: "AI REBUILT", line2: "A REAL APP", a: { img: "img/card_rea_orig.png", pos: "0% 0%", label: "Original", labelBg: "#3B0764" }, b: { img: "img/card_rea_new.png", pos: "0% 0%", label: "AI Rebuilt", labelBg: "#FFE11A", labelColor: "#111" } }} />
+    <Composition id="VCover2" component={Cover3} durationInFrames={1} {...common} defaultProps={{ portrait: "img/portrait2.png", pill: "Google Genie 4", pillIcon: "🎮", line1: "TYPE IT.", line2: "WALK INSIDE", a: { node: "prompt", prompt: "a neon city at night with flying cars", label: "1 Prompt", labelBg: "#3B0764" }, b: { img: "img/card_genie_world.png", label: "Playable World", labelBg: "#FFE11A", labelColor: "#111" } }} />
+    <Composition id="VCover3" component={Cover3} durationInFrames={1} {...common} defaultProps={{ portrait: "img/portrait3.png", pill: "Google Gemma 4", pillIcon: "🛰️", line1: "AI IN SPACE", line2: "WROTE THIS", a: { img: "img/suncatcher_hero.png", label: "AI Satellite", labelBg: "#3B0764" }, b: { node: "poem", label: "Its Poem", labelBg: "#FFE11A", labelColor: "#111" } }} />
+    <Composition id="VCover4" component={Cover3} durationInFrames={1} {...common} defaultProps={{ portrait: "img/portrait4.png", pW: 1600, pX: -520, cardsTop: 760, layout: "row", pill: "OpenAI GPT-6.1 Terra", pillIcon: "🎬", line1: "AI REVIEWS", line2: "A WHOLE MOVIE", a: { img: "img/card_film.png", label: "Whole Movie", labelBg: "#3B0764" }, b: { node: "report", label: "AI Review", labelBg: "#FFE11A", labelColor: "#111" } }} />
   </>
 );
