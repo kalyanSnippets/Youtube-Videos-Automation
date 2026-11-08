@@ -5,6 +5,7 @@ import { Reel2, R2_FRAMES } from "./R2";
 import { Reel3, R3_FRAMES } from "./R3";
 import { Reel4, R4_FRAMES } from "./R4";
 import { Reel5, R5_FRAMES } from "./R5";
+import { Reel5B, R5B_FRAMES } from "./R5B";
 import { Reel6, R6_FRAMES } from "./R6";
 import { Reel7, R7_FRAMES } from "./R7";
 import { Cover } from "./Cover";
@@ -19,6 +20,7 @@ export const RemotionRoot: React.FC = () => (
     <Composition id="Reel3-SpaceAI" component={Reel3} durationInFrames={R3_FRAMES} {...common} />
     <Composition id="Reel4-GPT61Terra" component={Reel4} durationInFrames={R4_FRAMES} {...common} />
     <Composition id="Reel5-GoogleVids" component={Reel5} durationInFrames={R5_FRAMES} {...common} />
+    <Composition id="Reel5B-GoogleVids-Device" component={Reel5B} durationInFrames={R5B_FRAMES} {...common} />
     <Composition id="Reel6-MoMomentic" component={Reel6} durationInFrames={R6_FRAMES} {...common} />
     <Composition id="Reel7-TripoCanvas" component={Reel7} durationInFrames={R7_FRAMES} {...common} />
     <Composition id="Cover1" component={Cover} durationInFrames={1} {...common} defaultProps={{ top: "img/cf_top1.png", topPos: "60% 40%", topZoom: 1.25, face: "img/cf_face1.png", faceY: 380, tag: "REA + CLAUDE CODE", line1: "I let AI rebuild", line2: "a real app", accent: "#CC785C" }} />
