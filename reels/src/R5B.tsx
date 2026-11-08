@@ -258,7 +258,7 @@ const S = {
           )}
           {frame >= sub && (
             <PopIn from="right">
-              <div style={{ width: 524, height: 175, transform: "scale(0.7)", transformOrigin: "0 0" }}><SubscribeCard clickAt={click} accent={C.red} sub="Useful AI tutorials" avatarSrc="img/ch_BEp74aewRSA.jpg" /></div>
+              <div style={{ width: 524, height: 160, transform: "scale(0.6)", transformOrigin: "0 0" }}><SubscribeCard clickAt={click} accent={C.red} sub="Useful AI tutorials" avatarSrc="img/ch_BEp74aewRSA.jpg" /></div>
             </PopIn>
           )}
         </div>
