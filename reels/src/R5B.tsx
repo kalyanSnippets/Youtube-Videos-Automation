@@ -11,7 +11,7 @@ const END = D.duration + 0.8;
 export const R5B_FRAMES = Math.ceil(END * FPS);
 
 const C = { bg1: "#F8FAFC", bg2: "#E8F0FE", ink: "#0F172A", mute: "#64748B", blue: "#4285F4", red: "#EA4335", yellow: "#FBBC04", green: "#34A853", line: "#E2E8F0" };
-const CARD = { x: 50, y: 1190, w: 980, h: 680, r: 44 };
+const CARD = { x: 50, y: 1060, w: 980, h: 820, r: 44 };
 const REC = "Screen recording · Google Vids";
 const GEN = "Made with Gemini Omni in Google Vids";
 const ease = Easing.bezier(0.2, 0.8, 0.2, 1);
@@ -98,7 +98,7 @@ const S = {
     const strike = interpolate(frame, [f(2.55), f(2.85)], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
     return (
       <>
-        <Phone at={6} x={330} y={300} w={420} />
+        <Phone at={6} x={350} y={260} w={380} />
         <PopIn delay={f(1.3)} from="left" style={{ position: "absolute", left: 40, top: 520 }}>
           <div style={{ background: "#fff", borderRadius: 24, padding: "16px 24px", boxShadow: "0 16px 40px rgba(15,23,42,0.18)", fontFamily: INTER, fontWeight: 900, fontSize: 40, color: C.ink, transform: "rotate(-5deg)" }}>🎬 AI videos</div>
         </PopIn>
@@ -108,18 +108,18 @@ const S = {
             <div style={{ position: "absolute", left: 14, right: 14, top: "50%", height: 8, background: C.red, borderRadius: 4, transform: `scaleX(${strike})`, transformOrigin: "0 50%" }} />
           </div>
         </PopIn>
-        <Credit text={GEN} top={1150} />
+        <Credit text={GEN} top={1020} />
       </>
     );
   },
   launch: () => (
     <>
-      <Laptop at={0.4} rate={0.5} top={470} />
+      <Laptop at={0.4} rate={0.5} top={420} />
       <div style={{ position: "absolute", top: 260, left: 0, right: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
         <PopIn delay={f(0.5)}><div style={{ fontFamily: MONO, fontWeight: 800, fontSize: 28, color: C.blue, letterSpacing: 4 }}>NEW MODEL</div></PopIn>
         <PopIn delay={f(0.55)}><div style={{ fontFamily: INTER, fontWeight: 900, fontSize: 84, color: C.ink, letterSpacing: -3 }}>Gemini Omni <span style={{ background: `linear-gradient(90deg, ${C.blue}, ${C.red})`, WebkitBackgroundClip: "text", color: "transparent" }}>1.2 Flash</span></div></PopIn>
       </div>
-      <Pill top={1020} delay={f(2.8)}>inside <GoogleWord size={44} /> Vids</Pill>
+      <Pill top={940} delay={f(2.8)}>inside <GoogleWord size={44} /> Vids</Pill>
     </>
   ),
   free: () => {
@@ -130,7 +130,7 @@ const S = {
         <Phone at={6} x={50} y={300} w={300} rot={-8} delay={f(1.5)} />
         <Phone at={12} x={390} y={260} w={300} delay={f(1.5) + 4} />
         <Phone at={19} x={730} y={300} w={300} rot={8} delay={f(1.5) + 8} />
-        <div style={{ position: "absolute", top: 960, left: 0, right: 0, display: "flex", justifyContent: "center", alignItems: "center", gap: 26 }}>
+        <div style={{ position: "absolute", top: 925, left: 0, right: 0, display: "flex", justifyContent: "center", alignItems: "center", gap: 26 }}>
           <PopIn delay={f(1.5)}><div style={{ fontFamily: INTER, fontWeight: 900, fontSize: 70, color: C.ink }}>3 videos <span style={{ color: C.mute, fontWeight: 700 }}>/ month</span></div></PopIn>
           {frame >= f(3.2) && <div style={{ transform: `rotate(-8deg) scale(${stamp})`, background: C.green, color: "#fff", borderRadius: 18, padding: "6px 24px", fontFamily: INTER, fontWeight: 900, fontSize: 64 }}>FREE</div>}
         </div>
@@ -140,18 +140,18 @@ const S = {
   tryit: () => (
     <>
       <Laptop at={1} rate={0.4} top={400} enter={false} zooms={[{ at: f(0.5), z: 2.2, ox: 0.2, oy: 0.52 }]} ring={{ x: 396, y: 216, from: f(1.0) }} />
-      <Pill top={980} delay={f(0.2)} bg={C.blue} color="#fff">🔗 vids.new</Pill>
+      <Pill top={940} delay={f(0.2)} bg={C.blue} color="#fff">🔗 vids.new</Pill>
     </>
   ),
   option: () => (
     <>
       <Laptop at={5} top={400} enter={false} zooms={[{ at: 1, z: 1, ox: 0.5, oy: 0.5 }, { at: f(0.7), z: 1.9, ox: 0.72, oy: 0.45 }]} />
-      <Pill top={980} delay={f(1.2)}>🎬 AI video clip</Pill>
+      <Pill top={940} delay={f(1.2)}>🎬 AI video clip</Pill>
     </>
   ),
   prompt: () => (
     <>
-      <Laptop at={36} top={520} enter={false} zooms={[{ at: 1, z: 1.9, ox: 0.72, oy: 0.45 }, { at: f(0.8), z: 2.4, ox: 0.73, oy: 0.6 }]} />
+      <Laptop at={36} top={480} enter={false} zooms={[{ at: 1, z: 1.9, ox: 0.72, oy: 0.45 }, { at: f(0.8), z: 2.4, ox: 0.73, oy: 0.6 }]} />
       <div style={{ position: "absolute", left: 60, right: 60, top: 270 }}>
         <PopIn from="down">
           <div style={{ background: "#fff", borderRadius: 30, padding: "24px 30px", boxShadow: `0 0 0 4px ${C.blue}, 0 30px 60px rgba(15,23,42,0.2)` }}>
@@ -173,7 +173,7 @@ const S = {
           <Laptop at={54} rate={8} top={400} enter={false} zooms={[{ at: 1, z: 1.9, ox: 0.72, oy: 0.35 }]} />
         ) : (
           <Sequence from={cut} layout="none">
-            <Phone at={16} x={300} y={270} w={480} />
+            <Phone at={16} x={340} y={230} w={400} />
           </Sequence>
         )}
         <PopIn delay={f(2.1)} style={{ position: "absolute", left: 30, top: 640 }}>
@@ -181,14 +181,14 @@ const S = {
             ⏱ up to <span style={{ color: C.blue }}>{Math.round(interpolate(frame, [f(2.1), f(2.7)], [1, 15], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }))}s</span>
           </div>
         </PopIn>
-        {frame >= cut && <Credit text={GEN} top={1150} />}
+        {frame >= cut && <Credit text={GEN} top={1020} />}
       </>
     );
   },
   reference: () => (
     <>
       <Laptop at={9} top={400} zooms={[{ at: f(0.6), z: 2.1, ox: 0.78, oy: 0.8 }]} ring={{ x: 509, y: 251, from: f(1.0) }} />
-      <Pill top={980} delay={f(0.9)} bg={C.blue} color="#fff">🖼 reference images</Pill>
+      <Pill top={940} delay={f(0.9)} bg={C.blue} color="#fff">🖼 reference images</Pill>
     </>
   ),
   question: () => (
@@ -258,7 +258,7 @@ const Presenter: React.FC = () => {
   const t = frame / FPS;
   const p = FULL_AT.reduce((acc, s) => Math.max(acc, interpolate(frame, [f(s.a) - 6, f(s.a) + 4, f(s.b) - 4, f(s.b) + 6], [0, 1, 1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: ease })), 0);
   const box = { x: CARD.x * (1 - p) + 0 * p, y: CARD.y * (1 - p), w: CARD.w + (1080 - CARD.w) * p, h: CARD.h + (1920 - CARD.h) * p, r: CARD.r * (1 - p) };
-  const focus = 740 + (860 - 740) * p;
+  const focus = 805 + (860 - 805) * p;
   return (
     <>
       <div style={{ position: "absolute", left: box.x, top: box.y, width: box.w, height: box.h, borderRadius: box.r, boxShadow: "0 30px 70px rgba(15,23,42,0.3)", overflow: "hidden" }}>
