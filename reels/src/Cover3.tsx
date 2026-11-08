@@ -4,7 +4,7 @@ import { INTER, MONO, SERIF } from "./lib";
 
 /* Viral-style reel cover (light lavender, big italic title, yellow brush highlight,
    before/after screens with labels, presenter cut-out in front). */
-type Screen = { img?: string; pos?: string; zoom?: number; node?: "prompt" | "poem" | "report"; prompt?: string; label: string; labelBg: string; labelColor?: string };
+type Screen = { img?: string; pos?: string; zoom?: number; node?: "prompt" | "poem" | "report" | "bugs"; prompt?: string; promptLabel?: string; label: string; labelBg: string; labelColor?: string };
 export type Cover3Props = {
   portrait: string; pW?: number; pX?: number; pY?: number;
   pill: string; pillIcon: string; line1: string; line2: string;
@@ -17,7 +17,7 @@ const Laptop: React.FC<{ s: Screen; w: number; top: number; left: number; rot?: 
     <div style={{ position: "absolute", top, left, width: w, transform: `rotate(${rot}deg)` }}>
       <div style={{ background: "#1f2230", borderRadius: 22, padding: 12, boxShadow: "0 30px 60px rgba(76,29,149,0.35)" }}>
         <div style={{ width: w - 24, height: h, borderRadius: 12, overflow: "hidden", background: "#fff", position: "relative" }}>
-          {s.img ? <Img src={staticFile(s.img)} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: s.pos ?? "50% 50%", transform: `scale(${s.zoom ?? 1})` }} /> : s.node === "prompt" ? <PromptScreen text={s.prompt ?? ""} /> : s.node === "poem" ? <PoemScreen /> : <ReportScreen />}
+          {s.img ? <Img src={staticFile(s.img)} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: s.pos ?? "50% 50%", transform: `scale(${s.zoom ?? 1})` }} /> : s.node === "prompt" ? <PromptScreen text={s.prompt ?? ""} label={s.promptLabel} /> : s.node === "poem" ? <PoemScreen /> : s.node === "bugs" ? <BugsScreen /> : <ReportScreen />}
         </div>
       </div>
       <div style={{ margin: "0 auto", width: w + 40, marginLeft: -20, height: 18, background: "linear-gradient(#d4d4dc,#a1a1aa)", borderRadius: "0 0 18px 18px" }} />
@@ -86,9 +86,9 @@ export const Cover3: React.FC<Cover3Props> = ({ portrait, pW = 860, pX = -70, pY
 };
 
 /* small HTML screens used inside the laptops */
-export const PromptScreen: React.FC<{ text: string }> = ({ text }) => (
+export const PromptScreen: React.FC<{ text: string; label?: string }> = ({ text, label = "Genie 4 · prompt" }) => (
   <div style={{ width: "100%", height: "100%", background: "#111827", display: "flex", flexDirection: "column", justifyContent: "center", padding: 26, gap: 14 }}>
-    <div style={{ fontFamily: MONO, fontSize: 22, color: "#9CA3AF" }}>Genie 4 · prompt</div>
+    <div style={{ fontFamily: MONO, fontSize: 22, color: "#9CA3AF" }}>{label}</div>
     <div style={{ background: "#1f2937", border: "3px solid #3B82F6", borderRadius: 18, padding: "16px 18px", fontFamily: INTER, fontWeight: 800, fontSize: 30, color: "#fff", lineHeight: 1.2 }}>✨ {text}<span style={{ color: "#3B82F6" }}>▍</span></div>
   </div>
 );
@@ -106,6 +106,16 @@ export const ReportScreen: React.FC = () => (
     {[["00:04", "lighting jump"], ["00:11", "continuity"], ["00:19", "frame hitch"], ["00:27", "colour mismatch"]].map(([t, n]) => (
       <div key={t} style={{ display: "flex", gap: 14, padding: "9px 16px", borderTop: "1px solid #eee", fontFamily: MONO, fontSize: 24 }}>
         <span style={{ color: "#EF4444", fontWeight: 800 }}>⚠ {t}</span><span style={{ color: "#111" }}>{n}</span>
+      </div>
+    ))}
+  </div>
+);
+export const BugsScreen: React.FC = () => (
+  <div style={{ width: "100%", height: "100%", background: "#fff", display: "flex", flexDirection: "column" }}>
+    <div style={{ background: "#111827", color: "#22C55E", fontFamily: MONO, fontWeight: 800, fontSize: 22, padding: "8px 16px" }}>Mo · bug report</div>
+    {[["🐞", "Checkout button not responding"], ["🐞", "Payment error 500"], ["🎥", "Recording + repro steps"]].map(([i, n]) => (
+      <div key={n} style={{ display: "flex", gap: 12, padding: "12px 16px", borderTop: "1px solid #eee", fontFamily: INTER, fontWeight: 800, fontSize: 25, color: "#111" }}>
+        <span>{i}</span><span>{n}</span>
       </div>
     ))}
   </div>
