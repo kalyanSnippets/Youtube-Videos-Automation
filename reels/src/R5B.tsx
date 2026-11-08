@@ -12,6 +12,7 @@ export const R5B_FRAMES = Math.ceil(END * FPS);
 
 const C = { bg1: "#F8FAFC", bg2: "#E8F0FE", ink: "#0F172A", mute: "#64748B", blue: "#4285F4", red: "#EA4335", yellow: "#FBBC04", green: "#34A853", line: "#E2E8F0" };
 const CARD = { x: 50, y: 1060, w: 980, h: 820, r: 44 };
+const MINI = { x: 40, y: 960, w: 450, h: 800 }; // full 9:16 frame, shrunk
 const REC = "Screen recording · Google Vids";
 const GEN = "Made with Gemini Omni in Google Vids";
 const ease = Easing.bezier(0.2, 0.8, 0.2, 1);
@@ -63,7 +64,7 @@ const Laptop: React.FC<{ at: number; rate?: number; top?: number; zooms?: Zoom[]
   );
 };
 
-const Phone: React.FC<{ at: number; w?: number; x: number; y: number; rot?: number; delay?: number; pos?: string }> = ({ at, w = 380, x, y, rot = 0, delay = 0, pos = "50% 60%" }) => {
+const Phone: React.FC<{ at: number; w?: number; x: number; y: number; rot?: number; delay?: number; pos?: string; src?: string; tag?: string }> = ({ at, w = 380, x, y, rot = 0, delay = 0, pos = "50% 60%", src = "b/v_robot.mp4", tag }) => {
   const frame = useCurrentFrame();
   const p = interpolate(frame, [delay, delay + 14], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: ease });
   const h = w * 2.05;
@@ -71,7 +72,8 @@ const Phone: React.FC<{ at: number; w?: number; x: number; y: number; rot?: numb
     <div style={{ position: "absolute", left: x, top: y + (1 - p) * 300, width: w, height: h, opacity: p, transform: `perspective(1400px) rotate(${rot}deg) rotateY(${Math.sin(frame / 35) * 8}deg)`, filter: "drop-shadow(0 40px 50px rgba(15,23,42,0.35))" }}>
       <div style={{ width: "100%", height: "100%", background: "#111827", borderRadius: w * 0.16, padding: w * 0.035 }}>
         <div style={{ width: "100%", height: "100%", borderRadius: w * 0.13, overflow: "hidden", position: "relative", background: "#000" }}>
-          {frame >= delay && <Sequence from={delay} layout="none"><OffthreadVideo src={staticFile("b/v_robot.mp4")} muted startFrom={Math.round(at * FPS)} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: pos, transform: "scale(1.15)" }} /></Sequence>}
+          {frame >= delay && <Sequence from={delay} layout="none"><OffthreadVideo src={staticFile(src)} muted startFrom={Math.round(at * FPS)} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: pos, transform: "scale(1.15)" }} /></Sequence>}
+          {tag && <div style={{ position: "absolute", bottom: w * 0.07, left: 0, right: 0, textAlign: "center" }}><span style={{ background: "rgba(0,0,0,0.6)", color: "#fff", fontFamily: INTER, fontWeight: 800, fontSize: w * 0.075, padding: "4px 12px", borderRadius: 99 }}>{tag}</span></div>}
           <div style={{ position: "absolute", top: w * 0.04, left: "50%", transform: "translateX(-50%)", width: w * 0.3, height: w * 0.08, borderRadius: 99, background: "#000" }} />
         </div>
       </div>
@@ -127,9 +129,10 @@ const S = {
     const stamp = interpolate(frame, [f(3.2), f(3.45)], [2.2, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
     return (
       <>
-        <Phone at={6} x={50} y={300} w={300} rot={-8} delay={f(1.5)} />
-        <Phone at={12} x={390} y={260} w={300} delay={f(1.5) + 4} />
-        <Phone at={19} x={730} y={300} w={300} rot={8} delay={f(1.5) + 8} />
+        <Phone at={6} x={50} y={300} w={300} rot={-8} delay={f(1.5)} tag="#1 robot city" />
+        <Phone at={0.5} src="b/omni_fox.mp4" pos="50% 50%" x={390} y={260} w={300} delay={f(1.5) + 4} tag="#2 moon fox" />
+        <Phone at={0.5} src="b/omni_island.mp4" pos="50% 50%" x={730} y={300} w={300} rot={8} delay={f(1.5) + 8} tag="#3 sky island" />
+        <Credit text="All 3 made with Gemini Omni 1.2 Flash" top={1020} />
         <div style={{ position: "absolute", top: 925, left: 0, right: 0, display: "flex", justifyContent: "center", alignItems: "center", gap: 26 }}>
           <PopIn delay={f(1.5)}><div style={{ fontFamily: INTER, fontWeight: 900, fontSize: 70, color: C.ink }}>3 videos <span style={{ color: C.mute, fontWeight: 700 }}>/ month</span></div></PopIn>
           {frame >= f(3.2) && <div style={{ transform: `rotate(-8deg) scale(${stamp})`, background: C.green, color: "#fff", borderRadius: 18, padding: "6px 24px", fontFamily: INTER, fontWeight: 900, fontSize: 64 }}>FREE</div>}
@@ -225,6 +228,43 @@ const S = {
       </div>
     );
   },
+  finale: () => {
+    const frame = useCurrentFrame();
+    const like = f(32.9 - 31.1), sub = f(36.4 - 31.1), click = f(37.3 - 31.1);
+    const hs = interpolate(frame, [like + 4, like + 10, like + 16], [0.6, 1.3, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+    return (
+      <>
+        <PopIn from="up" style={{ position: "absolute", left: 30, right: 30, top: 250 }}>
+          <div style={{ borderRadius: 28, overflow: "hidden", boxShadow: "0 40px 80px rgba(15,23,42,0.35)", border: "6px solid #fff", height: 574, position: "relative", background: "#000" }}>
+            <OffthreadVideo src={staticFile("b/v_robot.mp4")} muted startFrom={Math.round(6 * FPS)} style={{ width: "100%", height: "100%", objectFit: "cover", transform: "scale(1.12)" }} />
+            <div style={{ position: "absolute", left: 18, top: 16, background: "rgba(0,0,0,0.6)", color: "#fff", fontFamily: INTER, fontWeight: 800, fontSize: 26, padding: "6px 14px", borderRadius: 99 }}>▶ The full AI video</div>
+          </div>
+        </PopIn>
+        <div style={{ position: "absolute", top: 846, right: 50, fontFamily: INTER, fontWeight: 600, fontSize: 22, color: C.mute }}>{GEN} · unedited</div>
+        <div style={{ position: "absolute", left: 520, right: 36, top: 960, display: "flex", flexDirection: "column", gap: 22 }}>
+          <PopIn from="right">
+            <div style={{ background: "#fff", borderRadius: 26, padding: "18px 22px", boxShadow: "0 16px 40px rgba(15,23,42,0.15)", opacity: frame >= like ? 0.75 : 1 }}>
+              <div style={{ fontFamily: INTER, fontWeight: 800, fontSize: 28, color: C.mute }}>💬 drop your idea</div>
+              <div style={{ marginTop: 8, fontFamily: INTER, fontWeight: 800, fontSize: 32, color: C.ink, minHeight: 84 }}><Typewriter text="A dragon surfing a giant wave 🌊" delay={6} cps={22} caretColor={C.blue} /></div>
+            </div>
+          </PopIn>
+          {frame >= like && (
+            <PopIn from="right">
+              <div style={{ display: "flex", alignItems: "center", gap: 18, background: "#fff", borderRadius: 26, padding: "16px 22px", boxShadow: "0 16px 40px rgba(15,23,42,0.15)", opacity: frame >= sub ? 0.75 : 1 }}>
+                <div style={{ width: 84, height: 84, borderRadius: 42, background: C.red, color: "#fff", fontSize: 50, display: "flex", alignItems: "center", justifyContent: "center", transform: `scale(${hs})` }}>♥</div>
+                <div style={{ fontFamily: INTER, fontWeight: 900, fontSize: 34, color: C.ink, lineHeight: 1.1 }}>Love free<br />AI tools?</div>
+              </div>
+            </PopIn>
+          )}
+          {frame >= sub && (
+            <PopIn from="right">
+              <div style={{ width: 524, height: 175, transform: "scale(0.7)", transformOrigin: "0 0" }}><SubscribeCard clickAt={click} accent={C.red} sub="Useful AI tutorials" avatarSrc="img/ch_BEp74aewRSA.jpg" /></div>
+            </PopIn>
+          )}
+        </div>
+      </>
+    );
+  },
   subscribe: () => (
     <div style={{ position: "absolute", top: 380, left: 0, right: 0, display: "flex", justifyContent: "center" }}>
       <PopIn from="up"><SubscribeCard clickAt={f(0.9)} accent={C.red} sub="Useful AI tutorials" avatarSrc="img/ch_BEp74aewRSA.jpg" /></PopIn>
@@ -245,9 +285,7 @@ const SCENES: Scene[] = [
   { a: 22.0, b: 25.3, body: S.generate },
   { a: 25.3, b: 27.9, body: S.reference },
   { a: 27.9, b: 31.1, body: S.question },
-  { a: 31.1, b: 32.9, body: S.comment },
-  { a: 32.9, b: 36.4, body: S.like },
-  { a: 36.4, b: END, body: S.subscribe },
+  { a: 31.1, b: END, body: S.finale },
 ];
 const FULL_AT = SCENES.filter((s) => s.full);
 const isFull = (t: number) => FULL_AT.some((s) => t >= s.a && t < s.b);
@@ -257,7 +295,9 @@ const Presenter: React.FC = () => {
   const frame = useCurrentFrame();
   const t = frame / FPS;
   const p = FULL_AT.reduce((acc, s) => Math.max(acc, interpolate(frame, [f(s.a) - 6, f(s.a) + 4, f(s.b) - 4, f(s.b) + 6], [0, 1, 1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: ease })), 0);
-  const box = { x: CARD.x * (1 - p) + 0 * p, y: CARD.y * (1 - p), w: CARD.w + (1080 - CARD.w) * p, h: CARD.h + (1920 - CARD.h) * p, r: CARD.r * (1 - p) };
+  const m = interpolate(frame, [f(31.1) - 4, f(31.1) + 10], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: ease });
+  const base = { x: CARD.x + (MINI.x - CARD.x) * m, y: CARD.y + (MINI.y - CARD.y) * m, w: CARD.w + (MINI.w - CARD.w) * m, h: CARD.h + (MINI.h - CARD.h) * m, r: CARD.r };
+  const box = { x: base.x * (1 - p), y: base.y * (1 - p), w: base.w + (1080 - base.w) * p, h: base.h + (1920 - base.h) * p, r: base.r * (1 - p) };
   const focus = 805 + (860 - 805) * p;
   return (
     <>
