@@ -39,7 +39,7 @@ const Status: React.FC<{ text: string; color?: string }> = ({ text, color = C.gr
 
 /* ---------- mock shop (all illustration) ---------- */
 type ShopMode = "build" | "ok" | "fail" | "plain";
-const Shop: React.FC<{ mode: ShopMode; buildDur?: number; clickAt?: number; failAt?: number; scale?: number; top?: number }> = ({ mode, buildDur = 60, clickAt = 999, failAt = 999, scale = 1.18, top = TOP + 10 }) => {
+export const Shop: React.FC<{ mode: ShopMode; buildDur?: number; clickAt?: number; failAt?: number; scale?: number; top?: number }> = ({ mode, buildDur = 60, clickAt = 999, failAt = 999, scale = 1.18, top = TOP + 10 }) => {
   const frame = useCurrentFrame();
   const shown = (i: number) => mode !== "build" || frame >= (i * buildDur) / 5;
   const pressed = frame >= clickAt && frame < clickAt + 6;
