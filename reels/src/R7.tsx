@@ -1,5 +1,5 @@
 import React from "react";
-import { AbsoluteFill, Audio, interpolate, Sequence, staticFile, useCurrentFrame } from "remotion";
+import { AbsoluteFill, Audio, interpolate, Sequence, staticFile, useCurrentFrame, Img } from "remotion";
 import data from "../public/r/r7f_words.json";
 import { Aroll, Cursor, f, FPS, INTER, MONO, SERIF, Music, PopIn, ReelData, Sfx, SubscribeCard, Flash, chunkWords, activeChunk } from "./lib";
 
@@ -93,6 +93,44 @@ const Chip: React.FC<{ children: React.ReactNode; bg?: string; color?: string; d
 
 /* pipeline steps: [icon, title, startSec (scene-local)] */
 const STEPS: [string, string, Stage][] = [["🧠", "Plan steps", "sketch"], ["🧊", "3D model", "mesh"], ["🎨", "Textures", "tex"], ["📐", "Geometry", "tex"], ["🦴", "Rig · animation", "rig"]];
+
+
+/* ---------- real tripo3d.ai page sections in a browser window ---------- */
+type Box = { x: number; y: number; w: number; h: number; at: number; until?: number; label?: string; color?: string };
+const SITE_W = 1000, SRC_W = 2160;
+const Site: React.FC<{ img: string; srcH: number; top?: number; boxes?: Box[]; zoom?: { at: number; z: number; ox: number; oy: number } }> = ({ img, srcH, top = 290, boxes = [], zoom }) => {
+  const frame = useCurrentFrame();
+  const k = SITE_W / SRC_W, h = Math.round(srcH * k);
+  const zp = zoom ? interpolate(frame, [zoom.at, zoom.at + 14], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: (x) => 1 - Math.pow(1 - x, 3) }) : 0;
+  const z = (1 + interpolate(frame, [0, 200], [0, 0.04], { extrapolateRight: "clamp" })) * (1 + (zoom ? zoom.z - 1 : 0) * zp);
+  const origin = zoom ? `${zoom.ox * 100}% ${zoom.oy * 100}%` : "50% 50%";
+  return (
+    <PopIn from="up" style={{ position: "absolute", left: 40, top }}>
+      <div style={{ width: SITE_W, borderRadius: 22, overflow: "hidden", boxShadow: "0 30px 60px rgba(0,0,0,0.25)", background: "#0B0B0F" }}>
+        <div style={{ height: 44, background: "#1F2023", display: "flex", alignItems: "center", gap: 9, padding: "0 16px" }}>
+          {["#EF4444", "#F59E0B", "#22C55E"].map((c) => <div key={c} style={{ width: 13, height: 13, borderRadius: 7, background: c }} />)}
+          <div style={{ marginLeft: 12, flex: 1, height: 28, borderRadius: 14, background: "#2B2C30", color: "#A1A1AA", fontFamily: MONO, fontSize: 18, display: "flex", alignItems: "center", padding: "0 14px" }}>tripo3d.ai/features/3d-agentic-canvas</div>
+        </div>
+        <div style={{ width: SITE_W, height: h, overflow: "hidden", position: "relative" }}>
+          <div style={{ width: SITE_W, height: h, transform: `scale(${z})`, transformOrigin: origin, position: "relative" }}>
+            <Img src={staticFile(img)} style={{ width: SITE_W, height: h, display: "block" }} />
+            {boxes.map((b, i) => {
+              if (frame < b.at || (b.until !== undefined && frame >= b.until)) return null;
+              const s = interpolate(frame - b.at, [0, 8], [1.15, 1], { extrapolateRight: "clamp" });
+              const col = b.color ?? C.orange;
+              return (
+                <div key={i} style={{ position: "absolute", left: b.x * k, top: b.y * k, width: b.w * k, height: b.h * k, border: `6px solid ${col}`, borderRadius: 16, transform: `scale(${s})`, boxShadow: `0 0 30px ${col}` }}>
+                  {b.label && <div style={{ position: "absolute", left: -6, top: -50, background: col, color: "#111", fontFamily: INTER, fontWeight: 900, fontSize: 28, padding: "4px 14px", borderRadius: 10, whiteSpace: "nowrap" }}>{b.label}</div>}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+      <div style={{ marginTop: 8, textAlign: "right", fontFamily: INTER, fontWeight: 600, fontSize: 20, color: C.mute }}>Source: tripo3d.ai</div>
+    </PopIn>
+  );
+};
 
 /* ---------- scenes ---------- */
 const S = {
@@ -197,6 +235,55 @@ const S = {
       </Canvas>
     );
   },
+  siteIntro: () => (
+    <>
+      <Site img="img/tripo_hero.png" srcH={1560} boxes={[{ x: 120, y: 520, w: 960, h: 180, at: f(8.5 - 6.5), label: "NEW" }]} />
+    </>
+  ),
+  siteWorkflow: () => {
+    const frame = useCurrentFrame();
+    const cross = interpolate(frame, [f(2.4), f(2.7)], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+    return frame < f(2.75) ? (
+      <Canvas>
+        <div style={{ position: "absolute", left: 0, right: 0, top: TOP + 280, display: "flex", justifyContent: "center" }}>
+          <PopIn delay={f(0.8)}>
+            <div style={{ position: "relative", transform: "scale(1.45)" }}>
+              <Node icon="🧊" title="Generate one 3D object" state="done" w={640} />
+              <div style={{ position: "absolute", left: -20, right: -20, top: "50%", height: 12, background: "#EF4444", borderRadius: 6, transform: `rotate(-4deg) scaleX(${cross})`, transformOrigin: "0 50%" }} />
+            </div>
+          </PopIn>
+        </div>
+      </Canvas>
+    ) : (
+      <Sequence from={f(2.75)} layout="none">
+        <Canvas><Site img="img/tripo_steps.png" srcH={1500} boxes={[{ x: 40, y: 150, w: 2080, h: 90, at: 8, label: "the whole workflow" }]} /></Canvas>
+      </Sequence>
+    );
+  },
+  siteUpload: () => (
+    <Site img="img/tripo_steps.png" srcH={1500} zoom={{ at: 4, z: 1.35, ox: 0.5, oy: 0.45 }} boxes={[{ x: 1248, y: 352, w: 604, h: 768, at: f(0.4), label: "upload a picture" }, { x: 0, y: 352, w: 680, h: 316, at: f(1.4), color: C.teal }]} />
+  ),
+  sitePipeline: () => {
+    const L = (t: number) => f(t - 16.4);
+    return (
+      <>
+      {useCurrentFrame() >= L(16.98) && useCurrentFrame() < L(17.86) + 6 && <Chip top={TOP + 790} bg={C.orange}>🧠 AI plans the steps</Chip>}
+      <Site img="img/tripo_nodes.png" srcH={1520} boxes={[
+        { x: 700, y: 40, w: 760, h: 140, at: L(16.98), until: L(17.86) },
+        { x: 0, y: 240, w: 568, h: 540, at: L(17.86), label: "3D model" },
+        { x: 800, y: 840, w: 600, h: 600, at: L(19.26), label: "textures" },
+        { x: 1268, y: 240, w: 612, h: 540, at: L(20.08), label: "geometry" },
+        { x: 160, y: 840, w: 592, h: 600, at: L(21.36), label: "animation" },
+      ]} />
+      </>
+    );
+  },
+  siteReview: () => (
+    <>
+      <Site img="img/tripo_steps.png" srcH={1500} boxes={[{ x: 0, y: 740, w: 680, h: 180, at: f(0.5), color: C.violet, label: "review each step" }]} />
+      <Chip top={TOP + 760} delay={f(2.2)} bg={C.violet}>✏️ change one step · no restart</Chip>
+    </>
+  ),
   interesting: () => (
     <AbsoluteFill>
       <Aroll data={D} src="r/r7f_aroll.mp4" box={{ x: 0, y: 0, w: 1080, h: 1920 }} focusY={840} zoom={1.25} alternate={false} offset={f(22.8)} />
@@ -264,12 +351,12 @@ type Scene = { a: number; b: number; body: React.FC; face?: boolean };
 const SCENES: Scene[] = [
   { a: 0.0, b: 5.4, body: S.hook, face: true },
   { a: 5.4, b: 6.5, body: S.work },
-  { a: 6.5, b: 9.3, body: S.intro, face: true },
-  { a: 9.3, b: 14.2, body: S.notOnly, face: true },
-  { a: 14.2, b: 16.4, body: S.upload, face: true },
-  { a: 16.4, b: 22.8, body: S.pipeline, face: true },
+  { a: 6.5, b: 9.3, body: () => <Canvas><S.siteIntro /></Canvas>, face: true },
+  { a: 9.3, b: 14.2, body: S.siteWorkflow, face: true },
+  { a: 14.2, b: 16.4, body: () => <Canvas><S.siteUpload /></Canvas>, face: true },
+  { a: 16.4, b: 22.8, body: () => <Canvas><S.sitePipeline /></Canvas>, face: true },
   { a: 22.8, b: 24.35, body: S.interesting },
-  { a: 24.35, b: 28.0, body: S.review, face: true },
+  { a: 24.35, b: 28.0, body: () => <Canvas><S.siteReview /></Canvas>, face: true },
   { a: 28.0, b: 34.6, body: S.comment, face: true },
   { a: 34.6, b: END, body: S.subscribe, face: true },
 ];

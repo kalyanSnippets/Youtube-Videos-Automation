@@ -341,7 +341,7 @@ The best part: you can review and change any single step without starting over.
 
 Let's make this interesting. Comment ROBOT, DRAGON or SUPERHERO and I'll build the winner for a real 3D experiment 👇
 
-Animation is an illustration of the workflow. Agentic Canvas is in beta (Tripo MAX / Team plans).
+Screens: tripo3d.ai. The robot-drawing animation is an illustration. Agentic Canvas is in beta (Tripo MAX / Team plans).
 
 #TripoAI #AgenticCanvas #3D #AI3D #GameDev #3DModeling #AItools #Blender #AIwithKalyan #TechReels
 ```
@@ -353,7 +353,7 @@ Animation is an illustration of the workflow. Agentic Canvas is in beta (Tripo M
 ```
 Tripo AI's Agentic Canvas (beta) runs a full 3D workflow as editable steps (model, textures, geometry, rigging), so you can tweak one step instead of starting over.
 
-The animation in this video illustrates the workflow; it isn't Tripo output. Real experiment coming next!
+Screens: tripo3d.ai. The robot-drawing animation is an illustration, not Tripo output. Real experiment coming next!
 
 Comment ROBOT, DRAGON or SUPERHERO 👇 and I'll build the winner.
 #TripoAI #3D #AI #shorts
@@ -380,7 +380,7 @@ tripo ai, agentic canvas, tripo agentic canvas, ai 3d model, image to 3d, sketch
 | 4 | OpenAI launch clip; *Sintel* (CC BY 3.0) | "Clip: OpenAI" + full Sintel credit (**required**) |
 | 5 | Your Google Vids screen recording + generated robot; 2 Gemini Omni clips made via ElevenLabs | AI label + "made via ElevenLabs" note (done) |
 | 6 | Momentic homepage screenshot + hero video | "Source: momentic.ai" (done) |
-| 7 | None (all original motion graphics) | Note that it's an illustration (done) |
+| 7 | tripo3d.ai Agentic Canvas page screenshots; robot drawing is original animation | "Source: tripo3d.ai" (done) |
 
 - **Music:** original royalty-free tracks generated for these reels (vidIQ). Sound effects were made from scratch. Nothing needs a music licence.
 - **Official clips** (Google, OpenAI) are short, credited and used for news commentary. If a platform ever flags one, dispute it as commentary, or I can swap the clip for an animation.
