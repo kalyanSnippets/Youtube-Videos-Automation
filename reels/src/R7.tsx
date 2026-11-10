@@ -265,9 +265,10 @@ const S = {
   ),
   sitePipeline: () => {
     const L = (t: number) => f(t - 16.4);
+    const frame = useCurrentFrame();
     return (
       <>
-      {useCurrentFrame() >= L(16.98) && useCurrentFrame() < L(17.86) + 6 && <Chip top={TOP + 790} bg={C.orange}>🧠 AI plans the steps</Chip>}
+      {frame >= L(16.98) && frame < L(17.86) + 6 && <Chip top={TOP + 790} bg={C.orange}>🧠 AI plans the steps</Chip>}
       <Site img="img/tripo_nodes.png" srcH={1520} boxes={[
         { x: 700, y: 40, w: 760, h: 140, at: L(16.98), until: L(17.86) },
         { x: 0, y: 240, w: 568, h: 540, at: L(17.86), label: "3D model" },
