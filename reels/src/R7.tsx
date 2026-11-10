@@ -9,11 +9,11 @@ const D = data as ReelData;
 const END = D.duration + 0.8;
 export const R7_FRAMES = Math.ceil(END * FPS);
 
-const C = { bg: "#F4F1EA", dot: "rgba(17,24,39,0.10)", ink: "#111827", mute: "#6B7280", orange: "#FF6A2B", violet: "#7C3AED", teal: "#14B8A6", yellow: "#FACC15", card: "#FFFFFF", line: "#D6D3CB" };
-const FACE_Y = 1152;
-const TOP = 280;
+export const C = { bg: "#F4F1EA", dot: "rgba(17,24,39,0.10)", ink: "#111827", mute: "#6B7280", orange: "#FF6A2B", violet: "#7C3AED", teal: "#14B8A6", yellow: "#FACC15", card: "#FFFFFF", line: "#D6D3CB" };
+export const FACE_Y = 1152;
+export const TOP = 280;
 
-const Canvas: React.FC<{ children?: React.ReactNode }> = ({ children }) => (
+export const Canvas: React.FC<{ children?: React.ReactNode }> = ({ children }) => (
   <AbsoluteFill style={{ background: C.bg }}>
     <AbsoluteFill style={{ backgroundImage: `radial-gradient(${C.dot} 2.5px, transparent 2.5px)`, backgroundSize: "40px 40px" }} />
     {children}
@@ -22,7 +22,7 @@ const Canvas: React.FC<{ children?: React.ReactNode }> = ({ children }) => (
 
 /* ---------- the robot: sketch → mesh → textured → rigged ---------- */
 type Stage = "sketch" | "mesh" | "tex" | "rig";
-const Robot: React.FC<{ stage: Stage; draw?: number; size?: number; spin?: boolean; color?: string; wave?: boolean }> = ({ stage, draw = 1, size = 360, spin = true, color = C.orange, wave }) => {
+export const Robot: React.FC<{ stage: Stage; draw?: number; size?: number; spin?: boolean; color?: string; wave?: boolean }> = ({ stage, draw = 1, size = 360, spin = true, color = C.orange, wave }) => {
   const frame = useCurrentFrame();
   const rot = spin && stage !== "sketch" ? Math.sin(frame / 28) * 28 : 0;
   const arm = wave ? Math.sin(frame / 5) * 25 : 0;
@@ -73,7 +73,7 @@ const Robot: React.FC<{ stage: Stage; draw?: number; size?: number; spin?: boole
 };
 
 /* node card */
-const Node: React.FC<{ icon: string; title: string; state: "idle" | "run" | "done"; w?: number; accent?: string }> = ({ icon, title, state, w = 300, accent = C.orange }) => {
+export const Node: React.FC<{ icon: string; title: string; state: "idle" | "run" | "done"; w?: number; accent?: string }> = ({ icon, title, state, w = 300, accent = C.orange }) => {
   const frame = useCurrentFrame();
   const glow = state === "run" ? 0.5 + 0.5 * Math.sin(frame / 3) : 0;
   return (
@@ -85,7 +85,7 @@ const Node: React.FC<{ icon: string; title: string; state: "idle" | "run" | "don
   );
 };
 
-const Chip: React.FC<{ children: React.ReactNode; bg?: string; color?: string; delay?: number; top: number; size?: number }> = ({ children, bg = C.ink, color = "#fff", delay = 0, top, size = 44 }) => (
+export const Chip: React.FC<{ children: React.ReactNode; bg?: string; color?: string; delay?: number; top: number; size?: number }> = ({ children, bg = C.ink, color = "#fff", delay = 0, top, size = 44 }) => (
   <div style={{ position: "absolute", top, left: 0, right: 0, display: "flex", justifyContent: "center" }}>
     <PopIn delay={delay}><div style={{ background: bg, color, fontFamily: INTER, fontWeight: 900, fontSize: size, padding: "12px 30px", borderRadius: 999, boxShadow: "0 12px 30px rgba(0,0,0,0.15)" }}>{children}</div></PopIn>
   </div>
@@ -98,7 +98,7 @@ const STEPS: [string, string, Stage][] = [["🧠", "Plan steps", "sketch"], ["�
 /* ---------- real tripo3d.ai page sections in a browser window ---------- */
 type Box = { x: number; y: number; w: number; h: number; at: number; until?: number; label?: string; color?: string };
 const SITE_W = 1000, SRC_W = 2160;
-const Site: React.FC<{ img: string; srcH: number; top?: number; boxes?: Box[]; zoom?: { at: number; z: number; ox: number; oy: number } }> = ({ img, srcH, top = 290, boxes = [], zoom }) => {
+export const Site: React.FC<{ img: string; srcH: number; top?: number; boxes?: Box[]; zoom?: { at: number; z: number; ox: number; oy: number } }> = ({ img, srcH, top = 290, boxes = [], zoom }) => {
   const frame = useCurrentFrame();
   const k = SITE_W / SRC_W, h = Math.round(srcH * k);
   const zp = zoom ? interpolate(frame, [zoom.at, zoom.at + 14], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: (x) => 1 - Math.pow(1 - x, 3) }) : 0;
