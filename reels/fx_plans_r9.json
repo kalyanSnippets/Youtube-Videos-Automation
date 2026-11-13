@@ -1,5 +1,5 @@
 {"effects": [
- {"fx": "scribble", "start": 5.55, "end": 6.4, "text": "crazy?!"},
- {"fx": "tap", "start": 39.2, "end": 41.6, "at": "39.6"},
- {"fx": "comment-box", "start": 43.6, "end": 46.2, "text": "YES", "handle": "aiwithkalyan", "reply": "Not anymore", "chip": "$0 setup"}
+ {"fx": "uninstall", "start": 5.5, "end": 6.6, "text": "Uninstalling $20 subscription..."},
+ {"fx": "tap", "start": 40.8, "end": 43.2, "at": "41.15"},
+ {"fx": "comment-box", "start": 45.3, "end": 47.8, "text": "YES", "handle": "aiwithkalyan", "reply": "Not anymore", "chip": "$0 setup"}
 ]}

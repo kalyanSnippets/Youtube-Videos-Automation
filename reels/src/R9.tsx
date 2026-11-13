@@ -2,11 +2,12 @@ import React from "react";
 import { AbsoluteFill, Audio, interpolate, Sequence, staticFile, useCurrentFrame, OffthreadVideo, Img, Easing } from "remotion";
 import data from "../public/r/r9f_words.json";
 import face from "../public/r/r9f_face.json";
+import tmap from "../public/r/r9_timemap.json";
 import { f, FPS, INTER, MONO, Music, PopIn, ReelData, Sfx, Flash, chunkWords, activeChunk } from "./lib";
 
 /* Reel 9: "Claude Code without the $20 subscription". SIM-card concept:
    Claude Code = the phone, the AI model = the SIM card. Graphics live in split screens (graphic on top,
-   face-tracked Kalyan below). Full-face moments carry the effects-skill pass (scribble, follow tap, comment box). */
+   face-tracked Kalyan below). Full-face moments carry the effects-skill pass (uninstall glitch, follow tap, comment box). */
 const D = data as ReelData;
 const END = D.duration + 0.8;
 export const R9_FRAMES = Math.ceil(END * FPS);
@@ -14,7 +15,15 @@ const C = { bg: "#0E1116", panel: "#151A22", line: "#232B36", gold: "#E8C77A", g
 const ease = Easing.bezier(0.2, 0.8, 0.2, 1);
 const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
 const SEAM = 960;
-const L = (abs: number, a: number) => f(abs - a);
+/* graphics were timed on the previous cut; T() maps those times onto the new natural-speed cut */
+const TM = tmap as { old: number[]; new: number[] };
+const T = (x: number) => {
+  const o = TM.old, n = TM.new;
+  if (x <= o[0]) return n[0] + (x - o[0]);
+  for (let i = 1; i < o.length; i++) if (x <= o[i]) return n[i - 1] + ((x - o[i - 1]) / (o[i] - o[i - 1])) * (n[i] - n[i - 1]);
+  return n[n.length - 1] + (x - o[o.length - 1]);
+};
+const L = (abs: number, a: number) => f(T(abs) - T(a));
 
 /* ---------- face-tracked bottom half ---------- */
 const FT = face as { t: number[]; cy: number[]; h: number[] };
@@ -40,7 +49,7 @@ const FaceBox: React.FC<{ offset: number; y: number; h: number }> = ({ offset, y
 const Split: React.FC<{ offset: number; children: React.ReactNode }> = ({ offset, children }) => (
   <AbsoluteFill style={{ background: C.bg }}>
     <div style={{ position: "absolute", left: 0, top: 0, width: 1080, height: SEAM, overflow: "hidden", background: `radial-gradient(ellipse at 50% 40%, #1B2330, ${C.bg} 70%)` }}>
-      <AbsoluteFill style={{ backgroundImage: `radial-gradient(${C.line} 2px, transparent 2px)`, backgroundSize: "44px 44px", opacity: 0.7 }} />
+      <Stage3D />
       {children}
     </div>
     <FaceBox offset={offset} y={SEAM} h={1920 - SEAM} />
@@ -51,9 +60,39 @@ const Big: React.FC<{ children: React.ReactNode; size?: number; color?: string; 
   <div style={{ fontFamily: INTER, fontWeight: 900, fontSize: size, color, letterSpacing: -3, lineHeight: 0.95, ...style }}>{children}</div>
 );
 
+/* moving 3D floor grid, drifting particles and a light sweep */
+const Stage3D: React.FC = () => {
+  const frame = useCurrentFrame();
+  const sweep = ((frame % 150) / 150) * 2600 - 800;
+  return (
+    <AbsoluteFill>
+      <div style={{ position: "absolute", left: -600, right: -600, top: 520, height: 900, transform: "perspective(500px) rotateX(72deg)", transformOrigin: "50% 0%", backgroundImage: `linear-gradient(${C.gold}33 2px, transparent 2px), linear-gradient(90deg, ${C.gold}33 2px, transparent 2px)`, backgroundSize: "90px 90px", backgroundPosition: `0px ${(frame * 3) % 90}px`, maskImage: "linear-gradient(transparent, #000 25%, #000 70%, transparent)" }} />
+      {Array.from({ length: 26 }).map((_, i) => {
+        const x = (i * 211) % 1080, sp = 0.4 + (i % 5) * 0.25, y = (((i * 137 - frame * sp * 3) % 960) + 960) % 960;
+        return <div key={i} style={{ position: "absolute", left: x, top: y, width: 4 + (i % 3) * 3, height: 4 + (i % 3) * 3, borderRadius: 9, background: i % 4 ? C.gold : C.orange, opacity: 0.25 + (i % 4) * 0.12, boxShadow: `0 0 12px ${C.gold}` }} />;
+      })}
+      <div style={{ position: "absolute", top: -300, left: sweep, width: 180, height: 1600, transform: "rotate(25deg)", background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent)" }} />
+    </AbsoluteFill>
+  );
+};
+
+/* 3D entrance: flips in from depth, then floats */
+const Pop3D: React.FC<{ delay?: number; children: React.ReactNode; style?: React.CSSProperties; spin?: number; float?: number }> = ({ delay = 0, children, style, spin = 90, float = 6 }) => {
+  const frame = useCurrentFrame();
+  if (frame < delay) return null;
+  const p = interpolate(frame - delay, [0, 16], [0, 1], { ...clamp, easing: Easing.out(Easing.back(1.4)) });
+  const ry = (1 - p) * spin + Math.sin((frame - delay) / 26) * float;
+  const rx = Math.cos((frame - delay) / 34) * (float * 0.6);
+  return (
+    <div style={{ ...style, transform: `perspective(1300px) translateZ(${(1 - p) * -700}px) rotateY(${ry}deg) rotateX(${rx}deg)`, opacity: Math.min(1, p * 2), transformStyle: "preserve-3d" }}>{children}</div>
+  );
+};
+
 /* ---------- the SIM card + the phone ---------- */
 const Sim: React.FC<{ label: string; sub?: string; w?: number; color?: string; icon?: string }> = ({ label, sub, w = 300, color = C.gold, icon }) => {
+  const frame = useCurrentFrame();
   const h = w * 0.66;
+  const sheen = ((frame % 70) / 70) * (w * 2.2) - w * 0.6;
   return (
     <div style={{ position: "relative", width: w, height: h, background: `linear-gradient(135deg, #fff 0%, #F3F4F6 100%)`, clipPath: `polygon(${w * 0.18}px 0, 100% 0, 100% 100%, 0 100%, 0 ${h * 0.27}px)`, borderRadius: 10, boxShadow: "0 20px 40px rgba(0,0,0,0.5)" }}>
       <div style={{ position: "absolute", left: w * 0.1, top: h * 0.3, width: w * 0.3, height: h * 0.42, borderRadius: 8, background: `linear-gradient(135deg, ${color}, ${C.goldD})`, boxShadow: "inset 0 0 0 2px rgba(0,0,0,0.15)" }}>
@@ -65,6 +104,7 @@ const Sim: React.FC<{ label: string; sub?: string; w?: number; color?: string; i
         <div style={{ fontFamily: INTER, fontWeight: 900, fontSize: Math.min(w * 0.1, (w * 0.49) / Math.max(4, label.length + (icon ? 2 : 0)) * 1.7), color: C.ink, lineHeight: 1.0 }}>{icon ? `${icon} ` : ""}{label}</div>
         {sub && <div style={{ fontFamily: INTER, fontWeight: 700, fontSize: w * 0.055, color: "#4B5563", lineHeight: 1.12 }}>{sub}</div>}
       </div>
+      <div style={{ position: "absolute", top: -h * 0.3, left: sheen, width: w * 0.22, height: h * 1.6, transform: "rotate(20deg)", background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.75), transparent)", pointerEvents: "none" }} />
     </div>
   );
 };
@@ -72,8 +112,10 @@ const Phone: React.FC<{ w?: number; tray?: number; children?: React.ReactNode; t
   const frame = useCurrentFrame();
   const h = w * 2.05;
   return (
-    <div style={{ position: "relative", width: w, height: h, transform: `perspective(1200px) rotateY(${tilt + Math.sin(frame / 30) * 4}deg)` }}>
-      <div style={{ position: "absolute", inset: 0, background: "#1F2329", borderRadius: w * 0.16, boxShadow: "0 40px 70px rgba(0,0,0,0.6), inset 0 0 0 3px #3A414B" }} />
+    <div style={{ position: "relative", width: w, height: h, transformStyle: "preserve-3d", transform: `perspective(1400px) rotateX(${7 + Math.sin(frame / 45) * 3}deg) rotateY(${tilt + Math.sin(frame / 34) * 16}deg)` }}>
+      <div style={{ position: "absolute", inset: 0, background: "#0B0D10", borderRadius: w * 0.16, transform: `translateZ(${-w * 0.09}px)`, boxShadow: "0 50px 90px rgba(0,0,0,0.7)" }} />
+      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg,#3A414B,#1F2329 12%,#1F2329 88%,#3A414B)", borderRadius: w * 0.16, transform: `translateZ(${-w * 0.045}px)` }} />
+      <div style={{ position: "absolute", inset: 0, background: "#1F2329", borderRadius: w * 0.16, boxShadow: "inset 0 0 0 3px #4A525D" }} />
       <div style={{ position: "absolute", left: w * 0.05, right: w * 0.05, top: w * 0.05, bottom: w * 0.05, background: "#0B0D10", borderRadius: w * 0.12, overflow: "hidden", padding: w * 0.08 }}>
         <div style={{ height: w * 0.06, width: w * 0.3, margin: "0 auto", borderRadius: 99, background: "#000" }} />
         <div style={{ marginTop: w * 0.08, fontFamily: MONO, fontWeight: 800, fontSize: w * 0.075, color: C.orange }}>✻ Claude Code</div>
@@ -81,6 +123,7 @@ const Phone: React.FC<{ w?: number; tray?: number; children?: React.ReactNode; t
           &gt; fix the login bug<br />&gt; write tests<br /><span style={{ color: C.green }}>✓ done</span>
         </div>
         {children}
+        <div style={{ position: "absolute", inset: 0, background: `linear-gradient(${115 + Math.sin(frame / 40) * 20}deg, rgba(255,255,255,0.16), transparent 40%)`, pointerEvents: "none" }} />
       </div>
       {/* SIM tray on the right edge */}
       <div style={{ position: "absolute", right: -tray * w * 0.55, top: h * 0.42, width: w * 0.5, height: w * 0.36, background: "linear-gradient(90deg,#8E959F,#C7CCD3)", borderRadius: 8, boxShadow: "0 8px 16px rgba(0,0,0,0.4)" }} />
@@ -97,7 +140,7 @@ const BillPanel: React.FC = () => {
   return (
     <>
       <div style={{ position: "absolute", left: 0, right: 0, top: 90, display: "flex", justifyContent: "center" }}>
-        <div style={{ width: 640, background: "#FFFEFA", borderRadius: 18, padding: "30px 34px", fontFamily: MONO, color: C.ink, boxShadow: "0 30px 60px rgba(0,0,0,0.55)", transform: "rotate(-2deg)" }}>
+        <div style={{ width: 640, background: "#FFFEFA", borderRadius: 18, padding: "30px 34px", fontFamily: MONO, color: C.ink, boxShadow: "0 30px 60px rgba(0,0,0,0.55)", transform: `perspective(1200px) rotateX(${interpolate(frame, [0, 18], [70, 12], { ...clamp, easing: ease }) + Math.sin(frame / 30) * 3}deg) rotateY(${Math.sin(frame / 40) * 8}deg) rotate(-2deg) translateY(${interpolate(frame, [0, 18], [-300, 0], { ...clamp, easing: ease })}px)`, transformOrigin: "50% 0%" }}>
           <div style={{ fontWeight: 800, fontSize: 34, textAlign: "center" }}>MONTHLY SUBSCRIPTION</div>
           <div style={{ borderTop: "3px dashed #999", margin: "16px 0" }} />
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 40, fontWeight: 800 }}><span>Claude plan</span><span>$20</span></div>
@@ -123,7 +166,7 @@ const PhoneSimPanel: React.FC = () => {
   const simX = interpolate(frame, [L(11.0, a), L(11.0, a) + 12], [380, 0], { ...clamp, easing: ease });
   return (
     <>
-      {phoneIn && <PopIn style={{ position: "absolute", left: 170, top: 110 }}><Phone w={330} tray={tray} /></PopIn>}
+      {phoneIn && <Pop3D style={{ position: "absolute", left: 170, top: 110 }} spin={-120}><Phone w={330} tray={tray} /></Pop3D>}
       {phoneIn && <PopIn delay={4} style={{ position: "absolute", left: 120, top: 830 }}><div style={{ fontFamily: INTER, fontWeight: 900, fontSize: 40, color: "#fff" }}>📱 Claude Code = the phone</div></PopIn>}
       {frame >= L(10.0, a) && (
         <div style={{ position: "absolute", left: 600 + simX, top: 300 }}>
@@ -144,8 +187,8 @@ const SwapPanel: React.FC = () => {
   const y = interpolate(local, [0, 8], [-260, 0], { ...clamp, easing: ease });
   return (
     <>
-      <div style={{ position: "absolute", left: 90, top: 110 }}><Phone w={300} tray={1} /></div>
-      <div style={{ position: "absolute", left: 520, top: 330 + y }}><Sim label={sims[idx][0]} sub={sims[idx][1]} w={420} color={sims[idx][2]} /></div>
+      <Pop3D style={{ position: "absolute", left: 90, top: 110 }} spin={60} float={0}><Phone w={300} tray={1} /></Pop3D>
+      <div style={{ position: "absolute", left: 520, top: 330 + y, transform: `perspective(1200px) rotateY(${interpolate(local, [0, 10], [180, 0], clamp) + Math.sin(frame / 20) * 8}deg)` }}><Sim label={sims[idx][0]} sub={sims[idx][1]} w={420} color={sims[idx][2]} /></div>
       <PopIn delay={L(15.22, a)} style={{ position: "absolute", left: 470, top: 680 }}><div style={{ background: C.yellow, color: C.ink, fontFamily: INTER, fontWeight: 900, fontSize: 46, padding: "10px 24px", borderRadius: 14 }}>🔁 swap the AI model</div></PopIn>
     </>
   );
@@ -157,7 +200,11 @@ const MethodPanel: React.FC<{ n: string; label: string; sub: string; icon: strin
   return (
     <>
       <PopIn style={{ position: "absolute", left: 60, top: 80 }}><div style={{ display: "flex", gap: 0 }}><div style={{ background: color, color: C.ink, fontFamily: INTER, fontWeight: 900, fontSize: 64, padding: "4px 22px" }}>{n}</div><div style={{ background: "#fff", color: C.ink, fontFamily: INTER, fontWeight: 900, fontSize: 64, padding: "4px 24px" }}>METHOD</div></div></PopIn>
-      <div style={{ position: "absolute", left: 160 + x, top: 230 }}><Sim label={label} sub={sub} w={760} color={color} icon={icon} /></div>
+      <Pop3D delay={2} spin={110} float={9} style={{ position: "absolute", left: 160, top: 230 }}><Sim label={label} sub={sub} w={760} color={color} icon={icon} /></Pop3D>
+      {[0, 1, 2, 3, 4].map((i) => {
+        const a2 = frame / 18 + (i * Math.PI * 2) / 5;
+        return <div key={i} style={{ position: "absolute", left: 520 + Math.cos(a2) * 470 - 30, top: 420 + Math.sin(a2) * 300 - 30, fontSize: 54, opacity: 0.5 + 0.5 * Math.sin(a2), transform: `scale(${0.7 + 0.35 * Math.sin(a2)})`, zIndex: Math.sin(a2) > 0 ? 5 : 0 }}>{icon}</div>;
+      })}
       {extra}
     </>
   );
@@ -170,11 +217,11 @@ const InterfacePanel: React.FC = () => {
   const swap = frame >= L(33.7, a);
   return (
     <>
-      <div style={{ position: "absolute", left: 90, top: 100 }}><Phone w={300} tray={1} /></div>
+      <Pop3D style={{ position: "absolute", left: 90, top: 100 }} spin={60} float={0}><Phone w={300} tray={1} /></Pop3D>
       <PopIn delay={L(30.6, a)} style={{ position: "absolute", left: 470, top: 150 }}>
         <div style={{ background: C.green, color: C.ink, fontFamily: INTER, fontWeight: 900, fontSize: 44, padding: "12px 22px", borderRadius: 16 }}>✓ same Claude Code interface</div>
       </PopIn>
-      <div style={{ position: "absolute", left: 500, top: 360 }}>
+      <div style={{ position: "absolute", left: 500, top: 360, transform: `perspective(1200px) rotateY(${interpolate(frame, [L(33.7, a) - 6, L(33.7, a) + 6], [0, 360], clamp) + Math.sin(frame / 22) * 8}deg)` }}>
         <Sim label={swap ? "Any model" : "Claude"} sub={swap ? "local / free / other" : "Anthropic"} w={420} color={swap ? "#A7F3D0" : C.gold} />
       </div>
       {notNec && <PopIn style={{ position: "absolute", left: 470, top: 680 }}><div style={{ background: C.orange, color: C.ink, fontFamily: INTER, fontWeight: 900, fontSize: 40, padding: "12px 22px", borderRadius: 16 }}>↔ not necessarily Anthropic's model</div></PopIn>}
@@ -194,6 +241,10 @@ const SavePanel: React.FC = () => {
         <Big size={190} color={C.green}>${v}*</Big>
       </div>
       <PopIn delay={20}><div style={{ fontSize: 90 }}>💰💰💰</div></PopIn>
+      {Array.from({ length: 14 }).map((_, i) => {
+        const y = ((frame * (6 + (i % 4)) + i * 90) % 1100) - 140;
+        return <div key={i} style={{ position: "absolute", left: (i * 79) % 1040, top: y, width: 54, height: 54, borderRadius: 27, background: `radial-gradient(circle at 35% 35%, #FFF3B0, ${C.gold} 45%, ${C.goldD})`, boxShadow: "0 6px 14px rgba(0,0,0,0.4)", transform: `perspective(400px) rotateY(${frame * 12 + i * 40}deg)`, opacity: 0.85, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: INTER, fontWeight: 900, fontSize: 28, color: C.goldD }}>$</div>;
+      })}
       <div style={{ fontFamily: INTER, fontWeight: 600, fontSize: 28, color: C.mute }}>*can be free, depends on your setup & usage</div>
     </div>
   );
@@ -205,7 +256,7 @@ const TutorialPanel: React.FC = () => {
   const play = frame >= L(51.6, a);
   return (
     <>
-      <PopIn from="up" style={{ position: "absolute", left: 70, right: 70, top: 80 }}>
+      <Pop3D spin={-70} float={5} style={{ position: "absolute", left: 70, right: 70, top: 80 }}>
         <div style={{ background: "#fff", borderRadius: 24, overflow: "hidden", boxShadow: "0 30px 60px rgba(0,0,0,0.55)" }}>
           <div style={{ height: 420, position: "relative", background: `linear-gradient(135deg, #1B2330, #0E1116)`, display: "flex", alignItems: "center", justifyContent: "center", gap: 30 }}>
             <Phone w={150} tray={1} />
@@ -225,7 +276,7 @@ const TutorialPanel: React.FC = () => {
             </div>
           </div>
         </div>
-      </PopIn>
+      </Pop3D>
       {frame >= L(52.46, a) && <PopIn style={{ position: "absolute", left: 0, right: 0, top: 700, display: "flex", justifyContent: "center" }}><div style={{ background: C.yellow, color: C.ink, fontFamily: INTER, fontWeight: 900, fontSize: 50, padding: "10px 28px", borderRadius: 14 }}>▶ on my channel · link in bio</div></PopIn>}
     </>
   );
@@ -251,7 +302,8 @@ const SEGS: Seg[] = [
   { a: 34.95, b: 37.6, split: SavePanel },
   { a: 46.3, b: END, split: TutorialPanel },
 ];
-const splitAt = (t: number) => SEGS.find((s) => s.split && t >= s.a && t < s.b);
+const SEGS_T = SEGS.map((s) => ({ ...s, a: T(s.a), b: s.b === END ? END : T(s.b) }));
+const splitAt = (t: number) => SEGS_T.find((s) => s.split && t >= s.a && t < s.b);
 
 /* captions: seam in split screens, chest in full-face shots */
 const chunks = chunkWords(D.words, 3, 16);
@@ -289,7 +341,7 @@ export const Reel9: React.FC = () => {
   return (
     <AbsoluteFill style={{ background: "#000" }}>
       <OffthreadVideo src={staticFile("r/r9fx_aroll.mp4")} muted style={{ width: "100%", height: "100%" }} />
-      {SEGS.map((s, i) => (
+      {SEGS_T.map((s, i) => (
         <Sequence key={i} from={f(s.a)} durationInFrames={Math.max(1, f(s.b) - f(s.a))}>
           {s.split ? <Split offset={f(s.a)}><Flash dur={4} /><s.split /></Split> : s.banner}
         </Sequence>
@@ -297,7 +349,7 @@ export const Reel9: React.FC = () => {
       <Captions />
       <Audio src={staticFile("r/r9f_aroll.mp4")} />
       <Music src="r/r9_music.wav" total={END} base={0.1} boosts={[]} />
-      {sfx.map(([t, n, v], i) => <Sfx key={i} at={t} name={n} vol={v ?? 0.45} />)}
+      {sfx.map(([t, n, v], i) => <Sfx key={i} at={T(t)} name={n} vol={v ?? 0.45} />)}
     </AbsoluteFill>
   );
 };
