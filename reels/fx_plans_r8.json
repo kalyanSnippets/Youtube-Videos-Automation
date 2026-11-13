@@ -1,0 +1,85 @@
+{
+ "effects": [
+  {
+   "fx": "huge-strike",
+   "start": 3.6,
+   "end": 6.0,
+   "text": "WEBSITE",
+   "at": "0.9"
+  },
+  {
+   "fx": "spotlight",
+   "start": 11.9,
+   "end": 13.8,
+   "text": "FABLE 5.2"
+  },
+  {
+   "fx": "liquid-glass-graph",
+   "start": 16.9,
+   "end": 19.4,
+   "text": "AI agents",
+   "from": "0",
+   "to": "1000"
+  },
+  {
+   "fx": "lean-in",
+   "start": 23.7,
+   "end": 25.3,
+   "zoom": "1.4"
+  },
+  {
+   "fx": "messages",
+   "start": 31.0,
+   "end": 36.2,
+   "text": "Build failed|12 tests failing|Fable: found the bug, fix ready",
+   "title": "Messages",
+   "y": "0.93"
+  },
+  {
+   "fx": "over-the-shoulder-zoom",
+   "start": 45.5,
+   "end": 49.8,
+   "text": "Sales trend|Unusual numbers",
+   "to": "128K|3.2x"
+  },
+  {
+   "fx": "lineup",
+   "start": 53.2,
+   "end": 59.0,
+   "text": "Lead agent|Agent 1|Agent 2|Agent 3|Agent 4"
+  },
+  {
+   "fx": "select-resize",
+   "start": 62.6,
+   "end": 64.8,
+   "text": "30%"
+  },
+  {
+   "fx": "led-sign",
+   "start": 65.0,
+   "end": 67.8,
+   "text": "1M TOKENS"
+  },
+  {
+   "fx": "slow-push",
+   "start": 72.0,
+   "end": 74.2,
+   "zoom": "1.35"
+  },
+  {
+   "fx": "comment-box",
+   "start": 76.2,
+   "end": 78.8,
+   "text": "FABLE",
+   "handle": "aiwithkalyan",
+   "reply": "Sending you 3 prompts",
+   "chip": "3 prompts"
+  },
+  {
+   "fx": "tap",
+   "start": 79.0,
+   "end": 81.6,
+   "at": "79.5"
+  }
+ ]
+}

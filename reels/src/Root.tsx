@@ -11,6 +11,7 @@ import { Reel6, R6_FRAMES } from "./R6";
 import { Reel6B, R6B_FRAMES } from "./R6B";
 import { Reel7, R7_FRAMES } from "./R7";
 import { Reel7B, R7B_FRAMES } from "./R7B";
+import { Reel8, R8_FRAMES } from "./R8";
 import { Cover } from "./Cover";
 import { Cover2 } from "./Cover2";
 import { Cover3 } from "./Cover3";
@@ -28,6 +29,7 @@ export const RemotionRoot: React.FC = () => (
     <Composition id="Reel6B-MoMomentic-Whiteboard" component={Reel6B} durationInFrames={R6B_FRAMES} {...common} />
     <Composition id="Reel7-TripoCanvas" component={Reel7} durationInFrames={R7_FRAMES} {...common} />
     <Composition id="Reel7B-TripoCanvas-Effects" component={Reel7B} durationInFrames={R7B_FRAMES} {...common} />
+    <Composition id="Reel8-Fable52" component={Reel8} durationInFrames={R8_FRAMES} {...common} />
     <Composition id="Cover1" component={Cover} durationInFrames={1} {...common} defaultProps={{ top: "img/cf_top1.png", topPos: "60% 40%", topZoom: 1.25, face: "img/cf_face1.png", faceY: 380, tag: "REA + CLAUDE CODE", line1: "I let AI rebuild", line2: "a real app", accent: "#CC785C" }} />
     <Composition id="Cover2" component={Cover} durationInFrames={1} {...common} defaultProps={{ top: "img/cf_top2.png", face: "img/cf_face2.png", faceY: 380, tag: "GOOGLE GENIE 4", line1: "Type a prompt.", line2: "Walk inside it.", accent: "#3B82F6" }} />
     <Composition id="Cover3" component={Cover} durationInFrames={1} {...common} defaultProps={{ top: "img/cf_top3.png", topPos: "95% 35%", topZoom: 1.15, face: "img/cf_face3.png", faceY: 330, tag: "GEMMA 4 IN ORBIT", line1: "Google put AI", line2: "in SPACE 🛰", accent: "#F2B84B" }} />
