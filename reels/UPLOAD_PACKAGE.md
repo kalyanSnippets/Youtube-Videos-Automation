@@ -14,7 +14,7 @@ Seven finished vertical reels (1080×1920, 30 fps, H.264, about −15 LUFS) with
 | 6 | `06B_Momentic_Mo-Whiteboard.mp4` (alt: `06_Momentic_Mo-AI-Tester.mp4`) | 47s | `covers/06_Momentic-Mo_cover.jpg` |
 | 7 | `07_Tripo_Agentic-Canvas.mp4` | 43s | `covers/07_Tripo-Agentic-Canvas_cover.jpg` |
 
-Covers are 1080×1920. The title sits inside the middle 4:5 area, so it stays readable when Instagram crops the profile grid.
+Covers are 1080×1920. A second, Instagram-grid-proof set is in `insta-thumbnails/` (everything important sits inside the 3:4 grid crop). The title sits inside the middle 4:5 area, so it stays readable when Instagram crops the profile grid.
 
 ---
 
@@ -341,7 +341,7 @@ The best part: you can review and change any single step without starting over.
 
 Let's make this interesting. Comment ROBOT, DRAGON or SUPERHERO and I'll build the winner for a real 3D experiment 👇
 
-Screens: tripo3d.ai. The robot-drawing animation is an illustration. Agentic Canvas is in beta (Tripo MAX / Team plans).
+Screens: tripo3d.ai. The robot drawing, chat and receipt animations are illustrations. Agentic Canvas is in beta (Tripo MAX / Team plans).
 
 #TripoAI #AgenticCanvas #3D #AI3D #GameDev #3DModeling #AItools #Blender #AIwithKalyan #TechReels
 ```

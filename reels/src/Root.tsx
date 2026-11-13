@@ -5,6 +5,7 @@ import { Reel2, R2_FRAMES } from "./R2";
 import { Reel3, R3_FRAMES } from "./R3";
 import { Reel4, R4_FRAMES } from "./R4";
 import { Reel5, R5_FRAMES } from "./R5";
+import { ViralThumb } from "./Cover4";
 import { Reel5B, R5B_FRAMES } from "./R5B";
 import { Reel6, R6_FRAMES } from "./R6";
 import { Reel6B, R6B_FRAMES } from "./R6B";
@@ -42,5 +43,12 @@ export const RemotionRoot: React.FC = () => (
     <Composition id="VCover5" component={Cover3} durationInFrames={1} {...common} defaultProps={{ portrait: "img/portrait3.png", pill: "Google Vids · Gemini Omni", pillIcon: "🎬", line1: "FREE AI VIDEOS", line2: "IN GOOGLE VIDS", a: { node: "prompt", prompt: "a tiny robot walking through a futuristic city at night", promptLabel: "Google Vids · prompt", label: "1 Prompt", labelBg: "#3B0764" }, b: { img: "img/card_vids_robot.png", pos: "50% 60%", label: "FREE AI Video", labelBg: "#FFE11A", labelColor: "#111" } }} />
     <Composition id="VCover6" component={Cover3} durationInFrames={1} {...common} defaultProps={{ portrait: "img/portrait1.png", pX: -170, pW: 820, pill: "Momentic Mo", pillIcon: "🐞", line1: "AI TESTS YOUR", line2: "WEBSITE", a: { img: "img/card_mo_fail.png", pos: "50% 100%", label: "Broken Checkout", labelBg: "#3B0764" }, b: { node: "bugs", label: "AI Found It", labelBg: "#FFE11A", labelColor: "#111" } }} />
     <Composition id="VCover7" component={Cover3} durationInFrames={1} {...common} defaultProps={{ portrait: "img/portrait4.png", pW: 1600, pX: -520, cardsTop: 760, layout: "row", pill: "Tripo AI Agentic Canvas", pillIcon: "🧊", line1: "MY DRAWING", line2: "→ 3D CHARACTER", a: { img: "img/card_tripo_sketch.png", pos: "50% 40%", label: "My Drawing", labelBg: "#3B0764" }, b: { img: "img/card_tripo_char.png", pos: "50% 40%", label: "3D Character", labelBg: "#FFE11A", labelColor: "#111" } }} />
+    <Composition id="VThumb1" component={ViralThumb} durationInFrames={1} {...common} defaultProps={{"bg": "img/card_rea_new.png", "line1": "AI COPIED", "line2": "A WHOLE APP", "emoji": "🤯", "portrait": "img/portrait1.png", "tag": "REA + Claude Code"}} />
+    <Composition id="VThumb2" component={ViralThumb} durationInFrames={1} {...common} defaultProps={{"bg": "img/card_genie_world.png", "line1": "TYPE A PROMPT", "line2": "WALK INSIDE IT", "emoji": "🎮", "portrait": "img/portrait2.png", "tag": "Google Genie 4", "accent": "#7CFFB2"}} />
+    <Composition id="VThumb3" component={ViralThumb} durationInFrames={1} {...common} defaultProps={{"bg": "img/suncatcher_hero.png", "line1": "GOOGLE PUT AI", "line2": "IN SPACE", "emoji": "🛰️", "portrait": "img/portrait3.png", "tag": "Gemma 4 in orbit", "accent": "#7DD3FC"}} />
+    <Composition id="VThumb4" component={ViralThumb} durationInFrames={1} {...common} defaultProps={{"bg": "img/card_film.png", "line1": "AI REVIEWED", "line2": "A WHOLE MOVIE", "emoji": "🎬", "portrait": "img/portrait4.png", "pW": 1560, "pX": -560, "tag": "GPT-6.1 Terra", "accent": "#C4B5FD"}} />
+    <Composition id="VThumb5" component={ViralThumb} durationInFrames={1} {...common} defaultProps={{"bg": "img/card_vids_robot.png", "line1": "FREE AI VIDEOS", "line2": "FROM GOOGLE", "emoji": "🆓", "portrait": "img/portrait1.png", "flip": true, "tag": "Google Vids", "accent": "#FFE11A"}} />
+    <Composition id="VThumb6" component={ViralThumb} durationInFrames={1} {...common} defaultProps={{"bg": "img/card_mo_fail.png", "cardPos": "50% 100%", "line1": "THIS AI FINDS", "line2": "YOUR BUGS", "emoji": "🐞", "portrait": "img/portrait3.png", "flip": true, "tag": "Momentic Mo", "accent": "#86EFAC"}} />
+    <Composition id="VThumb7" component={ViralThumb} durationInFrames={1} {...common} defaultProps={{"bg": "img/card_tripo_char.png", "line1": "MY DRAWING", "line2": "→ 3D CHARACTER", "emoji": "🤖", "portrait": "img/portrait4.png", "pW": 1560, "pX": -560, "tag": "Tripo Agentic Canvas", "accent": "#FDBA74"}} />
   </>
 );
