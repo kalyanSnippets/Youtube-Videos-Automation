@@ -55,7 +55,7 @@ const Proof: React.FC<{ img: string; credit: string; offset: number; focus: stri
     <AbsoluteFill style={{ background: "#111" }}>
       <div style={{ position: "absolute", left: 0, top: 0, width: 1080, height: 980, overflow: "hidden", background: "#fff" }}>
         <div style={{ width: "100%", height: "100%", transform: `scale(${z})`, transformOrigin: focus }}>
-          <Img src={staticFile(img)} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "50% 0%" }} />
+          <Img src={staticFile(img)} style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "50% 30%" }} />
           {underline && <div style={{ position: "absolute", left: `${underline[0]}%`, top: `${underline[1]}%`, width: `${60 * ul}%`, height: 10, background: C.red, borderRadius: 5 }} />}
         </div>
         <div style={{ position: "absolute", right: 16, bottom: 12, background: "rgba(0,0,0,0.7)", color: "#fff", fontFamily: INTER, fontWeight: 600, fontSize: 22, padding: "4px 12px", borderRadius: 8 }}>{credit}</div>
@@ -82,12 +82,12 @@ const Banner: React.FC<{ num: string; label: string; color?: string }> = ({ num,
 type Cut = { a: number; b: number; el: (offset: number) => React.ReactNode; caps?: "top" | "none" | "low" };
 const CUTS: Cut[] = [
   { a: 0, b: 3.6, el: () => <Hook /> },
-  { a: 7.8, b: 11.95, el: () => <Launch startAt={10.1} />, caps: "low" },
-  { a: 13.8, b: 16.9, el: (o) => <Proof img="img/fable_anth.png" credit="Source: anthropic.com" offset={o} focus="30% 85%" zoomTo={1.35} underline={[4, 80, 30]} />, caps: "low" },
+  { a: 7.8, b: 11.95, el: () => <Launch startAt={10.6} />, caps: "low" },
+  { a: 13.8, b: 16.9, el: (o) => <Proof img="img/fable_anth.png" credit="Source: anthropic.com" offset={o} focus="0% 85%" zoomTo={1.12} underline={[4, 80, 30]} />, caps: "low" },
   {
     a: 19.4, b: 23.4, caps: "low",
     el: (o) => (
-      <Proof img="img/fable_ie.png" credit="Source: Interesting Engineering" offset={o} focus="50% 12%" zoomTo={1.3}>
+      <Proof img="img/fable_ie.png" credit="Source: Interesting Engineering" offset={o} focus="50% 8%" zoomTo={1.06}>
         <Sequence from={f(22.75 - 19.4)} layout="none">
           <PopIn style={{ position: "absolute", left: 0, right: 0, top: 560, display: "flex", justifyContent: "center" }}>
             <div style={{ transform: "rotate(-8deg)", border: `12px solid ${C.red}`, color: C.red, background: "rgba(255,255,255,0.9)", fontFamily: INTER, fontWeight: 900, fontSize: 130, padding: "0 40px", borderRadius: 22 }}>8 DAYS</div>
@@ -109,9 +109,10 @@ const Captions: React.FC = () => {
   const t = frame / FPS;
   const cut = CUTS.find((c) => t >= c.a && t < c.b);
   const msgs = t >= 30.8 && t < 36.4; // message pop-ups own the lower half
+  const zoomed = (t >= 23.6 && t < 25.4) || (t >= 45.4 && t < 49.9); // punch-ins: face is bigger
   const c = activeChunk(chunks, t);
   if (!c || cut?.caps === "none") return null;
-  const top = cut?.caps === "low" ? 1560 : msgs ? 150 : 1170;
+  const top = cut?.caps === "low" || zoomed ? 1560 : msgs ? 150 : 1170;
   return (
     <div style={{ position: "absolute", top, left: 40, right: 40, display: "flex", justifyContent: "center", flexWrap: "wrap", gap: "0 18px" }}>
       {c.words.map((w, i) => {
