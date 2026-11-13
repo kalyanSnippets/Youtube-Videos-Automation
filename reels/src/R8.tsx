@@ -264,7 +264,7 @@ const Captions: React.FC = () => {
   if (!c) return null;
   const split = !!splitAt(t);
   const lowCard = (t >= 16.9 && t < 19.4) || (t >= 24.0 && t < 28.8); // glass counter / toggles under the chin
-  const top = split ? SEAM - 52 : lowCard ? 1640 : 1170;
+  const top = split ? SEAM - 52 : lowCard ? 1200 : 1170;
   return (
     <div style={{ position: "absolute", top, left: 30, right: 30, display: "flex", justifyContent: "center", flexWrap: "wrap", gap: "0 18px" }}>
       {c.words.map((w, i) => {
