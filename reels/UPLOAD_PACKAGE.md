@@ -1,6 +1,6 @@
 # AI with Kalyan: Reels upload package
 
-Seven finished vertical reels (1080×1920, 30 fps, H.264, about −15 LUFS) with covers and copy-paste text for Instagram, YouTube Shorts and TikTok.
+Eight finished vertical reels (1080×1920, 30 fps, H.264, about −15 LUFS) with covers and copy-paste text for Instagram, YouTube Shorts and TikTok.
 
 ## What's in the package
 
@@ -13,6 +13,7 @@ Seven finished vertical reels (1080×1920, 30 fps, H.264, about −15 LUFS) with
 | 5 | `05B_Google_Vids-Device-Style.mp4` (alt: `05_Google_Vids-Free-AI-Video.mp4`) | 42s | `covers/05_Google-Vids_cover.jpg` |
 | 6 | `06B_Momentic_Mo-Whiteboard.mp4` (alt: `06_Momentic_Mo-AI-Tester.mp4`) | 47s | `covers/06_Momentic-Mo_cover.jpg` |
 | 7 | `07_Tripo_Agentic-Canvas.mp4` | 43s | `covers/07_Tripo-Agentic-Canvas_cover.jpg` |
+| 8 | `08_Claude_Fable-5.2.mp4` | 85s | (thumbnail on request) |
 
 Covers are 1080×1920. A second, Instagram-grid-proof set is in `insta-thumbnails/` (everything important sits inside the 3:4 grid crop). The title sits inside the middle 4:5 area, so it stays readable when Instagram crops the profile grid.
 
@@ -367,6 +368,95 @@ tripo ai, agentic canvas, tripo agentic canvas, ai 3d model, image to 3d, sketch
 **TikTok caption:** `Can AI turn a drawing into a 3D game character? 🤖 Comment ROBOT, DRAGON or SUPERHERO, I'll build the winner #tripoai #3d #gamedev #aitools #techtok`
 
 **Pinned comment:** `Vote here 👇 ROBOT 🤖 / DRAGON 🐉 / SUPERHERO 🦸. Most votes in 48 hours gets built in my next video!`
+
+---
+
+## Reel 8: Claude Fable 5.2 (AI built an entire OS)
+
+**Video:** `08_Claude_Fable-5.2.mp4` (85s). Set up the FABLE auto-DM **before** posting.
+
+**Instagram caption**
+```
+An AI just helped build an ENTIRE operating system 🤯
+
+Anthropic says one engineer used Claude Fable 5.2 to coordinate 1,000+ AI agents, and together they built a working OS prototype in 8 days.
+
+But it's not just for coding. 3 practical ways to use it:
+1️⃣ Coding: find bugs across hundreds of files, suggest fixes and test them
+2️⃣ Data analysis: spot trends, unusual numbers and build reports
+3️⃣ AI agents: let Fable lead a team of smaller agents on one big project
+
+Anthropic also says it's up to 30% faster than Fable 5.1, with a 1M-token context window.
+
+The catch: for everyday tasks you probably don't need this much power. It's built for the really complicated stuff.
+
+💬 Comment FABLE and I'll DM you my 3 ready-to-use prompts.
+
+Sources: Anthropic (anthropic.com, Claude release notes, Nov 9, 2026), Interesting Engineering. OS demo and speed figures are Anthropic's claims.
+
+#ClaudeAI #Anthropic #Fable52 #ClaudeFable #AIagents #AItools #AINews #Coding #DataAnalysis #AIwithKalyan
+```
+
+**YouTube title:** `Claude Fable 5.2 Built an Entire OS?! 1,000 AI Agents in 8 Days 🤯 #shorts`
+
+**YouTube description**
+```
+Anthropic just released Claude Fable 5.2 (Nov 9, 2026). Anthropic says one engineer used it to coordinate 1,000+ AI agents that built a working operating system prototype in 8 days.
+
+3 practical ways to use it:
+1. Coding: investigate big codebases, suggest fixes and test them
+2. Data analysis: find trends and unusual numbers, build reports
+3. AI agents: a lead agent coordinating smaller agents
+
+Also: up to 30% faster than Fable 5.1 (Anthropic's figure) and a 1M-token context window.
+For everyday tasks you probably don't need this much power.
+
+💬 Comment FABLE for my 3 use-case prompts.
+
+Sources: anthropic.com, Claude release notes, Interesting Engineering.
+#ClaudeAI #Anthropic #Fable52 #shorts
+```
+
+**YouTube tags (comma-separated)**
+```
+claude fable 5.2, claude fable, anthropic, claude ai, fable 5.2, ai agents, ai built an operating system, 1000 ai agents, claude new model, ai coding, ai data analysis, ai news, ai tools 2026, ai with kalyan
+```
+
+**TikTok caption:** `An AI built an entire OS with 1,000 agents in 8 days?! 🤯 Claude Fable 5.2 explained. Comment FABLE for my prompts #claudeai #anthropic #aiagents #ainews #techtok`
+
+**Pinned comment:** `Comment FABLE and I'll DM you 3 copy-paste prompts (coding, data, agents) 📩 Which one would you try first?`
+
+### The prompts you promised (send to everyone who comments FABLE)
+```
+Hey! Here are my 3 Claude Fable 5.2 prompts 👇 Copy, paste, and swap the [brackets] for your own details.
+
+1️⃣ CODING: find and fix bugs
+"You are a senior software engineer. Here is my project: [paste the files or describe the repo]. Something keeps breaking: [describe the bug, error message, when it happens].
+Step 1: Investigate the code and list the 3 most likely root causes, with the file and line for each.
+Step 2: For the most likely cause, suggest a minimal fix and show the exact code change.
+Step 3: Write tests that fail before the fix and pass after it.
+Ask me questions first if anything is unclear."
+
+2️⃣ DATA ANALYSIS: trends, odd numbers, report
+"You are a data analyst for a [type of business]. Here is my sales data: [paste the table or upload the CSV].
+1. Summarise the overall trend in plain English (3 bullets).
+2. Find any unusual numbers (spikes, drops, outliers) and give 2 possible reasons for each.
+3. Build a one-page report: key metrics table, 3 insights, and 3 actions I should take next month.
+Flag any data that looks wrong or missing."
+
+3️⃣ AI AGENTS: lead a team
+"Act as the lead agent for this project: [describe the project and the goal].
+1. Break it into 4-6 workstreams and assign each to a sub-agent with a clear role (e.g. UI, backend, tests, docs).
+2. For each sub-agent, write its task brief, inputs, and what 'done' looks like.
+3. Run the plan step by step, check each sub-agent's output, and fix conflicts between them.
+4. Finish with a summary of what was built, what's left, and the risks."
+
+Tip: Fable 5.2 is built for big, complicated jobs. For quick everyday questions a lighter model is fine.
+More tools like this on AI with Kalyan 🙌
+```
+
+### Auto-DM "FABLE"
+Set this up the same way as the EDIT reply (ManyChat → keyword **FABLE** → send the DM above → reply to the comment "Sent! Check your DMs 📩"). Turn it on before you post.
 
 ---
 
