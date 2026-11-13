@@ -1,0 +1,5 @@
+{"effects": [
+ {"fx": "scribble", "start": 5.55, "end": 6.4, "text": "crazy?!"},
+ {"fx": "tap", "start": 39.2, "end": 41.6, "at": "39.6"},
+ {"fx": "comment-box", "start": 43.6, "end": 46.2, "text": "YES", "handle": "aiwithkalyan", "reply": "Not anymore", "chip": "$0 setup"}
+]}
