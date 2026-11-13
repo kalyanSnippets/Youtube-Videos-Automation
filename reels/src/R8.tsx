@@ -1,7 +1,8 @@
 import React from "react";
 import { AbsoluteFill, Audio, interpolate, Sequence, staticFile, useCurrentFrame, OffthreadVideo, Img, Easing } from "remotion";
 import data from "../public/r/r8f_words.json";
-import { Aroll, f, FPS, INTER, MONO, Music, PopIn, ReelData, Sfx, Flash, chunkWords, activeChunk } from "./lib";
+import face from "../public/r/r8f_face.json";
+import { f, FPS, INTER, MONO, Music, PopIn, ReelData, Sfx, Flash, chunkWords, activeChunk } from "./lib";
 
 /* Reel 8 v2: Claude Fable 5.2, Varun-Mayya-style news edit.
    Full-face moments use the effects-skill pass (r8fx2_aroll.mp4: scribble, glass counter, toggles, messages, comment box, follow).
@@ -16,6 +17,31 @@ const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
 const SEAM = 960;
 const L = (abs: number, a: number) => f(abs - a); // absolute word time -> local frame
 
+
+/* face-tracked bottom half: whole head always visible, slightly zoomed out */
+const FT = face as { t: number[]; cy: number[]; h: number[] };
+const faceAt = (t: number) => {
+  const i = Math.max(0, FT.t.findIndex((x) => x > t) - 1);
+  const j = Math.min(FT.t.length - 1, i + 1);
+  const k = FT.t[j] === FT.t[i] ? 0 : Math.min(1, Math.max(0, (t - FT.t[i]) / (FT.t[j] - FT.t[i])));
+  return FT.cy[i] + (FT.cy[j] - FT.cy[i]) * k;
+};
+const FaceBox: React.FC<{ offset: number; y: number; h: number }> = ({ offset, y, h }) => {
+  const frame = useCurrentFrame();
+  const s = 0.86;
+  const cy = faceAt((frame + offset) / FPS);
+  let top = h * 0.55 - cy * s;
+  top = Math.min(0, Math.max(h - 1920 * s, top));
+  const left = (1080 - 1080 * s) / 2;
+  const v = (st: React.CSSProperties) => <OffthreadVideo src={staticFile("r/r8f_aroll.mp4")} muted startFrom={offset} style={st} />;
+  return (
+    <div style={{ position: "absolute", left: 0, top: y, width: 1080, height: h, overflow: "hidden", background: "#000" }}>
+      <div style={{ position: "absolute", inset: 0, filter: "blur(30px) brightness(0.55)", transform: "scale(1.15)" }}>{v({ width: "100%", height: "100%", objectFit: "cover" })}</div>
+      {v({ position: "absolute", left, top, width: 1080 * s, height: 1920 * s })}
+    </div>
+  );
+};
+
 /* ---------- split-screen frame ---------- */
 const Split: React.FC<{ offset: number; children: React.ReactNode }> = ({ offset, children }) => (
   <AbsoluteFill style={{ background: C.ink }}>
@@ -23,7 +49,7 @@ const Split: React.FC<{ offset: number; children: React.ReactNode }> = ({ offset
       <AbsoluteFill style={{ backgroundImage: `linear-gradient(${C.line} 1px, transparent 1px), linear-gradient(90deg, ${C.line} 1px, transparent 1px)`, backgroundSize: "60px 60px", opacity: 0.35 }} />
       {children}
     </div>
-    <Aroll data={D} src="r/r8f_aroll.mp4" box={{ x: 0, y: SEAM, w: 1080, h: 1920 - SEAM }} focusY={600} zoom={1} alternate={false} offset={offset} />
+    <FaceBox offset={offset} y={SEAM} h={1920 - SEAM} />
     <div style={{ position: "absolute", left: 0, right: 0, top: SEAM - 4, height: 8, background: C.yellow }} />
   </AbsoluteFill>
 );
