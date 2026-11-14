@@ -1,6 +1,6 @@
 # AI with Kalyan: Reels upload package
 
-Eight finished vertical reels (1080×1920, 30 fps, H.264, about −15 LUFS) with covers and copy-paste text for Instagram, YouTube Shorts and TikTok.
+Nine finished vertical reels (1080×1920, 30 fps, H.264, about −15 LUFS) with covers and copy-paste text for Instagram, YouTube Shorts and TikTok.
 
 ## What's in the package
 
@@ -14,6 +14,7 @@ Eight finished vertical reels (1080×1920, 30 fps, H.264, about −15 LUFS) with
 | 6 | `06B_Momentic_Mo-Whiteboard.mp4` (alt: `06_Momentic_Mo-AI-Tester.mp4`) | 47s | `covers/06_Momentic-Mo_cover.jpg` |
 | 7 | `07_Tripo_Agentic-Canvas.mp4` | 43s | `covers/07_Tripo-Agentic-Canvas_cover.jpg` |
 | 8 | `08_Claude_Fable-5.2.mp4` | 85s | (thumbnail on request) |
+| 9 | `09_ClaudeCode_No-Subscription.mp4` | 58s | (thumbnail on request) |
 
 Covers are 1080×1920. A second, Instagram-grid-proof set is in `insta-thumbnails/` (everything important sits inside the 3:4 grid crop). The title sits inside the middle 4:5 area, so it stays readable when Instagram crops the profile grid.
 
@@ -457,6 +458,56 @@ More tools like this on AI with Kalyan 🙌
 
 ### Auto-DM "FABLE"
 Set this up the same way as the EDIT reply (ManyChat → keyword **FABLE** → send the DM above → reply to the comment "Sent! Check your DMs 📩"). Turn it on before you post.
+
+---
+
+## Reel 9: Claude Code without the $20 subscription (SIM-card reel)
+
+**Video:** `09_ClaudeCode_No-Subscription.mp4` (58s). Full tutorial: https://youtu.be/cQGuX5RWDeY ("Claude Code Costs Nothing If You Do This").
+
+**Instagram caption**
+```
+Still paying $20 a month just to use Claude Code? 💸
+
+Think of Claude Code like your phone 📱 and the AI model like your SIM card. Just like you can swap a SIM, you can connect Claude Code to different AI models.
+
+I tested 3 ways to do it:
+1️⃣ Offline: run AI right on your own computer
+2️⃣ Free cloud: use free AI models online
+3️⃣ Multi-provider: connect several AI providers in one setup
+
+You keep the same Claude Code interface, but you're not necessarily using Anthropic's model, and that's how you can potentially save a lot of money.
+
+🎥 Full step-by-step tutorial (all 3 methods) on my YouTube channel: AI with Kalyan. Link in bio 👆
+"Claude Code Costs Nothing If You Do This"
+
+Are you paying for Claude right now? Comment YES or NO 👇
+
+#ClaudeCode #Claude #Anthropic #AIcoding #FreeAITools #AItools #LocalAI #OpenSourceAI #CodingTips #AIwithKalyan
+```
+**Instagram tip:** links in captions aren't clickable. Put https://youtu.be/cQGuX5RWDeY in your bio (or a link sticker in your Story) before posting.
+
+**YouTube Shorts title:** `Stop Paying $20/Month for Claude Code (3 Ways) #shorts`
+
+**YouTube description**
+```
+Claude Code is the phone, the AI model is the SIM card. You can swap it.
+
+I tested 3 ways to use Claude Code without the $20/month subscription:
+1. Offline: AI running on your own computer
+2. Free cloud AI models
+3. Multiple AI providers in one setup
+
+▶ Full step-by-step tutorial (all 3 methods): https://youtu.be/cQGuX5RWDeY
+
+Are you paying for Claude right now? Comment below 👇
+#ClaudeCode #AIcoding #FreeAITools #shorts
+```
+**YouTube "Related video":** link the Short to *Claude Code Costs Nothing If You Do This* (Edit → Related video). It adds a tap-through link on the Short.
+
+**YouTube tags:** `claude code, claude code free, claude code without subscription, claude code local model, free ai coding, claude code alternative models, anthropic, ai coding tools, local ai, free ai models, ai with kalyan`
+
+**Pinned comment (YouTube & Instagram):** `Full tutorial with all 3 methods 👉 https://youtu.be/cQGuX5RWDeY (Instagram: link in bio). Which method would you try first: offline, free cloud or multi-provider?`
 
 ---
 
