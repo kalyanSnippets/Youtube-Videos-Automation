@@ -534,3 +534,74 @@ Are you paying for Claude right now? Comment below 👇
 - Share each reel to your Story with a poll sticker (e.g. Reel 3: "Genius / Unnecessary").
 - On YouTube, reply to the first comments with a link to your related long video.
 - After 48 hours, check Insights for 3-second hold rate and average watch time. Tell me the numbers and I'll tighten the hooks for the next batch.
+
+---
+
+# Reels 10 and 11 (approved 2026-11-16)
+
+| # | Video file | Length | Comment keyword |
+|---|---|---|---|
+| 10 | `10_ClaudeCode_5-Skills.mp4` | 63s | SKILLS |
+| 11 | `11_ClaudeCode_5-AI-Tools.mp4` | 73s | PLUGIN |
+
+Both are 1080×1920, 30 fps, H.264, about −16.7 LUFS, with music synthesised for the reel (no licence or credit needed). Demo websites are made-up brands built from free Pexels/Mixkit stock (see `demo/ASSETS.md`). Turn **off** the AI label: nothing is AI-generated footage.
+
+## Reel 10: 5 Claude Code skills
+
+**Instagram caption**
+Claude Code built something that looked nothing like you imagined? 😬 Don't blame the AI yet.
+
+Try these 5 skills:
+1️⃣ find-skills: tells you which skills fit your project
+2️⃣ frontend-design: better layouts, colours and typography
+3️⃣ agent-browser: lets the agent open your site, click around and check it works
+4️⃣ brainstorming: plans properly before writing code
+5️⃣ grill-me: asks you questions instead of guessing
+
+Comment SKILLS and I'll DM you all 5 links 📩
+Follow @aiwithkalyan, we're just getting started 🚀
+
+#claudecode #claude #aitools #vibecoding #aiagents #webdesign #coding #developer
+
+**YouTube Shorts title:** 5 Claude Code skills that fix bad AI websites
+**Pinned comment:** Comment SKILLS and I'll send you all 5 links 👇
+
+**DM reply for "SKILLS"**
+Here are the 5 skills 👇
+1. find-skills: `npx skills add vercel-labs/skills --skill find-skills`
+2. frontend-design: `npx skills add vercel-labs/agent-skills --skill frontend-design`
+3. agent-browser: search "agent-browser" on skills.sh
+4. brainstorming: search "brainstorming" on skills.sh
+5. grill-me: `npx skills add mattpocock/skills --skill grill-me`
+Read each skill before you install it 🙏
+
+> Check before sending: the commands for 1, 2 and 5 come from search results, and 3 and 4 were not confirmed. Replace them with the exact repos you use.
+
+## Reel 11: 5 AI tools for Claude Code
+
+**Instagram caption**
+Don't use Claude Code without these 5 tools 👀 It's not just for coding.
+
+🔓 Free LLM API list: try AI models without paying per call (check the limits)
+🔓 ElevenLabs: turn your script into natural AI voiceover
+🔓 Remotion: make real animated videos with code (the 3D intro in this reel was made with it)
+🔓 Agent-Reach: let Claude research YouTube, Reddit and GitHub for you
+🔓 NVIDIA SkillSpector: scan AI skills before you install them
+
+Comment PLUGIN and I'll send you all the links 📩
+Follow @aiwithkalyan, I'll show you how to use each one.
+
+#claudecode #claude #remotion #elevenlabs #aitools #aiagents #nvidia #automation
+
+**YouTube Shorts title:** 5 AI tools that make Claude Code way more than a coding tool
+**Pinned comment:** Comment PLUGIN for all 5 links 👇
+
+**DM reply for "PLUGIN"**
+Here you go 👇
+1. Free LLM API list: github.com/jtig37/free-llm-api-resources
+2. ElevenLabs: elevenlabs.io
+3. Remotion: remotion.dev
+4. Agent-Reach: github.com/Panniantong/Agent-Reach
+5. NVIDIA SkillSpector: github.com/NVIDIA/SkillSpector
+
+> Note: link 1 is a copy of the original free-llm-api-resources list, which was taken down. That copy was last updated about two years ago.
