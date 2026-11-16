@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, Audio, Easing, interpolate, Sequence, staticFile, useCurrentFrame, OffthreadVideo } from "remotion";
 import data from "../public/r/r10f_words.json";
 import face from "../public/r/r10f_face.json";
-import { f, FPS, INTER, MONO, Music, PopIn, ReelData, Sfx, Flash, chunkWords, Typewriter, Cursor } from "./lib";
+import { f, FPS, INTER, MONO, Music, PopIn, ReelData, Sfx, Flash, chunkWords, Typewriter } from "./lib";
 import { K, ease, clamp, Split, ItemHeader, Banner, Chip, Captions, CommentPanel, Follow, FaceTrack, Float3D, Screen3D } from "./split";
 
 /* Reel 10: "5 Claude Code skills to try before you blame the AI".
@@ -17,7 +17,9 @@ export const R10_FRAMES = Math.ceil(END * FPS);
 /* frames since the panel started, for an event at absolute time `abs` in a panel that starts at `a` */
 const L = (abs: number, a: number) => f(abs) - f(a);
 
-const IMAG = "b/r10_designed.mp4", STAT = "b/r10_static.mp4", DSGN = "b/r10_designed.mp4";
+const IMAG = "b/r10_designed.mp4", STAT = "b/r10_static.mp4";
+/* each panel uses its own demo site so nothing repeats: headphones (hook), coffee shop (frontend-design), travel booking (agent-browser) */
+const CAFE_A = "b/r10_coffee_before.mp4", CAFE_B = "b/r10_coffee_after.mp4", TRAVEL = "b/r10_travel.mp4";
 const Label: React.FC<{ children: React.ReactNode; bg: string; size?: number }> = ({ children, bg, size = 40 }) => (
   <div style={{ background: bg, color: "#fff", fontFamily: INTER, fontWeight: 900, fontSize: size, padding: "6px 22px", borderRadius: 12, boxShadow: "0 10px 26px rgba(0,0,0,0.5)", whiteSpace: "nowrap" }}>{children}</div>
 );
@@ -82,7 +84,7 @@ const FindPanel: React.FC = () => {
   );
 };
 
-/* 20.23 frontend-design: the real static page flips into a real designed page (both built for this reel and recorded) */
+/* 20.23 frontend-design: a normal coffee-shop page flips into a designed one (both real pages built for this reel and recorded) */
 const FrontendPanel: React.FC = () => {
   const frame = useCurrentFrame();
   const a = 20.23;
@@ -96,8 +98,8 @@ const FrontendPanel: React.FC = () => {
       {frame >= L(22.25, a) && (
         <div style={{ position: "absolute", left: 60 + k * 100, top: 365 - k * 5, perspective: 1600 }}>
           <div style={{ transformStyle: "preserve-3d", transform: `rotateY(${k * 180}deg) scale(${interpolate(frame - L(22.25, a), [0, 8], [0.7, 1], clamp)})`, width: w }}>
-            <div style={{ backfaceVisibility: "hidden" }}><Screen3D src={STAT} w={w} url="localhost:3000" at={L(22.25, a) + 12} rotY={k ? 0 : 8} sway={k ? 0 : 3} glow="#6B7280" /></div>
-            <div style={{ position: "absolute", left: 0, top: 0, backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}><Screen3D src={DSGN} w={w} url="localhost:3000" at={sw - 4} rotY={k < 1 ? 0 : -6} sway={k < 1 ? 0 : 4} glow={K.pink} dark /></div>
+            <div style={{ backfaceVisibility: "hidden" }}><Screen3D src={CAFE_A} w={w} url="localhost:3000" at={L(22.25, a) + 12} rotY={k ? 0 : 8} sway={k ? 0 : 3} glow="#6B7280" /></div>
+            <div style={{ position: "absolute", left: 0, top: 0, backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}><Screen3D src={CAFE_B} w={w} url="localhost:3000" at={sw - 2} rotY={k < 1 ? 0 : -6} sway={k < 1 ? 0 : 4} glow="#E9A45C" dark /></div>
           </div>
         </div>
       )}
@@ -108,22 +110,21 @@ const FrontendPanel: React.FC = () => {
   );
 };
 
-/* 29.43 agent-browser: the agent opens the page, clicks around and checks it */
+/* 29.43 agent-browser: a real recording of a travel site being driven: Search is clicked at +0.88s and Book at +1.2s (cursor is in the recording) */
 const BrowserPanel: React.FC = () => {
   const frame = useCurrentFrame();
   const a = 29.43;
   const open = L(34.73, a);
-  const log: [string, number, string][] = [["$ agent-browser open localhost:3000", 34.73, "#E5E7EB"], ["$ agent-browser click @e3", 35.61, "#E5E7EB"], ["$ agent-browser click @e7", 35.93, "#E5E7EB"], ["✓ page loads", 36.49, K.green], ["✓ buttons work", 37.01, K.green], ["✓ no errors", 37.43, K.green]];
+  const log: [string, number, string][] = [["$ agent-browser open localhost:3000", 34.73, "#E5E7EB"], ["$ agent-browser click @e3", 35.61, "#E5E7EB"], ["$ agent-browser click @e7", 35.93, "#E5E7EB"], ["✓ page loads", 36.49, K.green], ["✓ search works", 37.01, K.green], ["✓ booking works", 37.43, K.green]];
   return (
     <>
       <ItemHeader n={3} of={5} kind="SKILL" name="agent-browser" color={K.green} nameAt={L(30.92, a)} />
       <Float3D delay={L(33.31, a)} spin={-60} sway={0} style={{ position: "absolute", left: 40, top: 370 }}>
-        <Screen3D src={DSGN} w={540} url="localhost:3000" at={open} startFrom={75} rotY={10} sway={3} glow={K.green} dark>
-          {frame < open + 8 && <div style={{ position: "absolute", left: 0, right: 0, top: 33, bottom: 0, background: "#0B0D10", opacity: interpolate(frame, [open, open + 8], [1, 0], clamp) }} />}
+        <Screen3D src={TRAVEL} w={560} url="localhost:3000" at={open} rotY={10} sway={3} glow={K.green}>
+          {frame < open + 6 && <div style={{ position: "absolute", left: 0, right: 0, top: 31, bottom: 0, background: "#0B0D10", opacity: interpolate(frame, [open, open + 6], [1, 0], clamp) }} />}
         </Screen3D>
-        {frame >= open + 8 && <Cursor path={[[open + 8, 470, 340], [L(35.61, a), 110, 255], [L(35.93, a), 455, 50], [L(36.6, a), 300, 200]]} clicks={[L(35.61, a), L(35.93, a)]} color="#fff" size={70} />}
       </Float3D>
-      <Float3D delay={L(33.53, a)} spin={70} sway={4} tilt={-8} style={{ position: "absolute", left: 575, top: 400, width: 480 }}>
+      <Float3D delay={L(33.53, a)} spin={70} sway={4} tilt={-8} style={{ position: "absolute", left: 590, top: 400, width: 465 }}>
         <Term size={25} style={{ padding: "18px 18px", height: 440 }}>
           {log.map(([t, at, c]) => frame >= L(at, a) && <PopIn key={t} delay={L(at, a)} from="left" dist={30} style={{ marginTop: 14, color: c, fontWeight: c === K.green ? 800 : 500, fontSize: c === K.green ? 32 : 20, whiteSpace: "nowrap" }}>{t}</PopIn>)}
         </Term>
