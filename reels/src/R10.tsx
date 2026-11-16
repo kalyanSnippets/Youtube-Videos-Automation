@@ -17,7 +17,7 @@ export const R10_FRAMES = Math.ceil(END * FPS);
 /* frames since the panel started, for an event at absolute time `abs` in a panel that starts at `a` */
 const L = (abs: number, a: number) => f(abs) - f(a);
 
-const IMAG = "b/r10_imagined.mp4", STAT = "b/r10_static.mp4", DSGN = "b/r10_designed.mp4";
+const IMAG = "b/r10_designed.mp4", STAT = "b/r10_static.mp4", DSGN = "b/r10_designed.mp4";
 const Label: React.FC<{ children: React.ReactNode; bg: string; size?: number }> = ({ children, bg, size = 40 }) => (
   <div style={{ background: bg, color: "#fff", fontFamily: INTER, fontWeight: 900, fontSize: size, padding: "6px 22px", borderRadius: 12, boxShadow: "0 10px 26px rgba(0,0,0,0.5)", whiteSpace: "nowrap" }}>{children}</div>
 );
@@ -28,7 +28,8 @@ const Term: React.FC<{ children: React.ReactNode; style?: React.CSSProperties; s
   </div>
 );
 
-/* 0.0 hook: the real 3D product page you imagined (apple.com, recorded live), then the plain static page you got */
+/* 0.0 hook: the awesome page you imagined, then the normal generic page you got.
+   Both are real pages built for this reel with free stock media (demo/ASSETS.md) and recorded in a browser. */
 const HookPanel: React.FC = () => {
   const frame = useCurrentFrame();
   const got = L(2.83, 0);
@@ -39,13 +40,13 @@ const HookPanel: React.FC = () => {
   return (
     <>
       <div style={{ position: "absolute", left: 90 - k * 60, top: 170 - k * 30, transform: `scale(${push * (1 - k * 0.45)})`, transformOrigin: "0 0", filter: `brightness(${1 - k * 0.35})` }}>
-        <Screen3D src={IMAG} w={900} url="apple.com/airpods-max" rotY={-10 - k * 10} rotX={5} glow={K.violet} />
+        <Screen3D src={IMAG} w={900} url="aura-headphones.com" rotY={-10 - k * 10} rotX={5} glow={K.violet} dark />
       </div>
       <PopIn delay={8} style={{ position: "absolute", left: interpolate(k, [0, 1], [300, 40]), top: interpolate(k, [0, 1], [800, 505]) }}><Label bg={K.violet} size={interpolate(k, [0, 1], [44, 32])}>What you imagined ✨</Label></PopIn>
       {frame >= got && (
         <>
           <div style={{ position: "absolute", left: 400 + shake, top: 300, transform: `scale(${slam})`, opacity: interpolate(frame, [got, got + 5], [0, 1], clamp) }}>
-            <Screen3D src={STAT} w={640} url="localhost:3000" rotY={9} rotX={3} sway={2} glow={K.red} />
+            <Screen3D src={STAT} w={640} url="localhost:3000" at={got} rotY={9} rotX={3} sway={2} glow={K.red} />
           </div>
           <PopIn delay={got + 9} style={{ position: "absolute", left: 560, top: 790 }}><Label bg={K.red} size={44}>What you got 😬</Label></PopIn>
         </>
@@ -95,7 +96,7 @@ const FrontendPanel: React.FC = () => {
       {frame >= L(22.25, a) && (
         <div style={{ position: "absolute", left: 60 + k * 100, top: 365 - k * 5, perspective: 1600 }}>
           <div style={{ transformStyle: "preserve-3d", transform: `rotateY(${k * 180}deg) scale(${interpolate(frame - L(22.25, a), [0, 8], [0.7, 1], clamp)})`, width: w }}>
-            <div style={{ backfaceVisibility: "hidden" }}><Screen3D src={STAT} w={w} url="localhost:3000" rotY={k ? 0 : 8} sway={k ? 0 : 3} glow="#6B7280" /></div>
+            <div style={{ backfaceVisibility: "hidden" }}><Screen3D src={STAT} w={w} url="localhost:3000" at={L(22.25, a) + 12} rotY={k ? 0 : 8} sway={k ? 0 : 3} glow="#6B7280" /></div>
             <div style={{ position: "absolute", left: 0, top: 0, backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}><Screen3D src={DSGN} w={w} url="localhost:3000" at={sw - 4} rotY={k < 1 ? 0 : -6} sway={k < 1 ? 0 : 4} glow={K.pink} dark /></div>
           </div>
         </div>

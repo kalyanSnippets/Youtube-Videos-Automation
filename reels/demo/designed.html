@@ -1,35 +1,53 @@
 <!doctype html><html><head><meta charset="utf-8"><title>AURA — Wireless Headphones</title>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:Inter,-apple-system,Segoe UI,Helvetica,Arial,sans-serif;background:#07070c;color:#fff;overflow-x:hidden}
-.nav{position:fixed;top:0;left:0;right:0;z-index:9;display:flex;justify-content:space-between;align-items:center;padding:20px 56px;backdrop-filter:blur(14px);background:rgba(7,7,12,.55)}
-.logo{font-weight:900;letter-spacing:6px;font-size:20px}.nav span{opacity:.7;margin-left:30px;font-size:14px}.cta{background:#fff;color:#111;font-weight:800;padding:10px 22px;border-radius:99px;font-size:14px}
-.hero{height:800px;position:relative;display:flex;align-items:center;padding:0 56px;background:radial-gradient(900px 600px at 72% 45%,#5b21b6 0%,#1e1b4b 38%,#07070c 72%)}
-.orb{position:absolute;border-radius:50%;filter:blur(60px);opacity:.55;animation:drift 7s ease-in-out infinite alternate}
-.o1{width:320px;height:320px;background:#f472b6;right:8%;top:10%}.o2{width:260px;height:260px;background:#38bdf8;right:34%;bottom:6%;animation-delay:-3s}
-@keyframes drift{to{transform:translate(-40px,30px) scale(1.15)}}
-h1{font-size:92px;line-height:.95;letter-spacing:-4px;margin:0;font-weight:900}h1 em{font-style:normal;background:linear-gradient(90deg,#f472b6,#a78bfa,#38bdf8);-webkit-background-clip:text;color:transparent}
-.sub{font-size:20px;opacity:.75;max-width:430px;margin:22px 0 30px;line-height:1.45}.row{display:flex;gap:14px;align-items:center}
-.buy{background:linear-gradient(90deg,#a78bfa,#f472b6);padding:16px 34px;border-radius:99px;font-weight:800;font-size:17px;box-shadow:0 12px 40px rgba(167,139,250,.5)}.price{font-size:17px;opacity:.8}
-.stage{position:absolute;right:70px;top:150px;width:520px;height:560px;perspective:1100px}
-.phones{width:100%;height:100%;transform-style:preserve-3d;animation:spin 6s ease-in-out infinite alternate}
-@keyframes spin{from{transform:rotateY(-38deg) rotateX(8deg) translateY(0)}to{transform:rotateY(38deg) rotateX(-4deg) translateY(-18px)}}
-.layer{position:absolute;inset:0}.shadow{position:absolute;left:110px;right:110px;bottom:-10px;height:40px;background:radial-gradient(closest-side,rgba(0,0,0,.7),transparent);filter:blur(8px)}
-.sec{padding:90px 56px;display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
-.card{background:linear-gradient(160deg,rgba(255,255,255,.1),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.14);border-radius:26px;padding:30px;height:230px}
-.card b{font-size:54px;display:block;letter-spacing:-2px;background:linear-gradient(90deg,#a78bfa,#38bdf8);-webkit-background-clip:text;color:transparent}.card p{opacity:.7;font-size:17px;line-height:1.4}
-h2{font-size:60px;letter-spacing:-2.5px;margin:0 56px;padding-top:80px}
+.nav{position:fixed;top:0;left:0;right:0;z-index:9;display:flex;justify-content:space-between;align-items:center;padding:18px 56px;backdrop-filter:blur(14px);background:rgba(7,7,12,.45)}
+.logo{font-weight:900;letter-spacing:6px;font-size:20px}.nav span{opacity:.8;margin-left:30px;font-size:14px}.cta{background:#fff;color:#111;font-weight:800;padding:10px 22px;border-radius:99px;font-size:14px;opacity:1!important}
+.hero{height:800px;position:relative;display:flex;align-items:center;padding:0 56px;overflow:hidden}
+.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(1.15)}
+.shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(7,7,12,.92) 0%,rgba(7,7,12,.6) 42%,rgba(7,7,12,.05) 100%),linear-gradient(0deg,#07070c 0%,transparent 30%)}
+.copy{position:relative;z-index:2;max-width:620px}
+.tag{display:inline-block;border:1px solid rgba(255,255,255,.4);border-radius:99px;padding:7px 16px;font-size:13px;letter-spacing:2px;font-weight:700;margin-bottom:22px;backdrop-filter:blur(8px)}
+h1{font-size:104px;line-height:.9;letter-spacing:-5px;margin:0;font-weight:900}
+h1 em{font-style:normal;background:linear-gradient(90deg,#fb923c,#f472b6,#a78bfa,#fb923c);background-size:300% 100%;-webkit-background-clip:text;color:transparent;animation:hue 5s linear infinite}
+@keyframes hue{to{background-position:300% 0}}
+.sub{font-size:20px;opacity:.85;max-width:440px;margin:22px 0 30px;line-height:1.45}.row{display:flex;gap:16px;align-items:center}
+.buy{background:linear-gradient(90deg,#fb923c,#f472b6);padding:17px 36px;border-radius:99px;font-weight:800;font-size:17px;box-shadow:0 12px 40px rgba(244,114,182,.55);animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.05);box-shadow:0 16px 60px rgba(244,114,182,.8)}}
+.stage{position:absolute;right:60px;top:110px;width:520px;height:620px;perspective:1200px;z-index:3}
+.rig{width:100%;height:100%;transform-style:preserve-3d;animation:spin 6s ease-in-out infinite alternate}
+@keyframes spin{from{transform:rotateY(-30deg) rotateX(8deg)}to{transform:rotateY(22deg) rotateX(-5deg) translateY(-14px)}}
+.vcard{position:absolute;left:150px;top:0;width:330px;height:580px;border-radius:34px;overflow:hidden;box-shadow:0 40px 90px rgba(0,0,0,.65),0 0 0 2px rgba(255,255,255,.25);transform:translateZ(-60px)}
+.vcard video{width:100%;height:100%;object-fit:cover}
+.pcard{position:absolute;left:0;top:250px;width:270px;height:270px;border-radius:30px;overflow:hidden;background:#fff;box-shadow:0 30px 70px rgba(0,0,0,.6);transform:translateZ(90px) rotate(-6deg)}
+.pcard img{width:100%;height:100%;object-fit:cover}
+.badge{position:absolute;background:rgba(255,255,255,.95);color:#111;border-radius:18px;padding:12px 18px;font-weight:900;font-size:22px;box-shadow:0 18px 40px rgba(0,0,0,.45)}
+.b1{right:-10px;top:70px;transform:translateZ(150px)}.b2{left:40px;top:170px;transform:translateZ(170px);background:#111;color:#fff}.b3{right:20px;bottom:40px;transform:translateZ(130px);background:linear-gradient(90deg,#fb923c,#f472b6);color:#fff}
+.marq{position:absolute;bottom:0;left:0;right:0;z-index:4;white-space:nowrap;overflow:hidden;border-top:1px solid rgba(255,255,255,.15);background:rgba(7,7,12,.6);backdrop-filter:blur(10px);padding:14px 0;font-weight:800;letter-spacing:4px;font-size:15px}
+.marq div{display:inline-block;animation:mq 14s linear infinite}@keyframes mq{to{transform:translateX(-50%)}}
+h2{font-size:64px;letter-spacing:-3px;margin:0;padding:80px 56px 0}
+.sec{padding:40px 56px 90px;display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:22px;perspective:1400px}
+.card{position:relative;border-radius:28px;overflow:hidden;height:330px;border:1px solid rgba(255,255,255,.14);animation:tilt 5s ease-in-out infinite alternate}
+.card:nth-child(2){animation-delay:-1.6s}.card:nth-child(3){animation-delay:-3.2s}
+@keyframes tilt{from{transform:rotateY(-9deg) rotateX(4deg)}to{transform:rotateY(9deg) rotateX(-4deg)}}
+.card img,.card video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.card .t{position:absolute;left:0;right:0;bottom:0;padding:22px;background:linear-gradient(0deg,rgba(0,0,0,.85),transparent)}.card b{font-size:46px;display:block;letter-spacing:-2px}.card p{margin:4px 0 0;opacity:.85;font-size:16px}
 </style></head><body>
-<div class="nav"><div class="logo">AURA</div><div><span>Sound</span><span>Design</span><span>Specs</span><span class="cta" style="opacity:1;margin-left:30px">Pre-order</span></div></div>
-<section class="hero"><div class="orb o1"></div><div class="orb o2"></div>
-<div style="position:relative;z-index:2"><h1>Sound,<br><em>sculpted.</em></h1><div class="sub">Studio-grade wireless headphones with adaptive noise cancelling and 40 hours of battery.</div>
-<div class="row"><div class="buy">Pre-order now</div><div class="price">From $199</div></div></div>
-<div class="stage"><div class="phones">
-<svg class="layer" style="transform:translateZ(-40px)" viewBox="0 0 520 560"><path d="M110 330 C110 90 410 90 410 330" fill="none" stroke="#1f1b3a" stroke-width="46" stroke-linecap="round"/></svg>
-<svg class="layer" viewBox="0 0 520 560"><defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#e9d5ff"/><stop offset=".5" stop-color="#a78bfa"/><stop offset="1" stop-color="#4c1d95"/></linearGradient><linearGradient id="c" x1="0" x2="1"><stop offset="0" stop-color="#312e81"/><stop offset="1" stop-color="#0f0d24"/></linearGradient></defs>
-<path d="M110 330 C110 90 410 90 410 330" fill="none" stroke="url(#g)" stroke-width="30" stroke-linecap="round"/>
-<rect x="52" y="290" width="118" height="200" rx="56" fill="url(#g)"/><rect x="350" y="290" width="118" height="200" rx="56" fill="url(#g)"/></svg>
-<svg class="layer" style="transform:translateZ(46px)" viewBox="0 0 520 560"><rect x="70" y="312" width="82" height="156" rx="40" fill="url(#c)"/><rect x="368" y="312" width="82" height="156" rx="40" fill="url(#c)"/><circle cx="111" cy="390" r="14" fill="#f472b6"/><circle cx="409" cy="390" r="14" fill="#38bdf8"/></svg>
-<div class="shadow"></div></div></div></section>
+<div class="nav"><div class="logo">AURA</div><div><span>Sound</span><span>Design</span><span>Specs</span><span class="cta">Pre-order</span></div></div>
+<section class="hero">
+<video class="bg" src="assets/v51764.webm" autoplay muted loop playsinline></video><div class="shade"></div>
+<div class="copy"><div class="tag">NEW · AURA ONE</div><h1>Feel every<br><em>beat.</em></h1><div class="sub">Studio-grade wireless headphones with adaptive noise cancelling and 40 hours of battery.</div>
+<div class="row"><div class="buy">Pre-order now</div><div style="opacity:.85">From $199</div></div></div>
+<div class="stage"><div class="rig">
+<div class="vcard"><video src="assets/v51771.webm" autoplay muted loop playsinline></video></div>
+<div class="pcard"><img src="assets/white.jpg"></div>
+<div class="badge b1">🔋 40h</div><div class="badge b2">🎧 Spatial audio</div><div class="badge b3">−45 dB ANC</div>
+</div></div>
+<div class="marq"><div>ADAPTIVE NOISE CANCELLING &nbsp;•&nbsp; 40H BATTERY &nbsp;•&nbsp; SPATIAL AUDIO &nbsp;•&nbsp; FEATHERWEIGHT 250G &nbsp;•&nbsp; ADAPTIVE NOISE CANCELLING &nbsp;•&nbsp; 40H BATTERY &nbsp;•&nbsp; SPATIAL AUDIO &nbsp;•&nbsp; FEATHERWEIGHT 250G &nbsp;•&nbsp; </div></div>
+</section>
 <h2>Built to disappear.</h2>
-<section class="sec"><div class="card"><b>40h</b><p>Battery that outlasts the longest flight.</p></div><div class="card"><b>−45dB</b><p>Adaptive noise cancelling that reads the room.</p></div><div class="card"><b>250g</b><p>Featherweight frame, memory-foam cushions.</p></div></section>
-</body></html>
+<section class="sec">
+<div class="card"><img src="assets/duo.jpg"><div class="t"><b>Share the moment</b><p>Pair two AURA ONE to a single phone.</p></div></div>
+<div class="card"><img src="assets/black.jpg"><div class="t"><b>250g</b><p>Featherweight frame, memory foam.</p></div></div>
+<div class="card"><img src="assets/desk.jpg"><div class="t"><b>40h</b><p>Outlasts the longest flight.</p></div></div>
+</section></body></html>
