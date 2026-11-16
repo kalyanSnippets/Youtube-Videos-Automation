@@ -1,9 +1,9 @@
 import React from "react";
-import { AbsoluteFill, Audio, interpolate, Sequence, staticFile, useCurrentFrame, OffthreadVideo } from "remotion";
+import { AbsoluteFill, Audio, Easing, interpolate, Sequence, staticFile, useCurrentFrame, OffthreadVideo } from "remotion";
 import data from "../public/r/r10f_words.json";
 import face from "../public/r/r10f_face.json";
 import { f, FPS, INTER, MONO, Music, PopIn, ReelData, Sfx, Flash, chunkWords, Typewriter, Cursor } from "./lib";
-import { K, ease, clamp, Split, ItemHeader, Banner, Chip, Captions, SiteMock, CommentPanel, Follow, FaceTrack } from "./split";
+import { K, ease, clamp, Split, ItemHeader, Banner, Chip, Captions, CommentPanel, Follow, FaceTrack, Float3D, Screen3D } from "./split";
 
 /* Reel 10: "5 Claude Code skills to try before you blame the AI".
    Each skill gets one split-screen panel that shows what the skill does, in the order Kalyan says it.
@@ -17,136 +17,144 @@ export const R10_FRAMES = Math.ceil(END * FPS);
 /* frames since the panel started, for an event at absolute time `abs` in a panel that starts at `a` */
 const L = (abs: number, a: number) => f(abs) - f(a);
 
-const Card: React.FC<{ label: string; labelBg: string; labelColor?: string; children: React.ReactNode; rot?: number }> = ({ label, labelBg, labelColor = "#fff", children, rot = 0 }) => (
-  <div style={{ transform: `rotate(${rot}deg)`, display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
-    <div style={{ boxShadow: "0 30px 60px rgba(0,0,0,0.6)", borderRadius: 18 }}>{children}</div>
-    <div style={{ background: labelBg, color: labelColor, fontFamily: INTER, fontWeight: 900, fontSize: 40, padding: "6px 22px", borderRadius: 12 }}>{label}</div>
+const IMAG = "b/r10_imagined.mp4", STAT = "b/r10_static.mp4", DSGN = "b/r10_designed.mp4";
+const Label: React.FC<{ children: React.ReactNode; bg: string; size?: number }> = ({ children, bg, size = 40 }) => (
+  <div style={{ background: bg, color: "#fff", fontFamily: INTER, fontWeight: 900, fontSize: size, padding: "6px 22px", borderRadius: 12, boxShadow: "0 10px 26px rgba(0,0,0,0.5)", whiteSpace: "nowrap" }}>{children}</div>
+);
+const Term: React.FC<{ children: React.ReactNode; style?: React.CSSProperties; size?: number }> = ({ children, style, size = 34 }) => (
+  <div style={{ background: "#0B0D10", border: `2px solid ${K.line}`, borderRadius: 22, padding: "22px 28px", fontFamily: MONO, fontSize: size, color: "#E5E7EB", boxShadow: "0 30px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06) inset", ...style }}>
+    <div style={{ color: K.orange, fontWeight: 800 }}>✻ Claude Code</div>
+    {children}
   </div>
 );
 
-/* 0.0 hook: what you imagined vs what you got */
+/* 0.0 hook: the real 3D product page you imagined (apple.com, recorded live), then the plain static page you got */
 const HookPanel: React.FC = () => {
   const frame = useCurrentFrame();
   const got = L(2.83, 0);
-  const drop = interpolate(frame - got, [0, 9], [-700, 0], { ...clamp, easing: ease });
-  const shake = frame >= got + 9 && frame < got + 17 ? Math.sin(frame * 2.4) * 7 : 0;
+  const k = interpolate(frame, [got, got + 10], [0, 1], { ...clamp, easing: ease });
+  const push = interpolate(frame, [0, got], [0.93, 1.0], clamp);
+  const slam = interpolate(frame, [got, got + 8], [2.4, 1], { ...clamp, easing: Easing.in(Easing.cubic) });
+  const shake = frame >= got + 8 && frame < got + 16 ? Math.sin(frame * 2.4) * 8 : 0;
   return (
     <>
-      <PopIn delay={6} style={{ position: "absolute", left: 60, top: 250 }}><Card label="What you imagined ✨" labelBg={K.violet} rot={-3}><SiteMock variant="nice" w={440} /></Card></PopIn>
+      <div style={{ position: "absolute", left: 90 - k * 60, top: 170 - k * 30, transform: `scale(${push * (1 - k * 0.45)})`, transformOrigin: "0 0", filter: `brightness(${1 - k * 0.35})` }}>
+        <Screen3D src={IMAG} w={900} url="apple.com/airpods-max" rotY={-10 - k * 10} rotX={5} glow={K.violet} />
+      </div>
+      <PopIn delay={8} style={{ position: "absolute", left: interpolate(k, [0, 1], [300, 40]), top: interpolate(k, [0, 1], [800, 505]) }}><Label bg={K.violet} size={interpolate(k, [0, 1], [44, 32])}>What you imagined ✨</Label></PopIn>
       {frame >= got && (
-        <div style={{ position: "absolute", left: 560, top: 330 + drop, transform: `translateX(${shake}px)` }}>
-          <Card label="What you got 😬" labelBg={K.red} rot={3}><SiteMock variant="ugly" w={440} /></Card>
-        </div>
+        <>
+          <div style={{ position: "absolute", left: 400 + shake, top: 300, transform: `scale(${slam})`, opacity: interpolate(frame, [got, got + 5], [0, 1], clamp) }}>
+            <Screen3D src={STAT} w={640} url="localhost:3000" rotY={9} rotX={3} sway={2} glow={K.red} />
+          </div>
+          <PopIn delay={got + 9} style={{ position: "absolute", left: 560, top: 790 }}><Label bg={K.red} size={44}>What you got 😬</Label></PopIn>
+        </>
       )}
-      {frame >= L(3.47, 0) && <PopIn style={{ position: "absolute", left: 0, right: 0, top: 150, display: "flex", justifyContent: "center" }}><Chip bg="#fff">Built with Claude Code… 🤔</Chip></PopIn>}
     </>
   );
 };
 
-/* 11.57 find-skills */
+/* 11.57 find-skills: describe what you're building, it suggests skills */
 const FindPanel: React.FC = () => {
   const frame = useCurrentFrame();
   const a = 11.57;
-  const rows = ["frontend-design", "agent-browser", "brainstorming"];
+  const rows: [string, string][] = [["frontend-design", K.pink], ["agent-browser", K.green], ["brainstorming", K.violet]];
   return (
     <>
       <ItemHeader n={1} of={5} kind="SKILL" name="find-skills" color={K.blue} nameAt={L(12.69, a)} />
-      {frame >= L(13.46, a) && (
-        <PopIn from="up" style={{ position: "absolute", left: 60, right: 60, top: 370 }}>
-          <div style={{ background: "#0B0D10", border: `2px solid ${K.line}`, borderRadius: 22, padding: "26px 30px", fontFamily: MONO, fontSize: 36, color: "#E5E7EB", height: 490, boxShadow: "0 30px 60px rgba(0,0,0,0.55)" }}>
-            <div style={{ color: K.orange, fontWeight: 800 }}>✻ Claude Code</div>
-            <div style={{ marginTop: 16, color: K.mute }}>&gt; <span style={{ color: "#fff" }}>{frame >= L(15.84, a) ? <Typewriter text="I want to build a landing page" delay={L(15.84, a)} cps={22} caret={frame < L(17.48, a)} /> : <span style={{ opacity: Math.floor(frame / 8) % 2 ? 1 : 0 }}>▍</span>}</span></div>
-            {frame >= L(17.48, a) && <div style={{ marginTop: 22, color: K.blue, fontWeight: 700, fontSize: 30 }}>🔎 relevant skills found:</div>}
-            {rows.map((r, i) => frame >= L(17.74, a) + i * 8 && (
-              <PopIn key={r} delay={L(17.74, a) + i * 8} from="left" style={{ marginTop: 12 }}><span style={{ color: K.green, fontWeight: 800 }}>✓ </span>{r}</PopIn>
-            ))}
+      <Float3D delay={L(13.46, a)} spin={-70} sway={4} tilt={7} style={{ position: "absolute", left: 50, top: 370, width: 640 }}>
+        <Term style={{ height: 490 }}>
+          <div style={{ marginTop: 14, color: K.blue }}>&gt; /find-skills</div>
+          <div style={{ marginTop: 10, color: "#fff", lineHeight: 1.35 }}>{frame >= L(15.84, a) ? <Typewriter text="I'm building a landing page for wireless headphones" delay={L(15.84, a)} cps={30} caret={frame < L(17.6, a)} /> : <span style={{ opacity: Math.floor(frame / 8) % 2 ? 1 : 0 }}>▍</span>}</div>
+          {frame >= L(17.48, a) && <div style={{ marginTop: 20, color: K.mute, fontSize: 28 }}>🔎 searching skills… 3 matches</div>}
+        </Term>
+      </Float3D>
+      {rows.map(([r, c], i) => (
+        <Float3D key={r} delay={L(17.74, a) + i * 7} spin={100} sway={7} tilt={-10} style={{ position: "absolute", left: 640 - i * 16, top: 420 + i * 140 }}>
+          <div style={{ background: K.panel, border: `4px solid ${c}`, borderRadius: 18, padding: "16px 22px", width: 400, boxShadow: `0 20px 50px ${c}55` }}>
+            <div style={{ fontFamily: INTER, fontWeight: 800, fontSize: 22, color: c, letterSpacing: 2 }}>SKILL MATCH</div>
+            <div style={{ fontFamily: MONO, fontWeight: 800, fontSize: 36, color: "#fff" }}>{r}</div>
           </div>
-        </PopIn>
-      )}
+        </Float3D>
+      ))}
     </>
   );
 };
 
-/* 20.23 frontend-design: boring site, then the designed one */
+/* 20.23 frontend-design: the real static page flips into a real designed page (both built for this reel and recorded) */
 const FrontendPanel: React.FC = () => {
   const frame = useCurrentFrame();
   const a = 20.23;
   const sw = L(25.97, a);
-  const k = interpolate(frame, [sw, sw + 12], [0, 1], { ...clamp, easing: ease });
-  const chips: [string, number, string][] = [["📐 Layouts", 27.63, K.blue], ["🎨 Colors", 28.07, K.pink], ["🔤 Typography", 28.57, K.yellow]];
+  const k = interpolate(frame, [sw, sw + 14], [0, 1], { ...clamp, easing: ease });
+  const chips: [string, number, string, number, number][] = [["📐 Layouts", 27.63, K.blue, 20, 380], ["🎨 Colors", 28.07, K.pink, 800, 470], ["🔤 Typography", 28.57, K.yellow, 690, 800]];
+  const w = 640 + k * 120;
   return (
     <>
       <ItemHeader n={2} of={5} kind="SKILL" name="frontend-design" color={K.pink} nameAt={L(21.33, a)} />
       {frame >= L(22.25, a) && (
-        <div style={{ position: "absolute", left: 60 + k * 0, top: 370, transform: `perspective(1400px) rotateY(${k * 180}deg)`, transformStyle: "preserve-3d" }}>
-          <div style={{ backfaceVisibility: "hidden" }}><PopIn><SiteMock variant="ugly" w={600} /></PopIn></div>
-          <div style={{ position: "absolute", left: 0, top: 0, backfaceVisibility: "hidden", transform: "rotateY(180deg)", boxShadow: "0 30px 70px rgba(124,58,237,0.5)", borderRadius: 26 }}><SiteMock variant="nice" w={600} /></div>
+        <div style={{ position: "absolute", left: 60 + k * 100, top: 365 - k * 5, perspective: 1600 }}>
+          <div style={{ transformStyle: "preserve-3d", transform: `rotateY(${k * 180}deg) scale(${interpolate(frame - L(22.25, a), [0, 8], [0.7, 1], clamp)})`, width: w }}>
+            <div style={{ backfaceVisibility: "hidden" }}><Screen3D src={STAT} w={w} url="localhost:3000" rotY={k ? 0 : 8} sway={k ? 0 : 3} glow="#6B7280" /></div>
+            <div style={{ position: "absolute", left: 0, top: 0, backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}><Screen3D src={DSGN} w={w} url="localhost:3000" at={sw - 4} rotY={k < 1 ? 0 : -6} sway={k < 1 ? 0 : 4} glow={K.pink} dark /></div>
+          </div>
         </div>
       )}
-      {frame >= L(22.83, a) && frame < sw && <PopIn style={{ position: "absolute", left: 700, top: 520 }}><Chip bg="#E5E7EB">😴 boring</Chip></PopIn>}
-      {frame >= L(23.33, a) && frame < sw && <PopIn style={{ position: "absolute", left: 700, top: 620 }}><Chip bg="#E5E7EB">basic</Chip></PopIn>}
-      {chips.map(([t, at, c], i) => frame >= L(at, a) && <PopIn key={t} delay={L(at, a)} from="right" style={{ position: "absolute", left: 690, top: 420 + i * 110 }}><Chip bg={c} size={40}>{t}</Chip></PopIn>)}
+      {frame >= L(22.83, a) && frame < sw && <Float3D delay={L(22.83, a)} style={{ position: "absolute", left: 740, top: 470 }}><Chip bg="#E5E7EB" size={48}>😴 boring</Chip></Float3D>}
+      {frame >= L(23.33, a) && frame < sw && <Float3D delay={L(23.33, a)} spin={-80} style={{ position: "absolute", left: 715, top: 590 }}><Chip bg="#E5E7EB" size={42}>basic-looking</Chip></Float3D>}
+      {chips.map(([t, at, c, x, y], i) => <Float3D key={t} delay={L(at, a)} spin={i % 2 ? -110 : 110} sway={8} style={{ position: "absolute", left: x, top: y, zIndex: 5 }}><Chip bg={c} size={40}>{t}</Chip></Float3D>)}
     </>
   );
 };
 
-/* 29.43 agent-browser: the agent opens the site, clicks around, checks it works */
+/* 29.43 agent-browser: the agent opens the page, clicks around and checks it */
 const BrowserPanel: React.FC = () => {
   const frame = useCurrentFrame();
   const a = 29.43;
   const open = L(34.73, a);
-  const checks: [string, number][] = [["page loads", 36.49], ["buttons work", 37.01], ["no errors", 37.43]];
+  const log: [string, number, string][] = [["$ agent-browser open localhost:3000", 34.73, "#E5E7EB"], ["$ agent-browser click @e3", 35.61, "#E5E7EB"], ["$ agent-browser click @e7", 35.93, "#E5E7EB"], ["✓ page loads", 36.49, K.green], ["✓ buttons work", 37.01, K.green], ["✓ no errors", 37.43, K.green]];
   return (
     <>
       <ItemHeader n={3} of={5} kind="SKILL" name="agent-browser" color={K.green} nameAt={L(30.92, a)} />
-      {frame >= L(33.31, a) && (
-        <PopIn from="up" style={{ position: "absolute", left: 60, top: 370 }}>
-          <div style={{ width: 620, height: 500, background: "#fff", borderRadius: 20, overflow: "hidden", boxShadow: "0 30px 60px rgba(0,0,0,0.55)" }}>
-            <div style={{ height: 62, background: "#E5E7EB", display: "flex", alignItems: "center", gap: 10, padding: "0 18px" }}>
-              {["#ff5f57", "#febc2e", "#28c840"].map((c) => <div key={c} style={{ width: 16, height: 16, borderRadius: 8, background: c }} />)}
-              <div style={{ flex: 1, marginLeft: 10, background: "#fff", borderRadius: 99, fontFamily: MONO, fontSize: 22, color: "#374151", padding: "6px 18px" }}>{frame >= open ? <Typewriter text="localhost:3000" delay={open} cps={30} caret={false} /> : ""}</div>
-            </div>
-            <div style={{ padding: 22, opacity: interpolate(frame, [open + 12, open + 18], [0, 1], clamp) }}><SiteMock variant="nice" w={576} /></div>
-          </div>
-          {frame >= open + 16 && <Cursor path={[[open + 16, 560, 420], [L(35.61, a), 500, 120], [L(35.93, a), 300, 330], [L(36.4, a), 120, 250]]} clicks={[L(35.61, a), L(35.93, a)]} color="#111" size={70} />}
-        </PopIn>
-      )}
-      {frame >= L(33.53, a) && frame < L(36.3, a) && <PopIn style={{ position: "absolute", left: 720, top: 470 }}><div style={{ fontSize: 150 }}>🤖</div></PopIn>}
-      {checks.map(([t, at], i) => frame >= L(at, a) && <PopIn key={t} delay={L(at, a)} from="right" style={{ position: "absolute", left: 710, top: 440 + i * 110 }}><Chip bg={K.green} size={36}>✓ {t}</Chip></PopIn>)}
+      <Float3D delay={L(33.31, a)} spin={-60} sway={0} style={{ position: "absolute", left: 40, top: 370 }}>
+        <Screen3D src={DSGN} w={540} url="localhost:3000" at={open} startFrom={75} rotY={10} sway={3} glow={K.green} dark>
+          {frame < open + 8 && <div style={{ position: "absolute", left: 0, right: 0, top: 33, bottom: 0, background: "#0B0D10", opacity: interpolate(frame, [open, open + 8], [1, 0], clamp) }} />}
+        </Screen3D>
+        {frame >= open + 8 && <Cursor path={[[open + 8, 470, 340], [L(35.61, a), 110, 255], [L(35.93, a), 455, 50], [L(36.6, a), 300, 200]]} clicks={[L(35.61, a), L(35.93, a)]} color="#fff" size={70} />}
+      </Float3D>
+      <Float3D delay={L(33.53, a)} spin={70} sway={4} tilt={-8} style={{ position: "absolute", left: 575, top: 400, width: 480 }}>
+        <Term size={25} style={{ padding: "18px 18px", height: 440 }}>
+          {log.map(([t, at, c]) => frame >= L(at, a) && <PopIn key={t} delay={L(at, a)} from="left" dist={30} style={{ marginTop: 14, color: c, fontWeight: c === K.green ? 800 : 500, fontSize: c === K.green ? 32 : 20, whiteSpace: "nowrap" }}>{t}</PopIn>)}
+        </Term>
+      </Float3D>
     </>
   );
 };
 
-/* 39.9 brainstorming: idea, then plan, then code */
+/* 39.9 brainstorming: idea, then plan, then code, as three cards stepping back in depth */
 const BrainstormPanel: React.FC = () => {
   const frame = useCurrentFrame();
   const a = 39.9;
   const steps: [string, string, number, string, string[]][] = [
-    ["💡", "IDEA", 42.11, K.yellow, ["what you want"]],
-    ["📋", "PLAN", 42.65, K.violet, ["✓ goals", "✓ steps", "✓ edge cases"]],
+    ["💡", "IDEA", 41.41, K.yellow, ["headphones", "landing page"]],
+    ["📋", "PLAN", 42.65, K.violet, ["✓ 3D hero", "✓ features", "✓ pre-order CTA"]],
     ["⌨️", "CODE", 44.09, K.green, ["only after", "the plan"]],
   ];
   return (
     <>
       <ItemHeader n={4} of={5} kind="SKILL" name="brainstorming" color={K.violet} nameAt={L(39.99, a)} />
-      <div style={{ position: "absolute", left: 50, right: 50, top: 400, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        {steps.map(([ic, t, at, c, lines], i) => (
-          <React.Fragment key={t}>
-            {i > 0 && <div style={{ fontFamily: INTER, fontWeight: 900, fontSize: 70, color: "#fff", opacity: frame >= L(at, a) ? 1 : 0 }}>→</div>}
-            <div style={{ width: 280, opacity: frame >= L(at, a) ? 1 : 0.0 }}>
-              {frame >= L(at, a) && (
-                <PopIn delay={L(at, a)}>
-                  <div style={{ background: K.panel, border: `4px solid ${c}`, borderRadius: 24, padding: "22px 18px", height: 380, textAlign: "center", boxShadow: "0 30px 60px rgba(0,0,0,0.5)" }}>
-                    <div style={{ fontSize: 96, lineHeight: 1.1 }}>{ic}</div>
-                    <div style={{ fontFamily: INTER, fontWeight: 900, fontSize: 52, color: c }}>{t}</div>
-                    {lines.map((l) => <div key={l} style={{ fontFamily: INTER, fontWeight: 700, fontSize: 30, color: "#E5E7EB", marginTop: 8 }}>{l}</div>)}
-                  </div>
-                </PopIn>
-              )}
+      {steps.map(([ic, t, at, c, lines], i) => (
+        <React.Fragment key={t}>
+          {i > 0 && frame >= L(at, a) && <div style={{ position: "absolute", left: 322 + (i - 1) * 345, top: 560, width: interpolate(frame - L(at, a), [0, 8], [0, 62], clamp), height: 10, borderRadius: 5, background: `linear-gradient(90deg, ${steps[i - 1][3]}, ${c})`, boxShadow: `0 0 20px ${c}` }} />}
+          <Float3D delay={L(at, a)} spin={i % 2 ? -100 : 100} sway={7} tilt={(1 - i) * 12} style={{ position: "absolute", left: 40 + i * 345, top: 390 }}>
+            <div style={{ width: 290, height: 400, background: `linear-gradient(160deg, ${K.panel}, #0B0D10)`, border: `4px solid ${c}`, borderRadius: 26, padding: "22px 16px", textAlign: "center", boxShadow: `0 30px 60px rgba(0,0,0,0.55), 0 0 50px ${c}44` }}>
+              <div style={{ fontSize: 100, lineHeight: 1.1, transform: `translateY(${Math.sin(frame / 10 + i) * 6}px)` }}>{ic}</div>
+              <div style={{ fontFamily: INTER, fontWeight: 900, fontSize: 54, color: c }}>{t}</div>
+              {lines.map((l) => <div key={l} style={{ fontFamily: INTER, fontWeight: 700, fontSize: 30, color: "#E5E7EB", marginTop: 8 }}>{l}</div>)}
             </div>
-          </React.Fragment>
-        ))}
-      </div>
+          </Float3D>
+        </React.Fragment>
+      ))}
     </>
   );
 };
@@ -155,23 +163,23 @@ const BrainstormPanel: React.FC = () => {
 const GrillPanel: React.FC = () => {
   const frame = useCurrentFrame();
   const a = 44.83;
-  const qs: [string, number][] = [["Who is this for?", 47.83], ["What's the main goal?", 48.25], ["Any must-haves?", 48.79]];
+  const qs: [string, number][] = [["Who is buying these headphones?", 47.83], ["What's the #1 action on the page?", 48.25], ["Premium or budget feel?", 48.79]];
   const clear = L(49.93, a);
   const guessing = frame >= L(46.69, a) && frame < L(47.67, a);
   return (
     <>
       <ItemHeader n={5} of={5} kind="SKILL" name="grill-me" color={K.orange} nameAt={L(45.65, a)} />
-      {guessing && <PopIn style={{ position: "absolute", left: 0, right: 0, top: 480, display: "flex", justifyContent: "center" }}><div style={{ position: "relative" }}><Chip bg="#E5E7EB" size={64}>🎲 guessing</Chip><div style={{ position: "absolute", left: -10, right: -10, top: "50%", height: 10, background: K.red, transform: `rotate(-6deg) scaleX(${interpolate(frame - L(46.99, a), [0, 6], [0, 1], clamp)})`, transformOrigin: "0 50%" }} /></div></PopIn>}
-      {qs.map(([q, at], i) => frame >= L(at, a) && (
-        <PopIn key={q} delay={L(at, a)} from="left" style={{ position: "absolute", left: 60, top: 380 + i * 118 }}>
+      {guessing && <Float3D delay={L(46.69, a)} style={{ position: "absolute", left: 0, right: 0, top: 480, display: "flex", justifyContent: "center" }}><div style={{ position: "relative" }}><Chip bg="#E5E7EB" size={64}>🎲 guessing</Chip><div style={{ position: "absolute", left: -10, right: -10, top: "50%", height: 10, background: K.red, transform: `rotate(-6deg) scaleX(${interpolate(frame - L(46.99, a), [0, 6], [0, 1], clamp)})`, transformOrigin: "0 50%" }} /></div></Float3D>}
+      {qs.map(([q, at], i) => (
+        <Float3D key={q} delay={L(at, a)} spin={-90} sway={5} tilt={6 - i * 6} style={{ position: "absolute", left: 50 + i * 40, top: 370 + i * 120 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <div style={{ width: 70, height: 70, borderRadius: 35, background: K.orange, color: K.ink, fontFamily: INTER, fontWeight: 900, fontSize: 40, display: "flex", alignItems: "center", justifyContent: "center" }}>✻</div>
-            <div style={{ background: "#fff", color: K.ink, fontFamily: INTER, fontWeight: 800, fontSize: 44, padding: "14px 28px", borderRadius: "8px 28px 28px 28px" }}>{q}</div>
+            <div style={{ width: 74, height: 74, borderRadius: 37, background: K.orange, color: K.ink, fontFamily: INTER, fontWeight: 900, fontSize: 42, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 0 30px ${K.orange}` }}>✻</div>
+            <div style={{ background: "#fff", color: K.ink, fontFamily: INTER, fontWeight: 800, fontSize: 40, padding: "14px 26px", borderRadius: "8px 28px 28px 28px", boxShadow: "0 20px 40px rgba(0,0,0,0.5)", whiteSpace: "nowrap" }}>{q}</div>
           </div>
-        </PopIn>
+        </Float3D>
       ))}
       {frame >= L(49.27, a) && (
-        <PopIn delay={L(49.27, a)} from="up" style={{ position: "absolute", left: 60, right: 60, top: 750 }}>
+        <PopIn delay={L(49.27, a)} from="up" style={{ position: "absolute", left: 60, right: 60, top: 760 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 22, fontFamily: INTER, fontWeight: 900, fontSize: 48 }}>
             <span style={{ color: "#fff" }}>Requirements:</span>
             <span style={{ color: K.mute, filter: "blur(3px)", textDecoration: frame >= clear ? "line-through" : "none" }}>vague</span>

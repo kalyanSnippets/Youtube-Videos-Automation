@@ -1,0 +1,35 @@
+<!doctype html><html><head><meta charset="utf-8"><title>AURA — Wireless Headphones</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Inter,-apple-system,Segoe UI,Helvetica,Arial,sans-serif;background:#07070c;color:#fff;overflow-x:hidden}
+.nav{position:fixed;top:0;left:0;right:0;z-index:9;display:flex;justify-content:space-between;align-items:center;padding:20px 56px;backdrop-filter:blur(14px);background:rgba(7,7,12,.55)}
+.logo{font-weight:900;letter-spacing:6px;font-size:20px}.nav span{opacity:.7;margin-left:30px;font-size:14px}.cta{background:#fff;color:#111;font-weight:800;padding:10px 22px;border-radius:99px;font-size:14px}
+.hero{height:800px;position:relative;display:flex;align-items:center;padding:0 56px;background:radial-gradient(900px 600px at 72% 45%,#5b21b6 0%,#1e1b4b 38%,#07070c 72%)}
+.orb{position:absolute;border-radius:50%;filter:blur(60px);opacity:.55;animation:drift 7s ease-in-out infinite alternate}
+.o1{width:320px;height:320px;background:#f472b6;right:8%;top:10%}.o2{width:260px;height:260px;background:#38bdf8;right:34%;bottom:6%;animation-delay:-3s}
+@keyframes drift{to{transform:translate(-40px,30px) scale(1.15)}}
+h1{font-size:92px;line-height:.95;letter-spacing:-4px;margin:0;font-weight:900}h1 em{font-style:normal;background:linear-gradient(90deg,#f472b6,#a78bfa,#38bdf8);-webkit-background-clip:text;color:transparent}
+.sub{font-size:20px;opacity:.75;max-width:430px;margin:22px 0 30px;line-height:1.45}.row{display:flex;gap:14px;align-items:center}
+.buy{background:linear-gradient(90deg,#a78bfa,#f472b6);padding:16px 34px;border-radius:99px;font-weight:800;font-size:17px;box-shadow:0 12px 40px rgba(167,139,250,.5)}.price{font-size:17px;opacity:.8}
+.stage{position:absolute;right:70px;top:150px;width:520px;height:560px;perspective:1100px}
+.phones{width:100%;height:100%;transform-style:preserve-3d;animation:spin 6s ease-in-out infinite alternate}
+@keyframes spin{from{transform:rotateY(-38deg) rotateX(8deg) translateY(0)}to{transform:rotateY(38deg) rotateX(-4deg) translateY(-18px)}}
+.layer{position:absolute;inset:0}.shadow{position:absolute;left:110px;right:110px;bottom:-10px;height:40px;background:radial-gradient(closest-side,rgba(0,0,0,.7),transparent);filter:blur(8px)}
+.sec{padding:90px 56px;display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.card{background:linear-gradient(160deg,rgba(255,255,255,.1),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.14);border-radius:26px;padding:30px;height:230px}
+.card b{font-size:54px;display:block;letter-spacing:-2px;background:linear-gradient(90deg,#a78bfa,#38bdf8);-webkit-background-clip:text;color:transparent}.card p{opacity:.7;font-size:17px;line-height:1.4}
+h2{font-size:60px;letter-spacing:-2.5px;margin:0 56px;padding-top:80px}
+</style></head><body>
+<div class="nav"><div class="logo">AURA</div><div><span>Sound</span><span>Design</span><span>Specs</span><span class="cta" style="opacity:1;margin-left:30px">Pre-order</span></div></div>
+<section class="hero"><div class="orb o1"></div><div class="orb o2"></div>
+<div style="position:relative;z-index:2"><h1>Sound,<br><em>sculpted.</em></h1><div class="sub">Studio-grade wireless headphones with adaptive noise cancelling and 40 hours of battery.</div>
+<div class="row"><div class="buy">Pre-order now</div><div class="price">From $199</div></div></div>
+<div class="stage"><div class="phones">
+<svg class="layer" style="transform:translateZ(-40px)" viewBox="0 0 520 560"><path d="M110 330 C110 90 410 90 410 330" fill="none" stroke="#1f1b3a" stroke-width="46" stroke-linecap="round"/></svg>
+<svg class="layer" viewBox="0 0 520 560"><defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#e9d5ff"/><stop offset=".5" stop-color="#a78bfa"/><stop offset="1" stop-color="#4c1d95"/></linearGradient><linearGradient id="c" x1="0" x2="1"><stop offset="0" stop-color="#312e81"/><stop offset="1" stop-color="#0f0d24"/></linearGradient></defs>
+<path d="M110 330 C110 90 410 90 410 330" fill="none" stroke="url(#g)" stroke-width="30" stroke-linecap="round"/>
+<rect x="52" y="290" width="118" height="200" rx="56" fill="url(#g)"/><rect x="350" y="290" width="118" height="200" rx="56" fill="url(#g)"/></svg>
+<svg class="layer" style="transform:translateZ(46px)" viewBox="0 0 520 560"><rect x="70" y="312" width="82" height="156" rx="40" fill="url(#c)"/><rect x="368" y="312" width="82" height="156" rx="40" fill="url(#c)"/><circle cx="111" cy="390" r="14" fill="#f472b6"/><circle cx="409" cy="390" r="14" fill="#38bdf8"/></svg>
+<div class="shadow"></div></div></div></section>
+<h2>Built to disappear.</h2>
+<section class="sec"><div class="card"><b>40h</b><p>Battery that outlasts the longest flight.</p></div><div class="card"><b>−45dB</b><p>Adaptive noise cancelling that reads the room.</p></div><div class="card"><b>250g</b><p>Featherweight frame, memory-foam cushions.</p></div></section>
+</body></html>

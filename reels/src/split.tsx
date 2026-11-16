@@ -1,5 +1,5 @@
 import React from "react";
-import { AbsoluteFill, Easing, interpolate, OffthreadVideo, staticFile, useCurrentFrame } from "remotion";
+import { AbsoluteFill, Easing, interpolate, OffthreadVideo, Sequence, staticFile, useCurrentFrame } from "remotion";
 import { activeChunk, Chunk, FPS, INTER, MONO, PopIn } from "./lib";
 
 /* Shared split-screen kit for the list-style reels (R10, R11): graphic on top, face-tracked A-roll below. */
@@ -35,6 +35,9 @@ const Stage: React.FC<{ accent: string }> = ({ accent }) => {
   const frame = useCurrentFrame();
   return (
     <AbsoluteFill>
+      {[0, 1, 2].map((i) => (
+        <div key={"o" + i} style={{ position: "absolute", left: 120 + i * 330 + Math.sin(frame / (40 + i * 9) + i) * 90, top: 180 + i * 150 + Math.cos(frame / (33 + i * 7)) * 70, width: 360, height: 360, borderRadius: 999, background: i === 1 ? K.orange : accent, opacity: 0.13, filter: "blur(70px)" }} />
+      ))}
       <div style={{ position: "absolute", left: -600, right: -600, top: 560, height: 900, transform: "perspective(500px) rotateX(72deg)", transformOrigin: "50% 0%", backgroundImage: `linear-gradient(${accent}2E 2px, transparent 2px), linear-gradient(90deg, ${accent}2E 2px, transparent 2px)`, backgroundSize: "90px 90px", backgroundPosition: `0px ${(frame * 2) % 90}px`, maskImage: "linear-gradient(transparent, #000 25%, #000 70%, transparent)" }} />
       {Array.from({ length: 14 }).map((_, i) => {
         const x = (i * 211) % 1080, sp = 0.4 + (i % 5) * 0.2, y = (((i * 137 - frame * sp * 2) % 960) + 960) % 960;
@@ -188,6 +191,41 @@ export const Follow: React.FC<{ tap?: number; top?: number }> = ({ tap = 22, top
           <div style={{ background: done ? "#E5E7EB" : "#0095F6", color: done ? K.ink : "#fff", fontFamily: INTER, fontWeight: 900, fontSize: 40, padding: "14px 30px", borderRadius: 99, transform: `scale(${interpolate(frame, [tap - 3, tap, tap + 5], [1, 0.9, 1], clamp)})` }}>{done ? "Following ✓" : "Follow"}</div>
         </div>
       </PopIn>
+    </div>
+  );
+};
+
+/* ---------- 3D kit ---------- */
+/* enters from depth with a spin, then keeps swaying: for cards and terminals */
+export const Float3D: React.FC<{ delay?: number; children: React.ReactNode; style?: React.CSSProperties; spin?: number; sway?: number; tilt?: number; depth?: number }> = ({ delay = 0, children, style, spin = 80, sway = 6, tilt = 0, depth = 700 }) => {
+  const frame = useCurrentFrame();
+  if (frame < delay) return null;
+  const p = interpolate(frame - delay, [0, 16], [0, 1], { ...clamp, easing: Easing.out(Easing.back(1.3)) });
+  const ry = tilt + (1 - p) * spin + Math.sin((frame - delay) / 26) * sway;
+  const rx = Math.cos((frame - delay) / 34) * sway * 0.6;
+  return <div style={{ ...style, transform: `perspective(1300px) translateZ(${(1 - p) * -depth}px) rotateY(${ry}deg) rotateX(${rx}deg)`, opacity: Math.min(1, p * 2), transformStyle: "preserve-3d" }}>{children}</div>;
+};
+
+/* a browser window floating in 3D that plays a real screen recording */
+export const Screen3D: React.FC<{ src: string; w: number; url: string; startFrom?: number; at?: number; rotY?: number; rotX?: number; sway?: number; glow?: string; dark?: boolean; children?: React.ReactNode }> = ({ src, w, url, startFrom = 0, at = 0, rotY = 0, rotX = 4, sway = 4, glow = K.violet, dark = false, children }) => {
+  const frame = useCurrentFrame();
+  const bar = Math.round(w * 0.055), h = Math.round(w * 0.625);
+  const ry = rotY + Math.sin(frame / 38) * sway, rx = rotX + Math.cos(frame / 47) * sway * 0.5;
+  const glare = ((frame % 120) / 120) * (w * 2.4) - w * 0.7;
+  return (
+    <div style={{ perspective: 1500, width: w }}>
+      <div style={{ position: "relative", width: w, height: h + bar, transformStyle: "preserve-3d", transform: `rotateY(${ry}deg) rotateX(${rx}deg)` }}>
+        <div style={{ position: "absolute", inset: 0, borderRadius: w * 0.022, background: "#05060A", transform: "translateZ(-22px)", boxShadow: `0 ${w * 0.07}px ${w * 0.16}px ${glow}77, 0 30px 60px rgba(0,0,0,0.7)` }} />
+        <div style={{ position: "absolute", inset: 0, borderRadius: w * 0.022, overflow: "hidden", background: dark ? "#111" : "#fff", boxShadow: "0 0 0 2px rgba(255,255,255,0.18)" }}>
+          <div style={{ height: bar, background: dark ? "#1E2128" : "#E5E7EB", display: "flex", alignItems: "center", gap: bar * 0.18, padding: `0 ${bar * 0.35}px` }}>
+            {["#ff5f57", "#febc2e", "#28c840"].map((c) => <div key={c} style={{ width: bar * 0.28, height: bar * 0.28, borderRadius: 99, background: c }} />)}
+            <div style={{ flex: 1, marginLeft: bar * 0.2, background: dark ? "#0B0D10" : "#fff", color: dark ? "#9AA0AB" : "#374151", borderRadius: 99, fontFamily: MONO, fontWeight: 500, fontSize: bar * 0.42, padding: `${bar * 0.1}px ${bar * 0.4}px` }}>🔒 {url}</div>
+          </div>
+          <div style={{ width: w, height: h }}><Sequence from={at} layout="none"><OffthreadVideo src={staticFile(src)} muted startFrom={startFrom} style={{ width: w, height: h, display: "block" }} /></Sequence></div>
+          <div style={{ position: "absolute", top: -h * 0.3, left: glare, width: w * 0.18, height: h * 1.8, transform: "rotate(20deg)", background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.16), transparent)", pointerEvents: "none" }} />
+          {children}
+        </div>
+      </div>
     </div>
   );
 };
