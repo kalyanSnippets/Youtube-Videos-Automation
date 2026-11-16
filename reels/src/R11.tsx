@@ -20,7 +20,7 @@ const TOOLS: [string, string, string][] = [["🆓", "Free LLM API", K.green], ["
 /* 0.0 hook: Claude Code in the middle, five tools land around it on "five AI tools" */
 const HookPanel: React.FC = () => {
   const frame = useCurrentFrame();
-  const pos: [number, number][] = [[70, 190], [660, 190], [40, 470], [690, 470], [345, 700]];
+  const pos: [number, number][] = [[60, 200], [620, 200], [60, 610], [600, 610], [330, 770]];
   return (
     <>
       <PopIn style={{ position: "absolute", left: 0, right: 0, top: 400, display: "flex", justifyContent: "center" }}>
