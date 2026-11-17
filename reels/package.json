@@ -7,6 +7,7 @@
     "render": "remotion render src/index.ts"
   },
   "dependencies": {
+    "@fontsource/press-start-2p": "5.2.5",
     "@react-three/fiber": "8.17.14",
     "@remotion/cli": "4.0.286",
     "@remotion/google-fonts": "4.0.286",
