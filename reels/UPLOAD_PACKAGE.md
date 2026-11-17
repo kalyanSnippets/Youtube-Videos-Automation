@@ -539,69 +539,132 @@ Are you paying for Claude right now? Comment below 👇
 
 # Reels 10 and 11 (approved 2026-11-16)
 
-| # | Video file | Length | Comment keyword |
-|---|---|---|---|
-| 10 | `10_ClaudeCode_5-Skills.mp4` | 63s | SKILLS |
-| 11 | `11_ClaudeCode_5-AI-Tools.mp4` | 73s | PLUGIN |
+| # | Video | Cover | Length | Comment keyword |
+|---|---|---|---|---|
+| 10 | `10_ClaudeCode_5-Skills.mp4` | `10_cover.jpg` | 63s | SKILLS |
+| 11 | `11_ClaudeCode_5-AI-Tools.mp4` | `11_cover.jpg` | 73s | PLUGIN |
 
-Both are 1080×1920, 30 fps, H.264, about −16.7 LUFS, with music synthesised for the reel (no licence or credit needed). Demo websites are made-up brands built from free Pexels/Mixkit stock (see `demo/ASSETS.md`). Turn **off** the AI label: nothing is AI-generated footage.
+Both are 1080×1920, 30 fps, H.264, about −16.7 LUFS. Music was synthesised for the reels, so there is nothing to license or credit. The demo websites in Reel 10 are made-up brands built from free Pexels and Mixkit stock (see `demo/ASSETS.md`). Leave the **AI label off**, because nothing is AI-generated footage. Covers are 1080×1920, and the hook text sits inside the 3:4 profile-grid crop.
+
+Suggested order: post Reel 11 first (broader appeal), then Reel 10 the next day.
 
 ## Reel 10: 5 Claude Code skills
 
-**Instagram caption**
-Claude Code built something that looked nothing like you imagined? 😬 Don't blame the AI yet.
+### Instagram
+**Caption**
+```
+Claude Code built something that looked NOTHING like you imagined? 😬
+Don't blame the AI yet. Give it the right skills.
 
-Try these 5 skills:
-1️⃣ find-skills: tells you which skills fit your project
+1️⃣ find-skills: tell it what you're building, it finds the right skills
 2️⃣ frontend-design: better layouts, colours and typography
-3️⃣ agent-browser: lets the agent open your site, click around and check it works
+3️⃣ agent-browser: the agent opens your site, clicks around, checks it works
 4️⃣ brainstorming: plans properly before writing code
 5️⃣ grill-me: asks you questions instead of guessing
 
-Comment SKILLS and I'll DM you all 5 links 📩
-Follow @aiwithkalyan, we're just getting started 🚀
+💬 Comment SKILLS and I'll DM you all 5 links
+➕ Follow @aiwithkalyan, we're just getting started
 
-#claudecode #claude #aitools #vibecoding #aiagents #webdesign #coding #developer
+#claudecode #claude #anthropic #aitools #aiagents #vibecoding #agentskills #webdesign #frontend #uidesign #aicoding #codingtips #developer #buildinpublic #techreels
+```
+**Topics:** Artificial intelligence · Web design · Programming
+**Alt text:** Kalyan explains five Claude Code skills, comparing a plain AI-made landing page with a polished one.
+**Pinned comment:** Comment SKILLS and I'll send you all 5 links 👇 Which one are you trying first?
 
-**YouTube Shorts title:** 5 Claude Code skills that fix bad AI websites
-**Pinned comment:** Comment SKILLS and I'll send you all 5 links 👇
+### YouTube Shorts
+**Title:** Stop Blaming the AI: 5 Claude Code Skills That Fix It #claudecode #shorts
+**Description**
+```
+Claude Code built something that looked nothing like you imagined? Before you blame the AI, try these 5 skills:
 
-**DM reply for "SKILLS"**
+1. find-skills: describe what you're building and it finds relevant skills
+2. frontend-design: better layouts, colours and typography
+3. agent-browser: lets your coding agent open a website, click around and check it works
+4. brainstorming: understands your idea and plans before writing code
+5. grill-me: asks you questions until your requirements are clear
+
+Sometimes you don't need a smarter AI, just the right skills.
+
+Comment "SKILLS" and I'll share all 5 links.
+Subscribe to AI with Kalyan for more real AI experiments, explained simply.
+
+#claudecode #claude #aitools
+```
+**Tags** (paste into the Tags box)
+```
+claude code, claude code skills, claude skills, agent skills, anthropic claude, claude code tutorial, find skills, frontend design skill, agent browser, brainstorming skill, grill me skill, vibe coding, ai coding tools, ai website builder, ai landing page, claude code tips, ai agents, AI with Kalyan
+```
+**Keywords to target:** claude code skills, best claude code skills, claude agent skills, claude code frontend design, claude code tips, vibe coding tools
+**Settings:** Not made for kids · Altered or synthetic content: No · Category: Science & Technology
+
+### DM reply ("SKILLS")
+```
 Here are the 5 skills 👇
-1. find-skills: `npx skills add vercel-labs/skills --skill find-skills`
-2. frontend-design: `npx skills add vercel-labs/agent-skills --skill frontend-design`
+1. find-skills: npx skills add vercel-labs/skills --skill find-skills
+2. frontend-design: npx skills add vercel-labs/agent-skills --skill frontend-design
 3. agent-browser: search "agent-browser" on skills.sh
 4. brainstorming: search "brainstorming" on skills.sh
-5. grill-me: `npx skills add mattpocock/skills --skill grill-me`
-Read each skill before you install it 🙏
-
-> Check before sending: the commands for 1, 2 and 5 come from search results, and 3 and 4 were not confirmed. Replace them with the exact repos you use.
+5. grill-me: npx skills add mattpocock/skills --skill grill-me
+Read each skill before installing 🙏
+```
+> Check before sending: commands 1, 2 and 5 come from search results and were not tested. Commands 3 and 4 were not confirmed, so replace those lines with the repos you use.
 
 ## Reel 11: 5 AI tools for Claude Code
 
-**Instagram caption**
-Don't use Claude Code without these 5 tools 👀 It's not just for coding.
+### Instagram
+**Caption**
+```
+Don't use Claude Code without these 5 tools 👀
+If you think it's only for coding, you're missing out.
 
 🔓 Free LLM API list: try AI models without paying per call (check the limits)
-🔓 ElevenLabs: turn your script into natural AI voiceover
-🔓 Remotion: make real animated videos with code (the 3D intro in this reel was made with it)
-🔓 Agent-Reach: let Claude research YouTube, Reddit and GitHub for you
+🔓 ElevenLabs: turn your script into natural-sounding AI voiceover
+🔓 Remotion: make real animated videos with code (the 3D intro in this reel was made with it 🤯)
+🔓 Agent-Reach: let Claude gather info from YouTube, Reddit and GitHub
 🔓 NVIDIA SkillSpector: scan AI skills before you install them
 
-Comment PLUGIN and I'll send you all the links 📩
-Follow @aiwithkalyan, I'll show you how to use each one.
+💬 Comment PLUGIN and I'll send you all the links
+➕ Follow @aiwithkalyan, I'll show you how to use each one
 
-#claudecode #claude #remotion #elevenlabs #aitools #aiagents #nvidia #automation
+#claudecode #claude #anthropic #aitools #remotion #elevenlabs #nvidia #aiagents #aivoice #aiautomation #contentcreation #videoediting #developer #productivity #techreels
+```
+**Topics:** Artificial intelligence · Programming · Content creation
+**Alt text:** Kalyan reveals five tools that extend Claude Code, shown on their real websites, including a 3D intro made with Remotion.
+**Pinned comment:** Comment PLUGIN for all 5 links 👇 Which tool surprised you most?
 
-**YouTube Shorts title:** 5 AI tools that make Claude Code way more than a coding tool
-**Pinned comment:** Comment PLUGIN for all 5 links 👇
+### YouTube Shorts
+**Title:** 5 AI Tools That Make Claude Code WAY More Than Coding #claudecode #shorts
+**Description**
+```
+Don't use Claude Code without checking out these 5 tools:
 
-**DM reply for "PLUGIN"**
+1. Free LLM API list: experiment with AI models without paying for every API call (check the free limits)
+2. ElevenLabs: Claude can help turn your script into natural-sounding AI speech
+3. Remotion: generate animations with code and render them into real videos (the 3D intro in this Short was made with Remotion)
+4. Agent-Reach: ask Claude to gather information from YouTube, Reddit and GitHub
+5. NVIDIA SkillSpector: a security scanner for AI agent skills, so you can check them before installing
+
+Claude Code isn't just for coding: voiceovers, animations, research and more.
+
+Comment "PLUGIN" and I'll send you all the links.
+Subscribe to AI with Kalyan, and I'll show you how to use each tool.
+
+#claudecode #remotion #aitools
+```
+**Tags**
+```
+claude code, claude code tools, claude code plugins, ai tools, remotion, remotion 3d, elevenlabs, ai voiceover, agent reach, nvidia skillspector, ai skill security, free llm api, free ai api, claude code tutorial, ai automation, ai video editing, ai agents, AI with Kalyan
+```
+**Keywords to target:** claude code tools, claude code plugins, remotion tutorial, elevenlabs claude, free llm api, ai skill security scanner
+**Settings:** Not made for kids · Altered or synthetic content: No · Category: Science & Technology
+
+### DM reply ("PLUGIN")
+```
 Here you go 👇
 1. Free LLM API list: github.com/jtig37/free-llm-api-resources
 2. ElevenLabs: elevenlabs.io
 3. Remotion: remotion.dev
 4. Agent-Reach: github.com/Panniantong/Agent-Reach
 5. NVIDIA SkillSpector: github.com/NVIDIA/SkillSpector
-
-> Note: link 1 is a copy of the original free-llm-api-resources list, which was taken down. That copy was last updated about two years ago.
+```
+> Link 1 is a copy of the original free-llm-api-resources list, which was taken down. That copy was last updated about two years ago.
