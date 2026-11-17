@@ -14,7 +14,13 @@ const FT = face as FaceTrack & { cx: number[] };
 const VID = "r/r12f_aroll.mp4";
 const END = D.duration + 0.6;
 export const R12_FRAMES = Math.ceil(END * FPS);
-const L = (abs: number, a: number) => f(abs) - f(a);
+/* graphic times were written against a first, longer cut; T() maps them onto the final cut by matching the same spoken words */
+const TM: [number, number][] = [[0, 0], [2.6, 2.52], [3.5, 3.34], [5.0, 4.98], [7.3, 6.85], [7.4, 6.9], [9.5, 8.18], [10.9, 9.54], [12.8, 10.36], [14.6, 11.9], [15.6, 12.55], [15.7, 12.62], [17.75, 14.7], [17.9, 14.82], [18.3, 15.16], [20.1, 17.0], [20.2, 17.08], [23.3, 20.0], [25.6, 22.15], [25.7, 22.2], [27.6, 24.04], [29.5, 25.9], [29.7, 26.0], [34.95, 31.05], [35.0, 31.08], [36.65, 32.48], [36.7, 32.52], [37.85, 33.6], [39.6, 35.45], [40.3, 36.16], [41.8, 37.62], [43.35, 39.25], [43.4, 39.3], [45.3, 41.16], [46.7, 42.12], [46.8, 42.2], [50.6, 46.0], [50.7, 46.08], [53.3, 48.3], [53.9, 48.74], [55.0, 50.24], [56.1, 51.2], [56.2, 51.24], [57.0, 52.02], [57.8, 52.74], [60.06, 54.97]];
+const T = (x: number) => {
+  for (let i = 1; i < TM.length; i++) if (x <= TM[i][0]) { const [o0, n0] = TM[i - 1], [o1, n1] = TM[i]; return n0 + ((x - o0) / (o1 - o0)) * (n1 - n0); }
+  return TM[TM.length - 1][1] + (x - TM[TM.length - 1][0]);
+};
+const L = (abs: number, a: number) => f(T(abs)) - f(T(a));
 const PIX = "'Press Start 2P', monospace";
 const P = { bg: "#0B0A2A", pink: "#FF4FD8", cyan: "#3CF2FF", gold: "#FFD23F", green: "#39FF6A", red: "#FF3B3B", white: "#F6F4FF" };
 
@@ -264,7 +270,7 @@ const AlivePanel: React.FC = () => {
             return <div key={i} style={{ position: "absolute", left: 530 + Math.cos(an) * r, top: 470 + Math.sin(an) * r * 0.75, width: 18, height: 18, background: [P.gold, P.pink, P.cyan, P.green][i % 4], opacity: interpolate(frame - morph, [8, 20], [1, 0], clamp) }} />;
           })}
           <div style={{ position: "absolute", left: 330, top: 210, width: 420, height: 500, transform: `scale(${pop}) translateY(${Math.sin(frame / 5) * 10}px)`, border: `8px solid ${P.gold}`, background: "#8FD3FF", overflow: "hidden", boxShadow: `0 0 60px ${P.gold}, 12px 12px 0 #000` }}>
-            <Img src={staticFile("img/r12_sprite.png")} style={{ width: "100%", height: "100%", objectFit: "cover", imageRendering: "auto" }} />
+            <Img src={staticFile("img/r12_sprite.png")} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "50% 45%" }} />
           </div>
           <PopIn delay={morph + 8} style={{ position: "absolute", left: 0, right: 0, top: 760, textAlign: "center" }}><Px size={46} color={P.gold}>IT'S ALIVE! ⚡</Px></PopIn>
         </>
@@ -289,26 +295,31 @@ const FacePip: React.FC<{ offset: number }> = ({ offset }) => {
 
 /* 36.7 full-screen gameplay with a HUD that reacts to what he says */
 const GamePanel: React.FC<{ offset: number }> = ({ offset }) => {
+  /* full screen, from Kalyan's screen recording: the title screen first, then gameplay cropped to 9:16 around his character */
   const frame = useCurrentFrame();
-  const a = 36.7;
-  const coinT = [40.3, 40.55, 40.8, 41.05, 41.3].map((x) => L(x, a));
-  const coins = coinT.filter((c) => frame >= c).length;
+  const a = 36.65;
+  const play = L(37.85, a);
   const lvl = L(41.8, a);
-  const zoom = interpolate(frame, [0, 200], [1.12, 1.22], clamp);
+  const tz = interpolate(frame, [0, play], [1.0, 1.08], clamp);
   return (
     <AbsoluteFill style={{ background: "#000" }}>
-      <AbsoluteFill style={{ transform: `scale(${zoom})`, transformOrigin: "50% 28%" }}>
-        <OffthreadVideo src={staticFile("b/r12_play.mp4")} muted style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "50% 30%" }} />
-      </AbsoluteFill>
-      <div style={{ position: "absolute", left: 30, right: 30, top: 70, display: "flex", justifyContent: "space-between" }}>
-        <div style={{ background: "#000c", border: `5px solid ${P.white}`, padding: "12px 18px" }}><Px size={28}>❤️❤️❤️</Px></div>
-        <div style={{ background: "#000c", border: `5px solid ${P.gold}`, padding: "12px 18px", transform: `scale(${coinT.some((c) => frame >= c && frame < c + 5) ? 1.15 : 1})` }}><Px size={30} color={P.gold}>🪙 x {String(coins).padStart(2, "0")}</Px></div>
-      </div>
-      {frame < L(39.5, a) && <PopIn delay={4} style={{ position: "absolute", left: 0, right: 0, top: 220, textAlign: "center" }}><div style={{ display: "inline-block", background: "#000c", border: `5px solid ${P.pink}`, padding: "14px 20px" }}><Px size={34} color={P.pink}>MY DRAWING IS PLAYABLE!</Px></div></PopIn>}
-      {frame >= L(39.6, a) && frame < L(40.3, a) && <PopIn delay={L(39.6, a)} style={{ position: "absolute", left: 0, right: 0, top: 230, textAlign: "center" }}><Px size={72} color={P.cyan}>JUMP!</Px></PopIn>}
-      {frame >= lvl && <PopIn delay={lvl} style={{ position: "absolute", left: 0, right: 0, top: 220, textAlign: "center" }}><div style={{ display: "inline-block", background: "#000", border: `6px solid ${P.green}`, padding: "16px 22px", boxShadow: `0 0 30px ${P.green}` }}><Px size={36} color={P.green}>LEVEL 2 UNLOCKED</Px></div></PopIn>}
+      {frame < play ? (
+        <AbsoluteFill>
+          <OffthreadVideo src={staticFile("b/r12_title.mp4")} muted startFrom={90} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", filter: "blur(24px) brightness(0.7)", transform: "scale(1.1)" }} />
+          <div style={{ position: "absolute", left: -140, right: -140, top: 520, transform: `scale(${tz})` }}>
+            <OffthreadVideo src={staticFile("b/r12_title.mp4")} muted startFrom={90} style={{ width: "100%", display: "block", boxShadow: "0 30px 80px #000a" }} />
+          </div>
+          <PopIn delay={2} style={{ position: "absolute", left: 0, right: 0, top: 300, textAlign: "center" }}><div style={{ display: "inline-block", background: "#000c", border: `6px solid ${P.pink}`, padding: "16px 22px" }}><Px size={38} color={P.pink}>MY DRAWING IS PLAYABLE!</Px></div></PopIn>
+        </AbsoluteFill>
+      ) : (
+        <Sequence from={play} layout="none">
+          <OffthreadVideo src={staticFile("b/r12_game_full.mp4")} muted startFrom={60} style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />
+        </Sequence>
+      )}
+      {frame >= L(39.6, a) && frame < L(40.3, a) && <PopIn delay={L(39.6, a)} style={{ position: "absolute", left: 0, right: 0, top: 300, textAlign: "center" }}><Px size={80} color={P.cyan}>JUMP!</Px></PopIn>}
+      {frame >= L(40.3, a) && frame < lvl && <PopIn delay={L(40.3, a)} style={{ position: "absolute", left: 0, right: 0, top: 300, textAlign: "center" }}><Px size={64} color={P.gold}>+ COINS 🪙</Px></PopIn>}
+      {frame >= lvl && <PopIn delay={lvl} style={{ position: "absolute", left: 0, right: 0, top: 290, textAlign: "center" }}><div style={{ display: "inline-block", background: "#000", border: `6px solid ${P.green}`, padding: "16px 22px", boxShadow: `0 0 30px ${P.green}` }}><Px size={34} color={P.green}>3 LEVELS · JUST ASK AI</Px></div></PopIn>}
       <FacePip offset={offset} />
-      <AbsoluteFill style={{ backgroundImage: "repeating-linear-gradient(0deg, rgba(0,0,0,0.08) 0px, rgba(0,0,0,0.08) 2px, transparent 2px, transparent 6px)" }} />
     </AbsoluteFill>
   );
 };
@@ -372,14 +383,15 @@ const SEGS: Seg[] = [
   { a: 20.1, b: 25.55, split: DrawPanel, accent: P.gold },
   { a: 25.55, b: 29.5, split: StudioPanel, accent: P.cyan },
   { a: 29.5, b: 34.95, split: PromptPanel, accent: P.pink },
-  { a: 34.95, b: 36.65, split: AlivePanel, accent: P.gold },
+  { a: 34.95, b: 36.65, full: () => <AbsoluteFill><ArcadeBg tint={P.gold} /><div style={{ position: "absolute", left: 0, top: 380, width: 1080, height: 960, transform: "scale(1.35)", transformOrigin: "50% 40%" }}><AlivePanel /></div><CRT /></AbsoluteFill> },
   { a: 36.65, b: 43.35, full: (o) => <GamePanel offset={o} /> },
   { a: 43.35, b: 46.7, split: NoCodePanel, accent: P.green },
   { a: 46.7, b: 50.6, over: <Achievement /> },
   { a: 50.6, b: 56.1, split: () => <CommentPanel word="GAME" title="💬 Comment GAME for my prompt" typeAt={L(53.3, 50.6)} sentAt={L(53.9, 50.6)} replyAt={L(55.0, 50.6)} reply="📩 aiwithkalyan: here's the prompt I used!" />, accent: P.gold },
   { a: 56.1, b: END, over: <Follow top={170} /> },
 ];
-const isSplit = (t: number) => SEGS.some((s) => (s.split || s.full) && t >= s.a && t < s.b);
+const SEGS_T = SEGS.map((s) => ({ ...s, a: T(s.a), b: s.b === END ? END : T(s.b) }));
+const isSplit = (t: number) => SEGS_T.some((s) => (s.split || s.full) && t >= s.a && t < s.b);
 const chunks = chunkWords(D.words, 3, 16);
 
 export const Reel12: React.FC = () => {
@@ -389,21 +401,21 @@ export const Reel12: React.FC = () => {
     [9.45, "8bit_select", 0.25], [12.8, "8bit_explode", 0.18], [15.6, "8bit_start", 0.3], [18.3, "8bit_powerup", 0.3],
     [20.1, "8bit_select", 0.25], [23.3, "8bit_jump", 0.25], [25.55, "8bit_select", 0.25], [27.6, "8bit_powerup", 0.22],
     [29.5, "8bit_select", 0.25], [34.95, "8bit_powerup", 0.3], [35.7, "8bit_levelup", 0.35],
-    [39.6, "8bit_jump", 0.3], [40.3, "8bit_coin", 0.3], [40.55, "8bit_coin", 0.3], [40.8, "8bit_coin", 0.3], [41.05, "8bit_coin", 0.3], [41.3, "8bit_coin", 0.3], [41.8, "8bit_levelup", 0.32],
+    [37.85, "8bit_start", 0.25], [39.6, "8bit_jump", 0.3], [40.3, "8bit_coin", 0.3], [40.6, "8bit_coin", 0.3], [40.9, "8bit_coin", 0.3], [41.8, "8bit_levelup", 0.32],
     [43.35, "8bit_select", 0.25], [46.7, "8bit_levelup", 0.35], [50.6, "8bit_select", 0.25], [53.9, "8bit_coin", 0.3], [55.0, "notify", 0.3], [57.0, "8bit_select", 0.35],
   ];
   return (
     <AbsoluteFill style={{ background: "#000" }}>
       <OffthreadVideo src={staticFile(VID)} muted style={{ width: "100%", height: "100%" }} />
-      {SEGS.map((s, i) => (
+      {SEGS_T.map((s, i) => (
         <Sequence key={i} from={f(s.a)} durationInFrames={Math.max(1, f(s.b) - f(s.a))}>
           {s.split ? <Split video={VID} face={FT} offset={f(s.a)} accent={s.accent}><s.split /></Split> : s.full ? s.full(f(s.a)) : s.over}
         </Sequence>
       ))}
       <Captions chunks={chunks} isSplit={isSplit} hi={P.gold} />
       <Audio src={staticFile(VID)} />
-      <Music src="r/r12_music.wav" total={END} base={0.075} boosts={[[46.7, 50.5, 0.12], [56.0, END, 0.12]]} />
-      {sfx.map(([t, n, v], i) => <Sfx key={i} at={t} name={n} vol={v ?? 0.3} />)}
+      <Music src="r/r12_music.wav" total={END} base={0.075} boosts={[[T(46.7), T(50.5), 0.12], [T(56.0), END, 0.12]]} />
+      {sfx.map(([t, n, v], i) => <Sfx key={i} at={T(t)} name={n} vol={v ?? 0.3} />)}
     </AbsoluteFill>
   );
 };
