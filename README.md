@@ -38,6 +38,7 @@ packages/
   video-core/          RenderProvider interface + edit-plan types shared with the local worker
   agents/              Orchestrator + specialized agent runners + state-machine domain actions
   prompts/             Versioned system prompts per agent
+  comment-bot/         Auto-replies to YouTube + Instagram comments (Google Doc keywords, AI answers)
   remotion/            Remotion component catalog (12 implemented, 24 catalogued)
   ffmpeg/              Typed wrappers around the ffmpeg/ffprobe binaries (local-worker side)
 docs/                  Architecture, agents, state machine, database, trust system, etc.
@@ -109,6 +110,7 @@ pnpm lint        # next lint for the web app
 - [`docs/REMOTION.md`](docs/REMOTION.md) — motion template catalog and render pipeline
 - [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md) — day-to-day dev workflow
 - [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) — deploying the web app and provisioning Postgres
+- [`docs/COMMENT-BOT.md`](docs/COMMENT-BOT.md) — auto-replies to YouTube and Instagram comments (keyword → prompt by DM, AI answers), with step-by-step setup
 
 ## Roadmap
 

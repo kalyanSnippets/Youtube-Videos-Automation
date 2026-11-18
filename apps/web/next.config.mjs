@@ -6,6 +6,7 @@ const nextConfig = {
     "@yaos/agents",
     "@yaos/agent-schemas",
     "@yaos/ai-providers",
+    "@yaos/comment-bot",
     "@yaos/research",
     "@yaos/transcription",
     "@yaos/video-core",

@@ -15,6 +15,7 @@
     "@yaos/agent-schemas": "workspace:*",
     "@yaos/agents": "workspace:*",
     "@yaos/ai-providers": "workspace:*",
+    "@yaos/comment-bot": "workspace:*",
     "@yaos/database": "workspace:*",
     "@yaos/prompts": "workspace:*",
     "@yaos/research": "workspace:*",

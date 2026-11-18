@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, FolderKanban, Lightbulb, Bot, Clapperboard, Settings } from "lucide-react";
+import { LayoutDashboard, FolderKanban, Lightbulb, Bot, Clapperboard, MessagesSquare, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { href: "/idea-lab", label: "Idea Lab", icon: Lightbulb },
   { href: "/agent-runs", label: "Agent Runs", icon: Bot },
   { href: "/motion-templates", label: "Motion Templates", icon: Clapperboard },
+  { href: "/comment-bot", label: "Comment Bot", icon: MessagesSquare },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 

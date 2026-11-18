@@ -22,6 +22,9 @@ importers:
       '@yaos/ai-providers':
         specifier: workspace:*
         version: link:../../packages/ai-providers
+      '@yaos/comment-bot':
+        specifier: workspace:*
+        version: link:../../packages/comment-bot
       '@yaos/database':
         specifier: workspace:*
         version: link:../../packages/database
@@ -141,6 +144,28 @@ importers:
         version: 2.1.9(@types/node@22.20.2)(terser@5.51.2)
 
   packages/ai-providers:
+    devDependencies:
+      '@types/node':
+        specifier: ^22.9.0
+        version: 22.20.2
+      typescript:
+        specifier: ^5.6.3
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.4
+        version: 2.1.9(@types/node@22.20.2)(terser@5.51.2)
+
+  packages/comment-bot:
+    dependencies:
+      '@yaos/ai-providers':
+        specifier: workspace:*
+        version: link:../ai-providers
+      '@yaos/database':
+        specifier: workspace:*
+        version: link:../database
+      drizzle-orm:
+        specifier: ^0.36.4
+        version: 0.36.4(@neondatabase/serverless@1.1.0)(@types/pg@8.23.1)(@types/react@18.3.31)(pg@8.23.0)(react@18.3.1)
     devDependencies:
       '@types/node':
         specifier: ^22.9.0
