@@ -1,5 +1,5 @@
 export * from "./types";
-export * from "./prompt-library";
+export * from "./library";
 export * from "./matcher";
 export * from "./responder";
 export * from "./llm";

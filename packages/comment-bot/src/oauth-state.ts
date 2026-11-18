@@ -1,7 +1,7 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 
 /**
- * Signed OAuth `state` so only someone who knows COMMENT_BOT_SECRET can connect an account,
+ * Signed OAuth `state` so only the signed-in owner (who holds APP_SECRET) can connect an account,
  * and a callback can't be replayed later. Format: <platform>.<unix-ms>.<hmac>.
  */
 const MAX_AGE_MS = 15 * 60 * 1000;

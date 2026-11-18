@@ -14,3 +14,4 @@ coverage/
 *.log
 apps/local-worker/data/
 packages/remotion/out/
+.preview/

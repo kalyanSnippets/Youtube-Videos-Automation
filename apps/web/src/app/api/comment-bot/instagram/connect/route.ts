@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { createOAuthState, instagramAuthUrl } from "@yaos/comment-bot";
-import { botBaseUrl, botSecret, isAuthorised, notAuthorised, resultPage } from "@/lib/comment-bot";
+import { botBaseUrl, isAuthorised, notAuthorised, resultPage } from "@/lib/comment-bot";
+import { appSecret } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
-/** Visit /api/comment-bot/instagram/connect?key=<COMMENT_BOT_SECRET> to link your Instagram account. */
+/** Visit /api/comment-bot/instagram/connectwhile signed in to link your Instagram account. */
 export async function GET(request: Request) {
-  if (!isAuthorised(request)) return notAuthorised();
+  if (!(await isAuthorised(request))) return notAuthorised();
   const appId = process.env.INSTAGRAM_APP_ID;
   if (!appId || !process.env.INSTAGRAM_APP_SECRET) {
     return resultPage("Instagram is not set up yet", "Add INSTAGRAM_APP_ID and INSTAGRAM_APP_SECRET to the site's environment variables, redeploy, then try again.", false);
@@ -14,7 +15,7 @@ export async function GET(request: Request) {
   const url = instagramAuthUrl({
     appId,
     redirectUri: `${botBaseUrl(request)}/api/comment-bot/instagram/callback`,
-    state: createOAuthState("INSTAGRAM", botSecret()!),
+    state: createOAuthState("INSTAGRAM", appSecret()!),
   });
   return NextResponse.redirect(url);
 }

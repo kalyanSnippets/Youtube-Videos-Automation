@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { looksLikeQuestion, matchKeyword } from "./matcher";
+import { looksLikeQuestion, matchKeyword, normaliseKeyword } from "./matcher";
 import type { LibraryEntry } from "./types";
 
 const entries: LibraryEntry[] = [
@@ -27,4 +27,11 @@ describe("looksLikeQuestion", () => {
   it("spots a question next to the keyword", () => expect(looksLikeQuestion("FABLE does this work on Windows?", "FABLE")).toBe(true));
   it("spots a question without a question mark", () => expect(looksLikeQuestion("how do I install it on mac")).toBe(true));
   it("treats praise as not a question", () => expect(looksLikeQuestion("FABLE love this video bro", "FABLE")).toBe(false));
+});
+
+describe("normaliseKeyword", () => {
+  it("cleans keywords typed in the editor", () => {
+    expect(normaliseKeyword("  #fable! ")).toBe("FABLE");
+    expect(normaliseKeyword("claude   code")).toBe("CLAUDE CODE");
+  });
 });

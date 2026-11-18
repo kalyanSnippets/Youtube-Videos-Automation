@@ -1,5 +1,14 @@
 import type { LibraryEntry } from "./types";
 
+/** "#Fable!" -> "FABLE". Used when saving resources so keywords match consistently. */
+export function normaliseKeyword(raw: string): string {
+  return raw
+    .normalize("NFKC")
+    .replace(/^[#"'“”‘’\s]+|[#"'“”‘’\s.!?,;:]+$/g, "")
+    .replace(/\s+/g, " ")
+    .toUpperCase();
+}
+
 function escapeRegExp(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }

@@ -1,5 +1,5 @@
 import { resolveLLM } from "./llm";
-import { extractGoogleDocId, googleDocViewUrl, loadPromptLibrary } from "./prompt-library";
+import { loadPromptLibrary } from "./library";
 import { processComment, type ProcessDeps, type ProcessOutcome } from "./processor";
 import { dbStore, getConnection, rowToComment, updateConnectionToken, type ConnectionRow } from "./store";
 import {
@@ -20,13 +20,8 @@ function dryRun(): boolean {
   return /^(1|true|yes)$/i.test(process.env.COMMENT_BOT_DRY_RUN ?? "");
 }
 
-function docViewUrl(): string | undefined {
-  const id = process.env.COMMENT_BOT_DOC_URL ? extractGoogleDocId(process.env.COMMENT_BOT_DOC_URL) : null;
-  return id ? googleDocViewUrl(id) : undefined;
-}
-
 async function baseDeps(): Promise<Omit<ProcessDeps, "senders">> {
-  return { store: dbStore, library: await loadPromptLibrary(), llm: resolveLLM(), docViewUrl: docViewUrl(), dryRun: dryRun() };
+  return { store: dbStore, library: await loadPromptLibrary(), llm: resolveLLM(), dryRun: dryRun() };
 }
 
 function tally(outcomes: ProcessOutcome[]): Record<string, number> {

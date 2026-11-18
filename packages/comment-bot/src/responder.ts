@@ -16,8 +16,6 @@ export interface RespondInput {
   library: PromptLibrary;
   media?: MediaContext;
   llm: LLM | null;
-  /** Public link to the prompt doc, used when a prompt is too long for one Instagram DM. */
-  docViewUrl?: string;
   /** Deterministic variant choice in tests. */
   pick?: (n: number) => number;
 }
@@ -43,23 +41,30 @@ function clip(text: string, max: number): string {
   return `${text.slice(0, max - 1).trimEnd()}…`;
 }
 
-export function buildInstagramDM(entry: LibraryEntry, name: string | undefined, docViewUrl?: string): string {
+function deliveryFooter(entry: LibraryEntry): string {
+  const lines = [];
+  if (entry.url) lines.push(`📄 Copy it here: ${entry.url}`);
+  if (entry.link && entry.link !== entry.url) lines.push(`🔗 ${entry.link}`);
+  return lines.length ? `\n\n${lines.join("\n")}` : "";
+}
+
+export function buildInstagramDM(entry: LibraryEntry, name: string | undefined): string {
   const greeting = `Hey${name ? ` @${name}` : ""}! Here's the ${entry.title} you asked for 👇\n\n`;
-  const footer = entry.link ? `\n\n🔗 ${entry.link}` : "";
+  const footer = deliveryFooter(entry);
   const full = `${greeting}${entry.message}${footer}`;
   if (full.length <= INSTAGRAM_DM_LIMIT) return full;
   // Too long for one DM, and Instagram only allows one private reply per comment, so send the
-  // start plus a link to the full text.
-  const fullLink = entry.link ?? docViewUrl;
-  const tail = fullLink ? `\n\n…full prompt here 👉 ${fullLink}` : "…";
+  // start plus the link to the full page.
+  const fullLink = entry.url ?? entry.link;
+  const tail = fullLink ? `…\n\n📄 Full prompt here 👉 ${fullLink}` : "…";
   const room = INSTAGRAM_DM_LIMIT - greeting.length - tail.length;
   return `${greeting}${entry.message.slice(0, Math.max(0, room)).trimEnd()}${tail}`;
 }
 
 export function buildYouTubeKeywordReply(entry: LibraryEntry, name: string | undefined): string {
   const head = `Here you go${name ? ` ${name.startsWith("@") ? name : `@${name}`}` : ""} 👇 ${entry.title}\n\n`;
-  const footer = entry.link ? `\n\n🔗 ${entry.link}` : "";
-  return clip(`${head}${entry.message}${footer}`, YOUTUBE_COMMENT_LIMIT);
+  const footer = deliveryFooter(entry);
+  return clip(`${head}${entry.message}`, YOUTUBE_COMMENT_LIMIT - footer.length) + footer;
 }
 
 interface AIDecision {
@@ -79,7 +84,7 @@ export function buildSystemPrompt(platform: Platform, library: PromptLibrary): s
     "About the creator and channel (from the creator's own notes):",
     library.about || "(no notes provided)",
     "",
-    "Free prompts/resources viewers can get by commenting a keyword:",
+    "Free prompts/resources viewers can get by commenting a keyword (they're also all on the creator's website):",
     keywordList,
     "",
     "Rules:",
@@ -190,7 +195,7 @@ export async function planReply(input: RespondInput): Promise<ReplyPlan> {
       return {
         action,
         matchedKeyword: entry.keyword,
-        privateReply: buildInstagramDM(entry, name, input.docViewUrl),
+        privateReply: buildInstagramDM(entry, name),
         publicReply: clip(aiReply ? `${aiReply}\n\n${note}` : note, INSTAGRAM_COMMENT_LIMIT),
       };
     }

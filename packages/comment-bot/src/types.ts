@@ -1,6 +1,6 @@
 export type Platform = "YOUTUBE" | "INSTAGRAM";
 
-/** One entry in the Google Doc prompt library. */
+/** One resource from the in-app Resources editor, as the bot sees it. */
 export interface LibraryEntry {
   /** Canonical keyword (first one listed), upper-cased. */
   keyword: string;
@@ -10,13 +10,15 @@ export interface LibraryEntry {
   link?: string;
   /** The prompt / resource text that gets delivered. */
   message: string;
+  /** Public page for this resource on the site, e.g. https://site/r/fable. Linked in every delivery. */
+  url?: string;
 }
 
 export interface PromptLibrary {
-  /** Free text before the first KEYWORD block: who you are, what the channel is about, FAQs. Fed to the AI. */
+  /** "About me" notes from Site settings: who you are, gear, schedule, FAQs. Fed to the AI, never shown publicly. */
   about: string;
   entries: LibraryEntry[];
-  /** Problems found while parsing, shown on the status page so the doc can be fixed. */
+  /** Problems worth showing on the Comment Bot page (e.g. no resources yet). */
   warnings: string[];
 }
 

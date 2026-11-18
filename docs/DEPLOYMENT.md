@@ -1,13 +1,15 @@
 # Deployment
 
+> For the recommended Supabase + Netlify setup with sign-in and the comment bot, follow [`SETUP.md`](SETUP.md).
+
 ## Database
 
 Any managed Postgres works (Supabase, RDS, Neon, Fly Postgres, Netlify DB, ...) — nothing in
 `packages/database` is provider-specific beyond the connection string.
 
 `packages/database/src/client.ts` resolves its connection string in this order:
-`NETLIFY_DB_URL` (auto-injected by Netlify — see "Deploying to Netlify" below) → `DATABASE_URL`
-(any other provider, or local dev) → a local-dev default. Only one needs to be set.
+`DATABASE_URL` (Supabase, any other provider, or local dev) → `NETLIFY_DB_URL` (auto-injected by
+Netlify — see "Deploying to Netlify" below) → a local-dev default. Only one needs to be set.
 
 1. Provision a Postgres instance, get its connection string.
 2. `DATABASE_URL=<connection string> pnpm db:migrate` from a machine with network access to it.

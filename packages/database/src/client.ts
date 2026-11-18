@@ -2,12 +2,13 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import * as schema from "./schema/index";
 
-// NETLIFY_DB_URL is auto-provisioned and injected by Netlify's build pipeline once
-// @netlify/database is a dependency of the deployed app (apps/web) - see docs/DEPLOYMENT.md.
-// DATABASE_URL remains the override for local dev or any non-Netlify host (Supabase, Neon, ...).
+// An explicit DATABASE_URL (Supabase, Neon, local dev, ...) always wins. Otherwise fall back to
+// NETLIFY_DB_URL, which Netlify injects when it provisions Netlify DB for the site - see
+// docs/DEPLOYMENT.md. DATABASE_URL must win so a Supabase setup isn't silently swapped for an
+// empty Netlify DB that Netlify auto-provisioned because @netlify/database is a dependency.
 const connectionString =
-  process.env.NETLIFY_DB_URL ??
   process.env.DATABASE_URL ??
+  process.env.NETLIFY_DB_URL ??
   "postgresql://yaos:yaos_dev_password@localhost:5432/yaos_dev";
 
 const isLocalConnection = /(^|@)(localhost|127\.0\.0\.1)(:|\/)/.test(connectionString);

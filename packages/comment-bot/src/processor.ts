@@ -16,7 +16,6 @@ export interface ProcessDeps {
   llm: LLM | null;
   senders: Senders;
   getMedia?(comment: IncomingComment): Promise<MediaContext | undefined>;
-  docViewUrl?: string;
   /** Plan and log but post nothing (COMMENT_BOT_DRY_RUN=true). */
   dryRun?: boolean;
 }
@@ -38,7 +37,7 @@ export async function processComment(deps: ProcessDeps, comment: IncomingComment
   const { platform, commentId } = comment;
   try {
     const media = deps.getMedia ? await deps.getMedia(comment).catch(() => undefined) : undefined;
-    const plan = await planReply({ comment, library: deps.library, media, llm: deps.llm, docViewUrl: deps.docViewUrl });
+    const plan = await planReply({ comment, library: deps.library, media, llm: deps.llm });
 
     if (plan.action === "NONE") {
       await deps.store.update(platform, commentId, { status: "SKIPPED", action: "NONE", skipReason: plan.skipReason ?? null, error: null });

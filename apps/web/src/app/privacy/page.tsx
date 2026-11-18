@@ -6,12 +6,14 @@ export default function PrivacyPage() {
     <main className="mx-auto max-w-2xl px-4 py-12 space-y-4 text-sm leading-relaxed">
       <h1 className="text-2xl font-semibold">Privacy Policy</h1>
       <p>
-        This site runs an automated assistant that replies to comments on the creator&apos;s own YouTube channel and Instagram account.
+        This site shares free resources from the creator&apos;s videos, and runs an automated assistant that replies to comments on the
+        creator&apos;s own YouTube channel and Instagram account.
       </p>
       <h2 className="text-lg font-semibold pt-2">What we collect</h2>
       <p>
         When you comment on one of the creator&apos;s videos or posts, we store the comment text, your public username or channel name,
-        your platform user id, the id of the video or post, and the reply we sent. Nothing else is collected, and we never see your password.
+        your platform user id, the id of the video or post, and the reply we sent. If you join the optional newsletter, we store your email
+        address and the page you signed up on. Nothing else is collected, and we never see your password.
       </p>
       <h2 className="text-lg font-semibold pt-2">How it is used</h2>
       <p>
@@ -20,7 +22,7 @@ export default function PrivacyPage() {
         provider to write the reply. We do not sell or share your data for advertising.
       </p>
       <h2 className="text-lg font-semibold pt-2">Retention</h2>
-      <p>Comment records are kept for up to 12 months and then deleted.</p>
+      <p>Comment records are kept for up to 12 months and then deleted. Newsletter emails are kept until you unsubscribe.</p>
       <h2 className="text-lg font-semibold pt-2" id="data-deletion">Deleting your data</h2>
       <p>
         To have your data deleted, send a direct message to the creator&apos;s Instagram account or reply &quot;delete my data&quot; to any of

@@ -6,7 +6,7 @@ import type { IncomingComment, PromptLibrary } from "./types";
 const library: PromptLibrary = {
   about: "AI tutorials channel.",
   warnings: [],
-  entries: [{ keyword: "FABLE", keywords: ["FABLE"], title: "Fable prompts", link: "https://ex.com/f", message: "Do the thing." }],
+  entries: [{ keyword: "FABLE", keywords: ["FABLE"], title: "Fable prompts", link: "https://ex.com/f", message: "Do the thing.", url: "https://site.example/r/fable" }],
 };
 
 function fakeLLM(response: object | string): LLM & { calls: number } {
@@ -31,6 +31,7 @@ describe("planReply", () => {
     expect(plan.action).toBe("KEYWORD");
     expect(plan.privateReply).toContain("Do the thing.");
     expect(plan.privateReply).toContain("https://ex.com/f");
+    expect(plan.privateReply).toContain("Copy it here: https://site.example/r/fable");
     expect(plan.publicReply).toBe("Sent! Check your DMs 📩");
     expect(llm.calls).toBe(0);
   });
@@ -41,6 +42,7 @@ describe("planReply", () => {
     expect(plan.privateReply).toBeUndefined();
     expect(plan.publicReply).toContain("@ravi");
     expect(plan.publicReply).toContain("Do the thing.");
+    expect(plan.publicReply).toContain("https://site.example/r/fable");
   });
 
   it("keyword plus a question: answers and delivers", async () => {
@@ -87,9 +89,9 @@ describe("safety helpers", () => {
   it("parses JSON wrapped in code fences", () => {
     expect(parseAIDecision('```json\n{"action":"reply","reply":"hi"}\n```')).toMatchObject({ action: "reply", reply: "hi" });
   });
-  it("keeps long prompts inside Instagram's DM limit with a link to the rest", () => {
-    const dm = buildInstagramDM({ keyword: "X", keywords: ["X"], title: "Big", message: "a".repeat(5000) }, "ravi", "https://docs.google.com/document/d/abc/view");
+  it("keeps long prompts inside Instagram's DM limit with a link to the full page", () => {
+    const dm = buildInstagramDM({ keyword: "X", keywords: ["X"], title: "Big", message: "a".repeat(5000), url: "https://site.example/r/big" }, "ravi");
     expect(dm.length).toBeLessThanOrEqual(INSTAGRAM_DM_LIMIT);
-    expect(dm).toContain("https://docs.google.com/document/d/abc/view");
+    expect(dm).toContain("Full prompt here 👉 https://site.example/r/big");
   });
 });

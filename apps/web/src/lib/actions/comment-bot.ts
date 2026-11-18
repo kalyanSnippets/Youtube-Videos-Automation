@@ -1,6 +1,7 @@
 "use server";
 
-import { loadPromptLibrary, planReply, resolveLLM, safeEqual, type Platform, type ReplyPlan } from "@yaos/comment-bot";
+import { loadPromptLibrary, planReply, resolveLLM, type Platform, type ReplyPlan } from "@yaos/comment-bot";
+import { requireAdmin } from "@/lib/admin";
 
 export interface TestReplyState {
   error?: string;
@@ -8,10 +9,9 @@ export interface TestReplyState {
   platform?: Platform;
 }
 
-/** Preview what the bot would post for a comment. Posts nothing. Needs the bot secret so strangers can't spend AI credits. */
+/** Preview what the bot would post for a comment. Posts nothing. Owner only, so strangers can't spend AI credits. */
 export async function testReply(_prev: TestReplyState, form: FormData): Promise<TestReplyState> {
-  const key = String(form.get("key") ?? "");
-  if (!safeEqual(key, process.env.COMMENT_BOT_SECRET)) return { error: "Wrong or missing key (COMMENT_BOT_SECRET)." };
+  await requireAdmin();
   const text = String(form.get("comment") ?? "").trim();
   const platform = (form.get("platform") === "YOUTUBE" ? "YOUTUBE" : "INSTAGRAM") as Platform;
   if (!text) return { error: "Type a comment to test." };

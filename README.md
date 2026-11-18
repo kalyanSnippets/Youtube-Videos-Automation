@@ -87,8 +87,9 @@ pnpm build    # production build of apps/web
 pnpm start    # serve the production build
 ```
 
-There's no sign-in step — it's a single-owner tool, so the app lands straight on the dashboard,
-auto-provisioning the owner user and workspace on first request.
+The home page (`/`) and resource pages (`/r/<slug>`) are public. Everything else is private: sign in with
+Google using an email listed in `ADMIN_EMAILS` (see `docs/SETUP.md`). The owner user and workspace are
+auto-provisioned on first request.
 
 ## Test / typecheck / lint
 
@@ -110,6 +111,7 @@ pnpm lint        # next lint for the web app
 - [`docs/REMOTION.md`](docs/REMOTION.md) — motion template catalog and render pipeline
 - [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md) — day-to-day dev workflow
 - [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) — deploying the web app and provisioning Postgres
+- [`docs/SETUP.md`](docs/SETUP.md) — **start here to go live**: Supabase + Netlify + Google sign-in + comment bot, step by step
 - [`docs/COMMENT-BOT.md`](docs/COMMENT-BOT.md) — auto-replies to YouTube and Instagram comments (keyword → prompt by DM, AI answers), with step-by-step setup
 
 ## Roadmap

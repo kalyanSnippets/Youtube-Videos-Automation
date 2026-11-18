@@ -1,11 +1,12 @@
 import { exchangeYouTubeCode, getMyChannel, saveConnection, verifyOAuthState } from "@yaos/comment-bot";
-import { botBaseUrl, botSecret, resultPage } from "@/lib/comment-bot";
+import { botBaseUrl, resultPage } from "@/lib/comment-bot";
+import { appSecret } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
   const params = new URL(request.url).searchParams;
-  const secret = botSecret();
+  const secret = appSecret();
   if (!secret || !verifyOAuthState(params.get("state"), "YOUTUBE", secret)) {
     return resultPage("Link expired", "Start again from the Connect YouTube link (links are valid for 15 minutes).", false);
   }

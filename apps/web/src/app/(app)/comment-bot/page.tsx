@@ -38,8 +38,8 @@ export default async function CommentBotPage() {
         <div className="flex-1 min-w-[240px]">
           <h1 className="text-xl font-semibold mb-1">Comment Bot</h1>
           <p className="text-sm text-text-dim">
-            Replies to YouTube and Instagram comments automatically. Keywords from your Google Doc get the prompt (by DM on Instagram);
-            other comments get a short AI answer. Setup guide: <code>docs/COMMENT-BOT.md</code>.
+            Replies to YouTube and Instagram comments automatically. Keywords from your <a className="text-accent-cyan" href="/resources">Resources</a> get
+            the prompt and its page link (by DM on Instagram); other comments get a short AI answer. Setup guide: <code>docs/SETUP.md</code>.
           </p>
         </div>
         {paused && <Badge variant="warning">Paused</Badge>}
@@ -88,7 +88,7 @@ export default async function CommentBotPage() {
       </div>
 
       <section className="panel p-5 space-y-3">
-        <h2 className="text-sm font-semibold text-text-dim uppercase tracking-wide">Prompt library (Google Doc)</h2>
+        <h2 className="text-sm font-semibold text-text-dim uppercase tracking-wide">Keywords the bot listens for</h2>
         {library.entries.length ? (
           <div className="flex flex-wrap gap-2">
             {library.entries.map((e) => (
@@ -154,8 +154,9 @@ export default async function CommentBotPage() {
       <section className="panel p-5">
         <h2 className="text-sm font-semibold text-text-dim uppercase tracking-wide mb-2">Settings checklist</h2>
         <ul className="grid gap-x-6 md:grid-cols-2">
-          <EnvRow name="COMMENT_BOT_SECRET" hint="Your password for connect links and the scheduled job (16+ characters)." />
-          <EnvRow name="COMMENT_BOT_DOC_URL" hint="Link to the Google Doc with your keywords and prompts." />
+          <EnvRow name="DATABASE_URL" hint="Supabase connection string (Transaction pooler)." />
+          <EnvRow name="APP_SECRET" hint="Random 32+ character secret: signs your login and protects the scheduled job." />
+          <EnvRow name="ADMIN_EMAILS" hint="Your Google email; only this account can sign in." />
           <EnvRow name="GEMINI_API_KEY" hint="Free key from aistudio.google.com for AI answers (or ANTHROPIC_API_KEY / OPENAI_API_KEY)." />
           <EnvRow name="GOOGLE_CLIENT_ID" hint="Google Cloud OAuth client for YouTube." />
           <EnvRow name="GOOGLE_CLIENT_SECRET" hint="Google Cloud OAuth client secret." />
@@ -170,9 +171,8 @@ export default async function CommentBotPage() {
 
 function ConnectForm({ action, label }: { action: string; label: string }) {
   return (
-    <form action={action} method="get" className="flex gap-2 pt-1">
-      <input name="key" type="password" required placeholder="Bot secret" className="min-w-0 flex-1 rounded-lg bg-bg-raised border border-border px-2 py-1.5 text-xs" />
-      <button className="rounded-lg border border-border px-3 py-1.5 text-xs hover:bg-bg-raised">{label}</button>
-    </form>
+    <a href={action} className="inline-block rounded-lg border border-border px-3 py-1.5 text-xs hover:bg-bg-raised">
+      {label}
+    </a>
   );
 }

@@ -16,9 +16,8 @@ export function TestReplyForm() {
           <option value="YOUTUBE">YouTube</option>
         </select>
       </div>
-      <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
+      <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
         <input name="title" placeholder="Video title (optional, gives the AI context)" className={input} />
-        <input name="key" type="password" placeholder="COMMENT_BOT_SECRET" className={input} />
         <button disabled={pending} className="rounded-lg bg-accent-cyan/20 border border-accent-cyan/40 px-4 py-2 text-sm text-accent-cyan disabled:opacity-50">
           {pending ? "Thinking…" : "Preview reply"}
         </button>

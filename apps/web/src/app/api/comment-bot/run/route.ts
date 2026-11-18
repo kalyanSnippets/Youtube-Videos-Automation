@@ -7,10 +7,10 @@ export const dynamic = "force-dynamic";
 /**
  * Called every minute by netlify/functions/comment-bot-tick.mts. Polls YouTube (no webhooks
  * there), retries failed Instagram replies and keeps the Instagram token fresh.
- * You can also open /api/comment-bot/run?key=<COMMENT_BOT_SECRET> to run it by hand.
+ * You can also open /api/comment-bot/run while signed in to run it by hand.
  */
 async function run(request: Request) {
-  if (!isAuthorised(request)) return notAuthorised();
+  if (!(await isAuthorised(request))) return notAuthorised();
   const settle = async <T,>(fn: () => Promise<T>) => {
     try {
       return await fn();

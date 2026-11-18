@@ -24,7 +24,10 @@ export function Topbar({ user }: { user: CurrentUser }) {
           <Plus size={15} />
           Start New Video
         </Link>
-        <div className="text-sm text-text-dim">{user.email}</div>
+        <a href="/" target="_blank" className="text-sm text-text-dim hover:text-text">View site ↗</a>
+        <form action="/api/auth/logout" method="post">
+          <button className="text-sm text-text-dim hover:text-text">Sign out</button>
+        </form>
       </div>
     </header>
   );

@@ -1,29 +1,24 @@
 import { NextResponse } from "next/server";
 import { safeEqual } from "@yaos/comment-bot";
+import { appSecret, sessionEmailFromRequest } from "./session";
 
 /** Public base URL used in OAuth redirect URIs. Netlify sets URL to the site's main address. */
 export function botBaseUrl(request: Request): string {
-  const configured = process.env.COMMENT_BOT_BASE_URL ?? process.env.URL;
+  const configured = process.env.SITE_URL ?? process.env.URL;
   return (configured ?? new URL(request.url).origin).replace(/\/$/, "");
 }
 
-export function botSecret(): string | null {
-  const s = process.env.COMMENT_BOT_SECRET;
-  return s && s.length >= 16 ? s : null;
-}
-
-/** The secret can come as `Authorization: Bearer <secret>` (scheduled job) or `?key=<secret>` (connect links). */
-export function isAuthorised(request: Request): boolean {
-  const secret = botSecret();
-  if (!secret) return false;
+/** Signed-in owner (browser), or `Authorization: Bearer <APP_SECRET>` (the scheduled job). */
+export async function isAuthorised(request: Request): Promise<boolean> {
+  if (await sessionEmailFromRequest(request)) return true;
+  const secret = appSecret();
   const bearer = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
-  const key = new URL(request.url).searchParams.get("key");
-  return safeEqual(bearer, secret) || safeEqual(key, secret);
+  return Boolean(secret) && safeEqual(bearer, secret);
 }
 
 export function notAuthorised(): NextResponse {
   return NextResponse.json(
-    { error: botSecret() ? "Missing or wrong key." : "Set COMMENT_BOT_SECRET (16+ characters) in the site's environment variables first." },
+    { error: appSecret() ? "Sign in first (or send the APP_SECRET bearer token)." : "Set APP_SECRET (16+ characters) in the site's environment variables first." },
     { status: 401 },
   );
 }
