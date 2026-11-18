@@ -2,6 +2,7 @@ import { listConnections, loadPromptLibrary, recentComments, replyStats, resolve
 import { Badge } from "@/components/ui/badge";
 import { formatRelativeTime } from "@/lib/utils";
 import { TestReplyForm } from "./test-form";
+import { retryFailedComments } from "@/lib/actions/comment-bot";
 
 const STATUS_VARIANT = { REPLIED: "success", SKIPPED: "default", FAILED: "danger", PROCESSING: "cyan", DRY_RUN: "purple" } as const;
 
@@ -109,6 +110,13 @@ export default async function CommentBotPage() {
         <h2 className="text-sm font-semibold text-text-dim uppercase tracking-wide">Test a reply</h2>
         <TestReplyForm />
       </section>
+
+      {(stats.FAILED ?? 0) > 0 || comments.some((c) => c.status === "FAILED") ? (
+        <form action={retryFailedComments} className="flex flex-wrap items-center gap-3">
+          <button className="rounded-lg border border-status-danger/40 text-status-danger px-3.5 py-2 text-sm hover:bg-status-danger/10">Retry failed comments</button>
+          <span className="text-xs text-text-dim">They are picked up again within about a minute.</span>
+        </form>
+      ) : null}
 
       <section className="panel overflow-x-auto">
         <table className="w-full text-sm">

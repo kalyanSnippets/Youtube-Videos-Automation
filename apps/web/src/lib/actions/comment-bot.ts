@@ -1,6 +1,7 @@
 "use server";
 
-import { loadPromptLibrary, planReply, resolveLLM, type Platform, type ReplyPlan } from "@yaos/comment-bot";
+import { revalidatePath } from "next/cache";
+import { loadPromptLibrary, planReply, resetFailedComments, resolveLLM, type Platform, type ReplyPlan } from "@yaos/comment-bot";
 import { requireAdmin } from "@/lib/admin";
 
 export interface TestReplyState {
@@ -27,4 +28,11 @@ export async function testReply(_prev: TestReplyState, form: FormData): Promise<
   } catch (error) {
     return { error: (error as Error).message };
   }
+}
+
+/** "Retry failed" button: failed comments get picked up again by the next run (about a minute). */
+export async function retryFailedComments(): Promise<void> {
+  await requireAdmin();
+  await resetFailedComments();
+  revalidatePath("/comment-bot");
 }

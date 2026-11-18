@@ -177,3 +177,13 @@ export async function replyStats(): Promise<Record<string, number>> {
     .groupBy(t.status);
   return Object.fromEntries(rows.map((r) => [r.status, r.n]));
 }
+
+/** Give every FAILED comment a fresh set of attempts; the next scheduled run (within a minute) retries them. */
+export async function resetFailedComments(): Promise<number> {
+  const rows = await db
+    .update(t)
+    .set({ attempts: 0, error: null, updatedAt: new Date() })
+    .where(eq(t.status, "FAILED"))
+    .returning({ id: t.id });
+  return rows.length;
+}

@@ -49,7 +49,7 @@ Site settings) are what the AI uses to answer questions in your voice.
 | `COMMENT_BOT_PAUSED` | `false` | `true` stops all replies right away. This is the emergency off switch. |
 | `COMMENT_BOT_DRY_RUN` | `false` | `true` logs what it *would* post on the Comment Bot page, without posting |
 | `YOUTUBE_BACKFILL_HOURS` | `48` | When YouTube is first connected, how far back to reply to older comments |
-| `GEMINI_MODEL` | `gemini-2.5-flash` | Gemini model to use |
+| `GEMINI_MODEL` | `gemini-3.8-flash` | Gemini model to use. If Google retires it, the bot switches to the replacement Google names automatically. |
 
 ## Limits to know about
 
