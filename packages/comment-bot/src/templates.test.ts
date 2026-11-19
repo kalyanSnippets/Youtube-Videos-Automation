@@ -97,3 +97,26 @@ describe("shared keywords", () => {
     expect(plan.privateReply).toContain("REEL PROMPT");
   });
 });
+
+describe("when the AI is busy", () => {
+  const busy = { name: "busy", complete: async () => { throw new Error("The AI is busy right now"); } };
+  const base = { about: "", warnings: [], entries: [{ keyword: "FABLE", keywords: ["FABLE"], title: "Fable", message: "PROMPT" }] };
+  const yt = (text: string) => ({ platform: "YOUTUBE" as const, commentId: "c", text, authorName: "@kavya" });
+
+  it("a general comment gets a thank-you line instead of failing", async () => {
+    const plan = await planReply({ comment: yt("Game"), library: { ...base, templates: { ...DEFAULT_TEMPLATES, generalReplies: ["Thanks {name}!"] } }, llm: busy, pick: () => 0 });
+    expect(plan).toEqual({ action: "GENERAL", publicReply: "Thanks @kavya!" });
+  });
+  it("a keyword with a question still gets the prompt", async () => {
+    const plan = await planReply({ comment: yt("FABLE does this work on Windows?"), library: base, llm: busy });
+    expect(plan.action).toBe("KEYWORD");
+    expect(plan.publicReply).toContain("PROMPT");
+  });
+  it("a real question fails so it is retried later", async () => {
+    await expect(planReply({ comment: yt("what mic do you use?"), library: base, llm: busy })).rejects.toThrow(/busy/);
+  });
+  it("general replies switched off: still no reply", async () => {
+    const plan = await planReply({ comment: yt("Game"), library: { ...base, templates: { ...DEFAULT_TEMPLATES, generalMode: "off" } }, llm: busy });
+    expect(plan.action).toBe("NONE");
+  });
+});

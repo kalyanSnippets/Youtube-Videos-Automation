@@ -26,3 +26,22 @@ describe("gemini model fallback", () => {
     expect(llm.name).toBe("gemini:gemini-3.8-flash");
   });
 });
+
+describe("gemini backup models", () => {
+  it("tries the next model when the main one is overloaded", async () => {
+    const calls: string[] = [];
+    vi.stubGlobal("fetch", async (url: string) => {
+      const model = url.match(/models\/([^:]+)/)![1]!;
+      calls.push(model);
+      if (model === "main") return new Response('{"error":{"code":503,"status":"UNAVAILABLE"}}', { status: 503 });
+      return Response.json({ candidates: [{ content: { parts: [{ text: '{"action":"reply","reply":"hi"}' }] } }] });
+    });
+    const llm = geminiLLM("k", "main", ["lite", "flash"]);
+    expect(await llm.complete("s", "u")).toBe('{"action":"reply","reply":"hi"}');
+    expect(calls).toEqual(["main", "lite"]);
+  });
+  it("says the AI is busy when every model is overloaded", async () => {
+    vi.stubGlobal("fetch", async () => new Response("{}", { status: 503 }));
+    await expect(geminiLLM("k", "main", ["lite"]).complete("s", "u")).rejects.toThrow(/busy/);
+  });
+});

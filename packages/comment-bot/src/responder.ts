@@ -163,9 +163,24 @@ export async function planReply(input: RespondInput): Promise<ReplyPlan> {
       }
       aiSkipReason = "No AI key configured (set GEMINI_API_KEY), so only keyword comments get replies.";
     } else {
-      const raw = await llm.complete(buildSystemPrompt(comment.platform, library), buildUserPrompt(comment, input.media));
-      const decision = parseAIDecision(raw);
-      if (!decision) {
+      let raw: string | null = null;
+      try {
+        raw = await llm.complete(buildSystemPrompt(comment.platform, library), buildUserPrompt(comment, input.media));
+      } catch (error) {
+        // The AI is busy or down. A keyword still gets its prompt, and a general comment gets one
+        // of the creator's thank-you lines; only a real question has to wait for a retry.
+        if (!match) {
+          if (!isQuestion && templates.generalMode !== "off" && !/https?:\/\/|www\./i.test(text)) {
+            return { action: "GENERAL", publicReply: randomGeneral() };
+          }
+          throw error;
+        }
+        aiSkipReason = (error as Error).message;
+      }
+      const decision = raw === null ? null : parseAIDecision(raw);
+      if (raw === null) {
+        // handled above (keyword without the AI's extra answer)
+      } else if (!decision) {
         aiSkipReason = "AI response was not valid JSON";
       } else if (decision.action === "skip") {
         aiSkipReason = `AI skipped: ${decision.reason ?? "not worth replying to"}`;
