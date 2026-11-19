@@ -13,7 +13,11 @@ export interface TestReplyState {
 
 /** Preview what the bot would post for a comment. Posts nothing. Owner only, so strangers can't spend AI credits. */
 export async function testReply(_prev: TestReplyState, form: FormData): Promise<TestReplyState> {
-  await requireAdmin();
+  try {
+    await requireAdmin();
+  } catch {
+    return { error: "You've been signed out. Reload the page and sign in again." };
+  }
   const text = String(form.get("comment") ?? "").trim();
   const platform = (form.get("platform") === "YOUTUBE" ? "YOUTUBE" : "INSTAGRAM") as Platform;
   if (!text) return { error: "Type a comment to test." };
@@ -27,6 +31,7 @@ export async function testReply(_prev: TestReplyState, form: FormData): Promise<
     });
     return { plan, platform };
   } catch (error) {
+    console.error("[comment-bot] action failed", error);
     return { error: (error as Error).message };
   }
 }
@@ -43,8 +48,8 @@ export async function retryFailedComments(): Promise<void> {
  * calls this once per comment so each result can be shown as it happens).
  */
 export async function processCommentNow(id: string): Promise<ProcessNowResult> {
-  await requireAdmin();
   try {
+    await requireAdmin();
     return await processStoredComment(id);
   } catch (error) {
     return { outcome: "FAILED", error: (error as Error).message };
@@ -58,8 +63,8 @@ export interface TemplatesFormState {
 
 /** Saves the reply wording from the "Reply messages" page. */
 export async function saveTemplates(_prev: TemplatesFormState, form: FormData): Promise<TemplatesFormState> {
-  await requireAdmin();
   try {
+    await requireAdmin();
     const templates = normaliseTemplates({
       igPublicReplies: String(form.get("igPublicReplies") ?? "").split("\n"),
       igDm: String(form.get("igDm") ?? ""),
@@ -80,6 +85,7 @@ export async function saveTemplates(_prev: TemplatesFormState, form: FormData): 
     revalidatePath("/comment-bot");
     return { saved: true };
   } catch (error) {
+    console.error("[comment-bot] action failed", error);
     return { error: (error as Error).message };
   }
 }

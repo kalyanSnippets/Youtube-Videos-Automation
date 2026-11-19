@@ -95,8 +95,8 @@ export async function deleteResource(form: FormData): Promise<void> {
 }
 
 export async function saveSiteSettings(_prev: FormState, form: FormData): Promise<FormState> {
-  await requireAdmin();
   try {
+    await requireAdmin();
     const values = {
       siteName: str(form, "siteName") || "AI with Kalyan",
       tagline: str(form, "tagline"),

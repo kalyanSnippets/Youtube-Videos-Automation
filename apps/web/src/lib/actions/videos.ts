@@ -39,8 +39,8 @@ function optionalUrl(value: string): string | null {
  * Nothing is saved; the text goes into the editor so you can check it before saving.
  */
 export async function importPrompt(form: FormData): Promise<ImportResult> {
-  await requireAdmin();
   try {
+    await requireAdmin();
     const file = form.get("file");
     const docLink = String(form.get("docLink") ?? "").trim();
     if (file instanceof File && file.size > 0) {
@@ -73,13 +73,13 @@ async function legacyResourceClash(keyword: string, watchUrls: string[]): Promis
 
 /** Step 2: save the prompt (and optionally copy it to the same video on the other platform). */
 export async function saveVideo(_prev: VideoFormState, form: FormData): Promise<VideoFormState> {
-  await requireAdmin();
-  await ensureSchemaPatches();
-  const id = String(form.get("id") ?? "");
-  const [video] = await db.select().from(schema.videos).where(eq(schema.videos.id, id));
-  if (!video) return { error: "That video no longer exists. Refresh the page." };
-
   try {
+    await requireAdmin();
+    await ensureSchemaPatches();
+    const id = String(form.get("id") ?? "");
+    const [video] = await db.select().from(schema.videos).where(eq(schema.videos.id, id));
+    if (!video) return { error: "That video no longer exists. Refresh the page." };
+
     const prompt = tidy(String(form.get("prompt") ?? ""));
     const keyword = normaliseKeyword(String(form.get("keyword") ?? "")) || null;
     const resourceTitle = String(form.get("resourceTitle") ?? "").trim().slice(0, 200) || null;
@@ -114,7 +114,9 @@ export async function saveVideo(_prev: VideoFormState, form: FormData): Promise<
     const where = twin ? ` Also added to the ${twin.platform === "INSTAGRAM" ? "Instagram" : "YouTube"} version.` : "";
     return { saved: prompt ? `Saved.${where}` : `Saved (no prompt yet, so it shows "Prompt coming soon").${where}` };
   } catch (error) {
-    return { error: (error as Error).message };
+    console.error("[videos] save failed", error);
+    const message = (error as Error).message;
+    return { error: /not signed in/i.test(message) ? "You've been signed out. Reload the page and sign in again." : `Couldn't save: ${message}` };
   }
 }
 
