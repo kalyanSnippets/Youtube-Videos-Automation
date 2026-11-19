@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 
 export default function CommentBotTestPage() {
   return (
-    <div className="p-6 space-y-6 max-w-4xl">
+    <div className="p-4 sm:p-6 space-y-6 max-w-4xl">
       <BotHeader subtitle="Type a comment and see exactly what the bot would reply. Nothing is posted." />
       <section className="panel p-5">
         <TestReplyForm />

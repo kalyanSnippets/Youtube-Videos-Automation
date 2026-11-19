@@ -27,7 +27,7 @@ export default async function OverviewPage({ params }: { params: Promise<{ id: s
       <div className="lg:col-span-2 space-y-6">
         <div className="panel p-5">
           <h2 className="text-sm font-semibold text-text-dim uppercase tracking-wide mb-3">Project Details</h2>
-          <dl className="grid grid-cols-2 gap-y-3 text-sm">
+          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 text-sm">
             <dt className="text-text-dim">Content type</dt>
             <dd className="capitalize">{project.contentType.replace("_", " ")}</dd>
             <dt className="text-text-dim">Seed idea</dt>

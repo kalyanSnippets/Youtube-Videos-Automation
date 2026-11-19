@@ -21,7 +21,7 @@ export default async function AnalyticsPage({ params }: { params: Promise<{ id: 
   }
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
       <Stat label="Impressions" value={snapshot.impressions} />
       <Stat label="CTR" value={snapshot.ctrPercent ? `${snapshot.ctrPercent}%` : null} />
       <Stat label="First 30s retention" value={snapshot.retentionFirst30sPercent ? `${snapshot.retentionFirst30sPercent}%` : null} />

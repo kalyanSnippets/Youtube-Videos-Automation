@@ -29,7 +29,7 @@ export default async function DashboardPage() {
     .limit(5);
 
   return (
-    <div className="p-6 space-y-8 max-w-[1400px]">
+    <div className="p-4 sm:p-6 space-y-8 max-w-[1400px]">
       <div>
         <h1 className="text-xl font-semibold mb-1">Dashboard</h1>
         <p className="text-sm text-text-dim">{projects.length} active project{projects.length === 1 ? "" : "s"} in your workspace.</p>

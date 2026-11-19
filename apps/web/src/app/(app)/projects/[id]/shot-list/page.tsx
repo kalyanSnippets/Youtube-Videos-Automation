@@ -46,7 +46,7 @@ export default async function ShotListPage({ params }: { params: Promise<{ id: s
                 <Badge variant={item.shotType === "SCREEN_RECORDING" ? "cyan" : "purple"}>{item.shotType.replace("_", " ")}</Badge>
               </div>
               {item.shotType === "SCREEN_RECORDING" ? (
-                <div className="grid grid-cols-2 gap-2 text-xs text-text-dim">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-text-dim">
                   <p>Software: {item.software}</p>
                   <p>Shortcut: {item.shortcut}</p>
                   <p className="col-span-2">Setup: {item.windowSetup}</p>
@@ -55,7 +55,7 @@ export default async function ShotListPage({ params }: { params: Promise<{ id: s
                   <p>Duration: {item.durationSeconds}s</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 gap-2 text-xs text-text-dim">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-text-dim">
                   <p>Tool: {item.toolOrModel}</p>
                   <p>Aspect ratio: {item.aspectRatio}</p>
                   <p className="col-span-2">Prompt: {item.prompt}</p>

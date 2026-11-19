@@ -22,7 +22,7 @@ export function ProjectHeader({ detail }: { detail: ProjectDetail }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-4">
         <Metric label="Completion">
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium">{progress}%</span>

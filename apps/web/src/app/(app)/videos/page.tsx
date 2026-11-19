@@ -70,7 +70,7 @@ export default async function VideosPage() {
   const pickable = videos.filter((v) => !v.hidden);
 
   return (
-    <div className="p-6 space-y-6 max-w-5xl">
+    <div className="p-4 sm:p-6 space-y-6 max-w-5xl">
       <div className="flex flex-wrap items-start gap-3">
         <div className="flex-1 min-w-[240px]">
           <h1 className="text-xl font-semibold mb-1">Videos & prompts</h1>
@@ -79,7 +79,7 @@ export default async function VideosPage() {
             comment bot sends it to anyone who comments the keyword.
           </p>
         </div>
-        <a href="/" target="_blank" className="rounded-lg border border-border px-3.5 py-2 text-sm text-text-dim hover:text-text">View website ↗</a>
+        <a href="/" target="_blank" className="hidden sm:inline-block rounded-lg border border-border px-3.5 py-2 text-sm text-text-dim hover:text-text">View website ↗</a>
       </div>
 
       <div className="flex flex-wrap gap-3">
@@ -116,19 +116,19 @@ export default async function VideosPage() {
             </p>
           </div>
           {oldResources.map((r) => (
-            <form key={r.id} action={moveResourceToVideo} className="flex flex-wrap items-center gap-2 rounded-lg bg-bg-raised/50 p-3">
+            <form key={r.id} action={moveResourceToVideo} className="flex flex-col gap-2 rounded-lg bg-bg-raised/50 p-3 sm:flex-row sm:flex-wrap sm:items-center">
               <input type="hidden" name="resourceId" value={r.id} />
               <span className="min-w-[180px] flex-1 text-sm">
                 <span className="font-medium">{r.title}</span>
                 {r.keywords?.length ? <span className="ml-2 text-xs text-accent-cyan">{r.keywords.join(", ")}</span> : null}
               </span>
-              <select name="videoId" defaultValue="" className={`${inputClass} w-auto max-w-[280px] py-1.5 text-xs`}>
+              <select name="videoId" defaultValue="" className={`${inputClass} w-full sm:w-auto sm:max-w-[280px] py-1.5 text-xs`}>
                 <option value="">YouTube video…</option>
                 {pickable.filter((v) => v.platform === "YOUTUBE").map((v) => (
                   <option key={v.id} value={v.id}>{(cleanTitle(v.title) || v.title).slice(0, 60)}</option>
                 ))}
               </select>
-              <select name="videoId" defaultValue="" className={`${inputClass} w-auto max-w-[280px] py-1.5 text-xs`}>
+              <select name="videoId" defaultValue="" className={`${inputClass} w-full sm:w-auto sm:max-w-[280px] py-1.5 text-xs`}>
                 <option value="">Instagram post… (optional)</option>
                 {pickable.filter((v) => v.platform === "INSTAGRAM").map((v) => (
                   <option key={v.id} value={v.id}>{(cleanTitle(v.title) || v.title).slice(0, 60)}</option>

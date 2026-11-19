@@ -40,7 +40,8 @@ export function VideoList({ videos }: { videos: VideoRowData[] }) {
 
   return (
     <div className="space-y-3">
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-col-reverse gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+        <div className="scroll-row -mx-4 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
         {FILTERS.map((f) => {
           const n = videos.filter(f.test).length;
           if (f.id === "hidden" && !n) return null;
@@ -51,7 +52,7 @@ export function VideoList({ videos }: { videos: VideoRowData[] }) {
                 setFilter(f.id);
                 setPinned(new Set());
               }}
-              className={`rounded-full px-3.5 py-1.5 text-xs border transition ${
+              className={`shrink-0 whitespace-nowrap rounded-full px-3.5 py-2 sm:py-1.5 text-xs border transition ${
                 filter === f.id ? "bg-accent-cyan/10 border-accent-cyan/40 text-accent-cyan" : "border-border text-text-dim hover:text-text"
               }`}
             >
@@ -59,7 +60,8 @@ export function VideoList({ videos }: { videos: VideoRowData[] }) {
             </button>
           );
         })}
-        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search" className="ml-auto w-full sm:w-48 rounded-lg bg-bg-raised border border-border px-3 py-1.5 text-sm" />
+        </div>
+        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search videos" className="sm:ml-auto w-full sm:w-48 rounded-lg bg-bg-raised border border-border px-3 py-2 sm:py-1.5 text-sm" />
       </div>
 
       <div className="panel divide-y divide-border-subtle overflow-hidden">
@@ -70,7 +72,7 @@ export function VideoList({ videos }: { videos: VideoRowData[] }) {
                 <Image src={`/api/thumb/${v.id}`} alt="" fill sizes="80px" className="object-cover" unoptimized />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium line-clamp-1">{v.resourceTitle || v.title}</p>
+                <p className="text-sm font-medium line-clamp-2 sm:line-clamp-1">{v.resourceTitle || v.title}</p>
                 <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-text-dim">
                   <span>{kindLabel(v)}</span>
                   {v.publishedAt && <span>· {new Date(v.publishedAt).toLocaleDateString()}</span>}
@@ -85,7 +87,7 @@ export function VideoList({ videos }: { videos: VideoRowData[] }) {
                     setOpen(open === v.id ? null : v.id);
                     setPinned((prev) => new Set(prev).add(v.id));
                   }}
-                  className={`rounded-lg px-3.5 py-1.5 text-sm font-medium transition ${
+                  className={`whitespace-nowrap rounded-lg px-3 py-2 sm:px-3.5 sm:py-1.5 text-sm font-medium transition ${
                     open === v.id ? "border border-border text-text-dim" : v.prompt ? "border border-border hover:border-accent-cyan/40" : "bg-accent-cyan text-bg"
                   }`}
                 >
@@ -96,7 +98,7 @@ export function VideoList({ videos }: { videos: VideoRowData[] }) {
             {open === v.id && <VideoEditor video={v} onDone={() => setOpen(null)} />}
           </div>
         ))}
-        {!shown.length && <p className="p-6 text-center text-sm text-text-dim">Nothing here. Try another filter.</p>}
+        {!shown.length && <p className="p-4 sm:p-6 text-center text-sm text-text-dim">Nothing here. Try another filter.</p>}
       </div>
     </div>
   );

@@ -80,7 +80,7 @@ export default async function ReferencesPage({ params }: { params: Promise<{ id:
                   </div>
                 </div>
               ) : null}
-              <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                 <Field label="Title logic" value={ref.titleLogic} />
                 <Field label="Thumbnail logic" value={ref.thumbnailLogic} />
                 <Field label="Hook analysis" value={ref.hookAnalysis} />

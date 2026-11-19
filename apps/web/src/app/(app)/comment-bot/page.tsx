@@ -64,14 +64,14 @@ export default async function CommentBotActivityPage() {
   );
 
   return (
-    <div className="p-6 space-y-6 max-w-5xl">
+    <div className="p-4 sm:p-6 space-y-6 max-w-5xl">
       <BotHeader subtitle="Every comment the bot saw, what it replied, and anything that needs a retry." />
 
       <div className="flex flex-wrap items-center gap-2 text-sm">
         {chip(Boolean(yt), yt ? `YouTube: ${yt.accountName}` : "YouTube not connected")}
         {chip(Boolean(ig), ig ? `Instagram: ${ig.accountName}` : "Instagram not connected")}
         {chip(Boolean(llm), llm ? "AI replies on" : "AI off (no key)")}
-        <span className="ml-auto text-text-dim">
+        <span className="w-full sm:w-auto sm:ml-auto text-text-dim">
           Last 24 hours: <span className="text-text font-medium">{stats.REPLIED ?? 0}</span> replied · {stats.SKIPPED ?? 0} no reply ·{" "}
           <span className={stats.FAILED ? "text-status-danger" : ""}>{stats.FAILED ?? 0} failed</span>
         </span>
@@ -100,14 +100,14 @@ export default async function CommentBotActivityPage() {
                 {c.error && (c.status === "FAILED" || isStuck(c)) && <p className="mt-1 text-xs text-status-danger">{c.error}</p>}
                 {isStuck(c) && !c.error && <p className="mt-1 text-xs text-status-danger">The server stopped before the reply was sent. Click Retry.</p>}
               </div>
-              <div className="sm:text-right">
+              <div className="flex flex-wrap items-center gap-2 sm:block sm:text-right">
                 <span className={`badge border ${pill.className}`}>{pill.label}</span>
                 {canSend && <RowSend item={toPending(c)} />}
               </div>
             </div>
           );
         })}
-        {comments.length === 0 && <p className="p-6 text-center text-sm text-text-dim">No comments yet. New comments show up here within a minute.</p>}
+        {comments.length === 0 && <p className="p-4 sm:p-6 text-center text-sm text-text-dim">No comments yet. New comments show up here within a minute.</p>}
       </section>
     </div>
   );

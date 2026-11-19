@@ -65,7 +65,7 @@ export default async function ProductionPage({ params }: { params: Promise<{ id:
                 </div>
               </div>
               <p className="text-sm text-text-dim italic">&ldquo;{scene.narration}&rdquo;</p>
-              <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-sm">
                 <Field label="Story purpose" value={scene.storyPurpose} />
                 <Field label="Viewer must see" value={scene.viewerMustSee} />
                 <Field label="Why this visual" value={scene.whyThisVisual} />

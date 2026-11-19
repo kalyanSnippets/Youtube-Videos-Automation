@@ -18,7 +18,7 @@ export default async function AgentRunsPage() {
   const projectById = new Map(projects.map((p) => [p.id, p]));
 
   return (
-    <div className="p-6 space-y-4 max-w-[1400px]">
+    <div className="p-4 sm:p-6 space-y-4 max-w-[1400px]">
       <div>
         <h1 className="text-xl font-semibold mb-1">Agent Runs</h1>
         <p className="text-sm text-text-dim">Every specialized agent execution across all projects.</p>
@@ -53,7 +53,7 @@ export default async function AgentRunsPage() {
             ))}
           </tbody>
         </table>
-        {runs.length === 0 ? <p className="p-6 text-center text-text-dim text-sm">No agent runs yet.</p> : null}
+        {runs.length === 0 ? <p className="p-4 sm:p-6 text-center text-text-dim text-sm">No agent runs yet.</p> : null}
       </div>
     </div>
   );

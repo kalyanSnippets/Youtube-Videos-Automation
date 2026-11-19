@@ -4,7 +4,7 @@ import type { CurrentUser } from "@/lib/auth";
 
 export function Topbar({ user }: { user: CurrentUser }) {
   return (
-    <header className="h-16 border-b border-border bg-bg-panel flex items-center justify-between px-6 shrink-0">
+    <header className="hidden md:flex h-16 border-b border-border bg-bg-panel items-center justify-between px-6 shrink-0">
       <div />
       <div className="flex items-center gap-3">
         <Link

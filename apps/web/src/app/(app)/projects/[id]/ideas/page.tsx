@@ -65,7 +65,7 @@ function IdeaCard({ idea, projectId }: { idea: typeof schema.videoIdeas.$inferSe
       <p className="text-sm text-text-dim italic">&ldquo;{idea.hook}&rdquo;</p>
       <PresentationModeBadge mode={idea.recommendedPresentationMode} />
 
-      <div className="grid grid-cols-3 gap-2 text-xs">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-xs">
         <Stat label="Trend" value={idea.trendScore} />
         <Stat label="Evergreen" value={idea.evergreenScore} />
         <Stat label="Click" value={idea.clickPotential} />

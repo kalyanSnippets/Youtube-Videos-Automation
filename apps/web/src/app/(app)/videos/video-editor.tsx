@@ -33,7 +33,7 @@ export function VideoEditor({ video, onDone }: { video: VideoRowData; onDone: ()
   return (
     <div className="border-t border-border-subtle bg-bg-raised/40 p-4 sm:p-5 space-y-4">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-xs font-medium text-text-dim">Fill the prompt from:</span>
+        <span className="w-full sm:w-auto text-xs font-medium text-text-dim">Fill the prompt from:</span>
         <button type="button" onClick={() => fileRef.current?.click()} disabled={importing} className="rounded-lg border border-border px-3 py-1.5 text-xs hover:border-accent-cyan/40 disabled:opacity-50">
           📄 A file (.docx, .pdf, .txt, .md)
         </button>
@@ -51,7 +51,7 @@ export function VideoEditor({ video, onDone }: { video: VideoRowData; onDone: ()
             e.target.value = "";
           }}
         />
-        <div className="flex flex-1 min-w-[260px] gap-2">
+        <div className="flex w-full sm:w-auto sm:flex-1 sm:min-w-[260px] gap-2">
           <input value={docLink} onChange={(e) => setDocLink(e.target.value)} placeholder="…or paste a Google Doc link" className={`${inputClass} py-1.5 text-xs`} />
           <button
             type="button"

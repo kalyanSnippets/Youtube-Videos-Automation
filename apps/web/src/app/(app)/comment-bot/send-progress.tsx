@@ -133,7 +133,7 @@ export function RowSend({ item }: { item: PendingComment }) {
           setState({ state: stateOf(r), note: explain(r) });
           router.refresh();
         }}
-        className="rounded-md border border-border px-2.5 py-1 text-xs hover:border-accent-cyan/40 disabled:opacity-50"
+        className="rounded-md border border-border px-3 py-2 sm:px-2.5 sm:py-1 text-xs hover:border-accent-cyan/40 disabled:opacity-50"
       >
         {state?.state === "sending" ? "Sending…" : label}
       </button>

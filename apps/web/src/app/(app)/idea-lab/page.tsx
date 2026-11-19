@@ -18,7 +18,7 @@ export default async function IdeaLabPage() {
   const projectById = new Map(projects.map((p) => [p.id, p]));
 
   return (
-    <div className="p-6 space-y-4 max-w-[1400px]">
+    <div className="p-4 sm:p-6 space-y-4 max-w-[1400px]">
       <div>
         <h1 className="text-xl font-semibold mb-1">Idea Lab</h1>
         <p className="text-sm text-text-dim">Cross-project opportunity research, ranked by overall score.</p>

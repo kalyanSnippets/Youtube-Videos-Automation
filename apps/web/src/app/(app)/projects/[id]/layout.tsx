@@ -16,7 +16,7 @@ export default async function ProjectLayout({
     <div>
       <ProjectHeader detail={detail} />
       <ProjectTabs projectId={id} />
-      <div className="p-6 max-w-[1200px]">{children}</div>
+      <div className="p-4 sm:p-6 max-w-[1200px]">{children}</div>
     </div>
   );
 }

@@ -39,7 +39,7 @@ export default async function ProjectsPage({ searchParams }: { searchParams: Pro
   });
 
   return (
-    <div className="p-6 space-y-6 max-w-[1400px]">
+    <div className="p-4 sm:p-6 space-y-6 max-w-[1400px]">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Projects</h1>
         <Link href="/projects/new" className="text-sm text-accent-cyan hover:underline">

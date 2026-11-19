@@ -43,7 +43,7 @@ export default async function CommentBotSetupPage() {
   );
 
   return (
-    <div className="p-6 space-y-6 max-w-5xl">
+    <div className="p-4 sm:p-6 space-y-6 max-w-5xl">
       <BotHeader subtitle="Connected accounts, the keywords the bot listens for, and the site's settings checklist." />
 
       <div className="grid gap-4 md:grid-cols-3">

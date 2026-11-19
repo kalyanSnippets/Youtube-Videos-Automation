@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export default async function ReplyTemplatesPage() {
   const settings = await getSiteSettings();
   return (
-    <div className="p-6 space-y-6 max-w-6xl">
+    <div className="p-4 sm:p-6 space-y-6 max-w-6xl">
       <BotHeader subtitle="Choose what the bot says. Pick a ready-made style or write your own, and check the preview." />
       <section className="panel p-5 space-y-3">
         <h2 className="font-semibold">How replies work</h2>

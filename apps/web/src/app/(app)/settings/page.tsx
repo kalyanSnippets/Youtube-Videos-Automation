@@ -43,7 +43,7 @@ export default async function SettingsPage() {
   };
 
   return (
-    <div className="p-6 space-y-8 max-w-3xl">
+    <div className="p-4 sm:p-6 space-y-8 max-w-3xl">
       <div>
         <h1 className="text-xl font-semibold mb-1">Settings</h1>
         <p className="text-sm text-text-dim">Your public website, the comment bot's notes about you, and the studio's channel profile.</p>
@@ -61,7 +61,7 @@ export default async function SettingsPage() {
         <form action={updateChannelProfile} className="panel p-6 space-y-4">
           <input type="hidden" name="workspaceId" value={user.workspaceId} />
           <h2 className="text-sm font-semibold text-text-dim uppercase tracking-wide">Channel Profile</h2>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <TextField label="Niche" name="niche" defaultValue={profile.niche} />
             <TextField label="Format" name="format" defaultValue={profile.format} />
             <TextField label="Audience" name="audience" defaultValue={profile.audience} />
@@ -91,7 +91,7 @@ export default async function SettingsPage() {
 
       <div className="panel p-6 space-y-3">
         <h2 className="text-sm font-semibold text-text-dim uppercase tracking-wide">Integrations</h2>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {Object.entries(integrationStatus).map(([service, status]) => (
             <div key={service} className="flex items-center justify-between rounded-lg border border-border-subtle bg-bg-raised px-3 py-2.5">
               <span className="text-sm">{INTEGRATION_LABELS[service]}</span>

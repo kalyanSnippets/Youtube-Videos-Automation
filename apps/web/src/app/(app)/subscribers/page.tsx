@@ -5,7 +5,7 @@ import { formatRelativeTime } from "@/lib/utils";
 export default async function SubscribersPage() {
   const rows = await db.select().from(schema.newsletterSubscribers).orderBy(desc(schema.newsletterSubscribers.createdAt)).limit(500);
   return (
-    <div className="p-6 space-y-4 max-w-4xl">
+    <div className="p-4 sm:p-6 space-y-4 max-w-4xl">
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex-1 min-w-[240px]">
           <h1 className="text-xl font-semibold mb-1">Subscribers</h1>

@@ -5,7 +5,7 @@ export default async function MotionTemplatesPage() {
   const templates = await db.select().from(schema.motionTemplates).orderBy(schema.motionTemplates.category);
 
   return (
-    <div className="p-6 space-y-4 max-w-[1400px]">
+    <div className="p-4 sm:p-6 space-y-4 max-w-[1400px]">
       <div>
         <h1 className="text-xl font-semibold mb-1">Motion Templates</h1>
         <p className="text-sm text-text-dim">Reusable Remotion component catalog. The Edit Director selects component keys from here.</p>

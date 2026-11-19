@@ -77,7 +77,7 @@ function ArollShotCard({ shot, projectId }: { shot: typeof schema.arollShots.$in
         </div>
       </div>
       <p className="text-sm text-text-dim italic">&ldquo;{shot.narration}&rdquo;</p>
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-2 text-sm">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-2 text-sm">
         <Field label="Shot" value={shot.shotType} />
         <Field label="Camera" value={shot.cameraPosition} />
         <Field label="Framing" value={shot.framing} />

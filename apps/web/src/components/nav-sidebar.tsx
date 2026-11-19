@@ -6,7 +6,7 @@ import { LayoutDashboard, FolderKanban, Lightbulb, Bot, Clapperboard, MessagesSq
 import { cn } from "@/lib/utils";
 
 /** Grouped so the everyday creator tools are on top and the video-production studio is separate. */
-const NAV_GROUPS: { title: string; items: { href: string; label: string; icon: typeof Film }[] }[] = [
+export const NAV_GROUPS: { title: string; items: { href: string; label: string; icon: typeof Film }[] }[] = [
   {
     title: "Channel",
     items: [
@@ -31,7 +31,7 @@ const NAV_GROUPS: { title: string; items: { href: string; label: string; icon: t
 export function NavSidebar() {
   const pathname = usePathname();
   return (
-    <aside className="w-60 shrink-0 border-r border-border bg-bg-panel flex flex-col">
+    <aside className="hidden md:flex w-60 shrink-0 border-r border-border bg-bg-panel flex-col">
       <div className="h-16 flex items-center gap-2 px-5 border-b border-border">
         <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-accent-cyan to-accent-purple" />
         <span className="font-semibold text-sm">YouTube Agent OS</span>
