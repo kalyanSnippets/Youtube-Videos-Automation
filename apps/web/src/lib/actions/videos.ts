@@ -112,7 +112,12 @@ export async function saveVideo(_prev: VideoFormState, form: FormData): Promise<
     if (twin) await db.update(schema.videos).set(fields).where(eq(schema.videos.id, twin.id));
     refresh();
     const where = twin ? ` Also added to the ${twin.platform === "INSTAGRAM" ? "Instagram" : "YouTube"} version.` : "";
-    return { saved: prompt ? `Saved.${where}` : `Saved (no prompt yet, so it shows "Prompt coming soon").${where}` };
+    if (prompt) return { saved: `Saved.${where}` };
+    return {
+      saved: keyword
+        ? `Saved. Comments with ${keyword} get the link to this video's page now; add the prompt when it's ready.${where}`
+        : `Saved (no prompt yet, so it shows "Prompt coming soon").${where}`,
+    };
   } catch (error) {
     console.error("[videos] save failed", error);
     const message = (error as Error).message;

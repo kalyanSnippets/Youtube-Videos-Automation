@@ -19,6 +19,7 @@ const SAMPLE = {
   prompt: "1️⃣ CODING: \"You are a senior software engineer. Here is my project: [describe it]…\"\n2️⃣ DATA: \"You are a data analyst…\"",
   link: "https://aiwithkalyan.netlify.app/r/fable",
   video: "https://youtu.be/abc123",
+  site: "https://aiwithkalyan.com",
 };
 
 function Preview({ label, text }: { label: string; text: string }) {

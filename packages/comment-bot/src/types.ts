@@ -14,6 +14,8 @@ export interface LibraryEntry {
   url?: string;
   /** Video/post ids this entry belongs to. When two entries share a keyword, a comment on one of these wins. */
   mediaIds?: string[];
+  /** Keyword is set but the prompt isn't added yet: reply with the page link and "coming soon". */
+  comingSoon?: boolean;
 }
 
 export interface PromptLibrary {
@@ -24,6 +26,8 @@ export interface PromptLibrary {
   warnings: string[];
   /** Reply wording from the admin "Reply messages" page; defaults when absent. */
   templates?: import("./templates").ReplyTemplates;
+  /** Home page of the public site, for {site} in messages. */
+  siteUrl?: string;
 }
 
 /** A comment normalised across platforms. */

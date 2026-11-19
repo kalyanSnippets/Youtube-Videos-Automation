@@ -10,6 +10,9 @@ const EXAMPLES = ["FABLE", "nice content bro 🔥", "what mic do you use?", "FAB
 function describe(state: TestReplyState): string {
   const p = state.plan!;
   const where = state.platform === "INSTAGRAM" ? "Instagram" : "YouTube";
+  if (p.action === "KEYWORD" && !p.privateReply && state.platform === "INSTAGRAM") {
+    return `Keyword ${p.matchedKeyword}: the prompt isn't added yet, so it replies with the page link ("coming soon").`;
+  }
   switch (p.action) {
     case "KEYWORD":
       return state.platform === "INSTAGRAM"

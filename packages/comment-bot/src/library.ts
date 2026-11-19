@@ -26,15 +26,17 @@ export function cleanVideoTitle(title: string): string {
 /** Videos that have both a keyword and a prompt become keyword entries. The bot links to the video's page on the site. */
 export function videosToEntries(rows: VideoRow[], base = siteBaseUrl()): LibraryEntry[] {
   return rows
-    .filter((v) => !v.hidden && v.keyword && v.prompt)
+    // A keyword counts as soon as it's set, even before the prompt is added (then it's "coming soon").
+    .filter((v) => !v.hidden && v.keyword)
     .map((v) => ({
       keyword: v.keyword!,
       keywords: [v.keyword!],
       title: v.resourceTitle?.trim() || cleanVideoTitle(v.title),
       link: v.watchUrl,
-      message: v.prompt!,
+      message: v.prompt ?? "",
       url: videoPageUrl(v.slug, base),
       mediaIds: [v.externalId],
+      ...(v.prompt ? {} : { comingSoon: true }),
     }));
 }
 
@@ -83,7 +85,7 @@ export async function loadPromptLibrary(options: { force?: boolean } = {}): Prom
     db
       .select()
       .from(schema.videos)
-      .where(and(eq(schema.videos.hidden, false), isNotNull(schema.videos.keyword), isNotNull(schema.videos.prompt)))
+      .where(and(eq(schema.videos.hidden, false), isNotNull(schema.videos.keyword)))
       .catch(() => [] as VideoRow[]), // table not migrated yet: keep working with resources only
   ]);
   const base = siteBaseUrl();
@@ -94,7 +96,7 @@ export async function loadPromptLibrary(options: { force?: boolean } = {}): Prom
   const entries = [...extra, ...resourceLib.entries];
   const warnings = resourceLib.warnings.filter((w) => !w.startsWith("No published resources"));
   if (!entries.length) warnings.push("No keywords yet: upload a prompt to a video, or add a resource.");
-  const library = { about: resourceLib.about, entries, warnings, templates: normaliseTemplates(settings[0]?.botTemplates) };
+  const library = { about: resourceLib.about, entries, warnings, templates: normaliseTemplates(settings[0]?.botTemplates), siteUrl: base };
   cache = { at: Date.now(), library };
   return library;
 }

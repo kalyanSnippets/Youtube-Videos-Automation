@@ -15,7 +15,7 @@ export default async function ReplyTemplatesPage() {
         <div className="grid gap-3 md:grid-cols-3 text-sm">
           <div className="panel-raised p-3 space-y-1">
             <p className="font-medium">1. Keyword comments</p>
-            <p className="text-text-dim">“FABLE” on a video with that keyword. Instagram: the prompt and its link go by <b>DM</b>, and a short public reply says it&apos;s sent. YouTube (no DMs): a short public reply with the <b>link to the prompt&apos;s page</b> on your site.</p>
+            <p className="text-text-dim">“FABLE” on a video with that keyword. Instagram: a short public reply says &ldquo;check your DMs&rdquo;, and the <b>DM</b> has the prompt, its link and your website. YouTube (no DMs): a public reply with the <b>link to the prompt&apos;s page</b>. A keyword counts as soon as it&apos;s set on a video; until the prompt is added they get the page link with &ldquo;coming soon&rdquo;.</p>
           </div>
           <div className="panel-raised p-3 space-y-1">
             <p className="font-medium">2. Questions</p>
@@ -23,7 +23,7 @@ export default async function ReplyTemplatesPage() {
           </div>
           <div className="panel-raised p-3 space-y-1">
             <p className="font-medium">3. General comments</p>
-            <p className="text-text-dim">“Nice content!” Your choice below: an AI thank-you, one of your own thank-you lines, or no reply. Spam and abuse are always skipped.</p>
+            <p className="text-text-dim">“Nice content!” By default: “Thank you so much, @name! 🙌” (your thank-you lines below). Or let the AI write each one, or don&apos;t reply. Spam and abuse are always skipped.</p>
           </div>
         </div>
       </section>

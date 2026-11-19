@@ -23,6 +23,8 @@ function Status({ v }: { v: VideoRowData }) {
   if (v.prompt && v.keyword)
     return <span className="badge border bg-status-success/10 text-status-success border-status-success/30">✓ Prompt · {v.keyword}</span>;
   if (v.prompt) return <span className="badge border bg-status-success/10 text-status-success border-status-success/30">✓ Prompt (no keyword)</span>;
+  if (v.keyword)
+    return <span className="badge border bg-status-warning/10 text-status-warning border-status-warning/30">{v.keyword} · add the prompt</span>;
   return <span className="badge border bg-status-warning/10 text-status-warning border-status-warning/30">Needs a prompt</span>;
 }
 

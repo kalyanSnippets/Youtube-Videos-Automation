@@ -1,5 +1,5 @@
 import type { LLM } from "./llm";
-import { DEFAULT_TEMPLATES, YOUTUBE_PROMPT_FALLBACK, fillTemplate, renderDelivery, type ReplyTemplates, type TemplateVars } from "./templates";
+import { COMING_SOON_REPLY, DEFAULT_TEMPLATES, YOUTUBE_PROMPT_FALLBACK, fillTemplate, renderDelivery, type ReplyTemplates, type TemplateVars } from "./templates";
 import { looksLikeQuestion, matchKeyword } from "./matcher";
 import type { IncomingComment, LibraryEntry, MediaContext, Platform, PromptLibrary, ReplyPlan } from "./types";
 
@@ -26,8 +26,10 @@ function clip(text: string, max: number): string {
   return `${text.slice(0, max - 1).trimEnd()}…`;
 }
 
+let currentSite: string | undefined;
+
 function deliveryVars(entry: LibraryEntry, name: string | undefined): TemplateVars {
-  return { name, title: entry.title, keyword: entry.keyword, prompt: entry.message, link: entry.url, video: entry.link };
+  return { name, title: entry.title, keyword: entry.keyword, prompt: entry.message, link: entry.url, video: entry.link, site: currentSite };
 }
 
 export function buildInstagramDM(entry: LibraryEntry, name: string | undefined, templates: ReplyTemplates = DEFAULT_TEMPLATES): string {
@@ -133,6 +135,7 @@ export async function planReply(input: RespondInput): Promise<ReplyPlan> {
   const { comment, library, llm } = input;
   const name = comment.authorName?.replace(/^@/, "");
   const templates = library.templates ?? DEFAULT_TEMPLATES;
+  currentSite = library.siteUrl;
   const text = comment.text.trim();
   if (!text) return { action: "NONE", skipReason: "Empty comment" };
 
@@ -201,6 +204,15 @@ export async function planReply(input: RespondInput): Promise<ReplyPlan> {
   }
 
   const entry = match?.entry ?? aiKeywordEntry;
+  if (entry?.comingSoon) {
+    // Keyword set, prompt not added yet: a public reply with the page link (no DM, there's nothing to send).
+    const note = fillTemplate(COMING_SOON_REPLY, { name, title: entry.title, link: entry.url ?? entry.link });
+    return {
+      action: "KEYWORD",
+      matchedKeyword: entry.keyword,
+      publicReply: clip(aiReply ? `${aiReply}\n\n${note}` : note, comment.platform === "INSTAGRAM" ? INSTAGRAM_COMMENT_LIMIT : YOUTUBE_COMMENT_LIMIT),
+    };
+  }
   if (entry) {
     const action: ReplyPlan["action"] = aiReply ? "KEYWORD_AND_ANSWER" : "KEYWORD";
     if (comment.platform === "INSTAGRAM") {

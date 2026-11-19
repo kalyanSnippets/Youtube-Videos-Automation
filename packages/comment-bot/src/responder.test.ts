@@ -1,12 +1,14 @@
 import { describe, expect, it } from "vitest";
 import type { LLM } from "./llm";
 import { buildInstagramDM, INSTAGRAM_DM_LIMIT, parseAIDecision, planReply, sanitiseAIReply } from "./responder";
+import { DEFAULT_TEMPLATES } from "./templates";
 import type { IncomingComment, PromptLibrary } from "./types";
 
 const library: PromptLibrary = {
   about: "AI tutorials channel.",
   warnings: [],
   entries: [{ keyword: "FABLE", keywords: ["FABLE"], title: "Fable prompts", link: "https://ex.com/f", message: "Do the thing.", url: "https://site.example/r/fable" }],
+  siteUrl: "https://site.example",
 };
 
 function fakeLLM(response: object | string): LLM & { calls: number } {
@@ -30,7 +32,7 @@ describe("planReply", () => {
     const plan = await planReply({ comment: ig("FABLE"), library, llm, pick: () => 0 });
     expect(plan.action).toBe("KEYWORD");
     expect(plan.privateReply).toContain("Do the thing.");
-    expect(plan.privateReply).toContain("https://ex.com/f");
+    expect(plan.privateReply).toContain("More free prompts and videos: https://site.example");
     expect(plan.privateReply).toContain("Copy it here: https://site.example/r/fable");
     expect(plan.publicReply).toBe("Sent! Check your DMs 📩");
     expect(llm.calls).toBe(0);
@@ -40,7 +42,7 @@ describe("planReply", () => {
     const plan = await planReply({ comment: yt("fable!"), library, llm: null });
     expect(plan.action).toBe("KEYWORD");
     expect(plan.privateReply).toBeUndefined();
-    expect(plan.publicReply).toBe("Here you go @ravi 👇 The Fable prompts is ready to copy on my site:\nhttps://site.example/r/fable");
+    expect(plan.publicReply).toBe("Here you go @ravi 👇 You can find the prompt here:\nhttps://site.example/r/fable");
     expect(plan.publicReply).not.toContain("Do the thing.");
   });
 
@@ -81,8 +83,23 @@ describe("planReply", () => {
     expect(plan.skipReason).toMatch(/self promo/);
   });
 
-  it("without an AI key, non-keyword comments are skipped with a reason", async () => {
-    const plan = await planReply({ comment: yt("great video"), library, llm: null });
+  it("by default a general comment gets 'Thank you so much, @name!'", async () => {
+    const plan = await planReply({ comment: yt("nice content"), library, llm: null, pick: () => 0 });
+    expect(plan).toEqual({ action: "GENERAL", publicReply: "Thank you so much, @ravi! 🙌" });
+  });
+
+  it("a keyword whose prompt isn't added yet still gets the page link", async () => {
+    const soon = { ...library, entries: [{ keyword: "GAME", keywords: ["GAME"], title: "Game", message: "", url: "https://site.example/v/game", comingSoon: true }] };
+    const plan = await planReply({ comment: yt("Game"), library: soon, llm: null });
+    expect(plan.action).toBe("KEYWORD");
+    expect(plan.matchedKeyword).toBe("GAME");
+    expect(plan.publicReply).toContain("https://site.example/v/game");
+    expect(plan.privateReply).toBeUndefined();
+  });
+
+  it("without an AI key and with AI thank-yous chosen, general comments are skipped with a reason", async () => {
+    const aiMode = { ...library, templates: { ...DEFAULT_TEMPLATES, generalMode: "ai" as const } };
+    const plan = await planReply({ comment: yt("great video"), library: aiMode, llm: null });
     expect(plan.action).toBe("NONE");
     expect(plan.skipReason).toMatch(/GEMINI_API_KEY/);
   });

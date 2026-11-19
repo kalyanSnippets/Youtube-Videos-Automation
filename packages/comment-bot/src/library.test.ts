@@ -47,7 +47,11 @@ describe("videosToEntries", () => {
       mediaIds: ["abc"],
     });
   });
-  it("skips videos without a prompt, without a keyword, or that are hidden", () => {
-    expect(videosToEntries([video({ prompt: null }), video({ id: "2", keyword: null }), video({ id: "3", hidden: true })], "https://s")).toEqual([]);
+  it("skips videos without a keyword or that are hidden", () => {
+    expect(videosToEntries([video({ id: "2", keyword: null }), video({ id: "3", hidden: true })], "https://s")).toEqual([]);
+  });
+  it("a keyword without a prompt still counts, marked coming soon", () => {
+    const [entry] = videosToEntries([video({ prompt: null })], "https://s");
+    expect(entry).toMatchObject({ keyword: "EDIT", message: "", comingSoon: true, url: "https://s/v/great-video-abc123" });
   });
 });
