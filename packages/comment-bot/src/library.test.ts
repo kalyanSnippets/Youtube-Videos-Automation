@@ -55,3 +55,11 @@ describe("videosToEntries", () => {
     expect(entry).toMatchObject({ keyword: "EDIT", message: "", comingSoon: true, url: "https://s/v/great-video-abc123" });
   });
 });
+
+describe("a keyword box saved as 'GAME, GAME'", () => {
+  it("becomes one GAME keyword, so a comment saying 'Game' matches", () => {
+    const [entry] = videosToEntries([video({ keyword: "GAME, GAME" })], "https://s");
+    expect(entry?.keywords).toEqual(["GAME"]);
+    expect(entry?.keyword).toBe("GAME");
+  });
+});

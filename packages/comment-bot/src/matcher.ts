@@ -9,6 +9,11 @@ export function normaliseKeyword(raw: string): string {
     .toUpperCase();
 }
 
+/** "game, GAME / #Games" -> ["GAME", "GAMES"]. A keyword box may hold several words, separated by commas. */
+export function splitKeywords(raw: string | null | undefined): string[] {
+  return [...new Set((raw ?? "").split(/[,/|\n;]+/).map(normaliseKeyword).filter(Boolean))];
+}
+
 function escapeRegExp(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
@@ -24,8 +29,9 @@ export function matchKeyword(commentText: string, entries: LibraryEntry[]): { en
   let best: { entry: LibraryEntry; keyword: string; index: number } | null = null;
   for (const entry of entries) {
     for (const keyword of entry.keywords) {
+      // Any capitalisation, an optional # in front, and a plural ("games") all count.
       const pattern = keyword.split(" ").map(escapeRegExp).join("\\s+");
-      const re = new RegExp(`(?<![\\p{L}\\p{N}_])#?${pattern}(?![\\p{L}\\p{N}_])`, "iu");
+      const re = new RegExp(`(?<![\\p{L}\\p{N}_])#?${pattern}(?:e?s)?(?![\\p{L}\\p{N}_])`, "iu");
       const m = re.exec(text);
       if (m && (!best || m.index < best.index)) best = { entry, keyword, index: m.index };
     }

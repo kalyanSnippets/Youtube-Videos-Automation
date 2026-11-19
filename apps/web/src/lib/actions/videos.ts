@@ -3,7 +3,7 @@
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { db, ensureSchemaPatches, schema } from "@yaos/database";
-import { clearPromptLibraryCache, normaliseKeyword } from "@yaos/comment-bot";
+import { clearPromptLibraryCache, splitKeywords } from "@yaos/comment-bot";
 import { requireAdmin } from "@/lib/admin";
 import { fetchGoogleDoc, googleDocId, readUpload, takeKeywordLine, tidy } from "@/lib/prompt-import";
 import { runVideoSync, type SyncReport } from "@/lib/video-sync";
@@ -81,7 +81,9 @@ export async function saveVideo(_prev: VideoFormState, form: FormData): Promise<
     if (!video) return { error: "That video no longer exists. Refresh the page." };
 
     const prompt = tidy(String(form.get("prompt") ?? ""));
-    const keyword = normaliseKeyword(String(form.get("keyword") ?? "")) || null;
+    // Several keywords may be typed, separated by commas: store them cleaned and de-duplicated ("GAME, GAMES").
+    const keywordList = splitKeywords(String(form.get("keyword") ?? ""));
+    const keyword = keywordList.length ? keywordList.join(", ") : null;
     const resourceTitle = String(form.get("resourceTitle") ?? "").trim().slice(0, 200) || null;
     let extraLink: string | null;
     try {
@@ -93,8 +95,8 @@ export async function saveVideo(_prev: VideoFormState, form: FormData): Promise<
     const twinId = String(form.get("twinId") ?? "");
     const [twin] = twinId ? await db.select().from(schema.videos).where(eq(schema.videos.id, twinId)) : [];
 
-    if (keyword) {
-      const clash = await legacyResourceClash(keyword, [video.watchUrl, twin?.watchUrl ?? ""].filter(Boolean));
+    for (const kw of keywordList) {
+      const clash = await legacyResourceClash(kw, [video.watchUrl, twin?.watchUrl ?? ""].filter(Boolean));
       if (clash) return { error: clash };
     }
 

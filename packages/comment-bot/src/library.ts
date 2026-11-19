@@ -1,6 +1,7 @@
 import { and, asc, eq, isNotNull } from "drizzle-orm";
 import { db, ensureSchemaPatches, schema } from "@yaos/database";
 import { normaliseTemplates } from "./templates";
+import { splitKeywords } from "./matcher";
 import type { LibraryEntry, PromptLibrary } from "./types";
 
 /** Public base URL of the site (Netlify sets URL on every deploy). */
@@ -27,10 +28,10 @@ export function cleanVideoTitle(title: string): string {
 export function videosToEntries(rows: VideoRow[], base = siteBaseUrl()): LibraryEntry[] {
   return rows
     // A keyword counts as soon as it's set, even before the prompt is added (then it's "coming soon").
-    .filter((v) => !v.hidden && v.keyword)
+    .filter((v) => !v.hidden && splitKeywords(v.keyword).length > 0)
     .map((v) => ({
-      keyword: v.keyword!,
-      keywords: [v.keyword!],
+      keyword: splitKeywords(v.keyword)[0] ?? v.keyword!,
+      keywords: splitKeywords(v.keyword),
       title: v.resourceTitle?.trim() || cleanVideoTitle(v.title),
       link: v.watchUrl,
       message: v.prompt ?? "",

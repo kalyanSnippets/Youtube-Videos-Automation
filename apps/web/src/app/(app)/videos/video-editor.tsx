@@ -91,8 +91,8 @@ export function VideoEditor({ video, onDone }: { video: VideoRowData; onDone: ()
         <div className="grid gap-4 sm:grid-cols-[180px_1fr]">
           <label className="block space-y-1">
             <span className="text-xs font-medium">Keyword</span>
-            <input name="keyword" value={keyword} onChange={(e) => setKeyword(e.target.value)} placeholder="e.g. FABLE" className={inputClass} />
-            <span className="block text-[11px] text-text-faint">Viewers comment this word to get the prompt.</span>
+            <input name="keyword" value={keyword} onChange={(e) => setKeyword(e.target.value)} placeholder="e.g. GAME" className={inputClass} />
+            <span className="block text-[11px] text-text-faint">The word viewers comment, in any case (game, Game, GAME). Several? Separate with commas.</span>
           </label>
           <label className="block space-y-1">
             <span className="text-xs font-medium">Prompt name (optional)</span>

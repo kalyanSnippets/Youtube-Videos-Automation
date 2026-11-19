@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { looksLikeQuestion, matchKeyword, normaliseKeyword } from "./matcher";
+import { looksLikeQuestion, matchKeyword, normaliseKeyword, splitKeywords } from "./matcher";
 import type { LibraryEntry } from "./types";
 
 const entries: LibraryEntry[] = [
@@ -11,7 +11,7 @@ describe("matchKeyword", () => {
   it.each(["FABLE", "fable", "Fable!!", "#fable please 🙏", "pls send FABLE5", "🔥fable🔥"])("matches %s", (c) => {
     expect(matchKeyword(c, entries)).not.toBeNull();
   });
-  it.each(["fables are fun", "unfabled", "great video", ""])("does not match %s", (c) => {
+  it.each(["unfabled", "fabulous work", "great video", ""])("does not match %s", (c) => {
     expect(matchKeyword(c, entries)).toBeNull();
   });
   it("matches multi-word keywords across extra spaces", () => {
@@ -33,5 +33,24 @@ describe("normaliseKeyword", () => {
   it("cleans keywords typed in the editor", () => {
     expect(normaliseKeyword("  #fable! ")).toBe("FABLE");
     expect(normaliseKeyword("claude   code")).toBe("CLAUDE CODE");
+  });
+});
+
+describe("keywords typed in any case", () => {
+  const game: LibraryEntry[] = [{ keyword: "GAME", keywords: ["GAME"], title: "Game", message: "PROMPT" }];
+  it.each(["Game", "game", "GAME", "gAmE", "#game", "game 🔥", "GAME!!", "Games", "send me the game prompt pls"])("%s matches GAME", (c) => {
+    expect(matchKeyword(c, game)?.entry.keyword).toBe("GAME");
+  });
+  it.each(["nice", "not bad", "great content", "gamer life", "endgame"])("%s does not match GAME", (c) => {
+    expect(matchKeyword(c, game)).toBeNull();
+  });
+});
+
+describe("splitKeywords", () => {
+  it("splits, cleans and de-duplicates a keyword box", () => {
+    expect(splitKeywords("GAME, GAME")).toEqual(["GAME"]);
+    expect(splitKeywords("game, #Games / my game")).toEqual(["GAME", "GAMES", "MY GAME"]);
+    expect(splitKeywords("")).toEqual([]);
+    expect(splitKeywords(null)).toEqual([]);
   });
 });
