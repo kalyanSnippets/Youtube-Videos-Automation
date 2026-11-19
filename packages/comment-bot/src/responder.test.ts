@@ -92,6 +92,7 @@ describe("safety helpers", () => {
   it("keeps long prompts inside Instagram's DM limit with a link to the full page", () => {
     const dm = buildInstagramDM({ keyword: "X", keywords: ["X"], title: "Big", message: "a".repeat(5000), url: "https://site.example/r/big" }, "ravi");
     expect(dm.length).toBeLessThanOrEqual(INSTAGRAM_DM_LIMIT);
-    expect(dm).toContain("Full prompt here 👉 https://site.example/r/big");
+    expect(dm).toContain("https://site.example/r/big");
+    expect(dm).toContain("…");
   });
 });

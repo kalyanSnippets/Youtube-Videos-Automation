@@ -1,4 +1,5 @@
 import type { LLM } from "./llm";
+import { DEFAULT_TEMPLATES, fillTemplate, renderDelivery, type ReplyTemplates, type TemplateVars } from "./templates";
 import { looksLikeQuestion, matchKeyword } from "./matcher";
 import type { IncomingComment, LibraryEntry, MediaContext, Platform, PromptLibrary, ReplyPlan } from "./types";
 
@@ -20,51 +21,21 @@ export interface RespondInput {
   pick?: (n: number) => number;
 }
 
-const IG_PUBLIC_VARIANTS = [
-  "Sent! Check your DMs 📩",
-  "Just sent it to your DMs, {name} 🙌",
-  "Done! The {title} is in your DMs 📬",
-  "Check your inbox, {name}! Sent it over 🚀",
-  "It's in your DMs ✅ Enjoy!",
-];
-
-function fill(template: string, vars: { name?: string; title: string }): string {
-  return template
-    .replace("{name}", vars.name ? `@${vars.name}` : "friend")
-    .replace("{title}", vars.title)
-    .replace(/\s+,/g, ",")
-    .trim();
-}
-
 function clip(text: string, max: number): string {
   if (text.length <= max) return text;
   return `${text.slice(0, max - 1).trimEnd()}…`;
 }
 
-function deliveryFooter(entry: LibraryEntry): string {
-  const lines = [];
-  if (entry.url) lines.push(`📄 Copy it here: ${entry.url}`);
-  if (entry.link && entry.link !== entry.url) lines.push(`🔗 ${entry.link}`);
-  return lines.length ? `\n\n${lines.join("\n")}` : "";
+function deliveryVars(entry: LibraryEntry, name: string | undefined): TemplateVars {
+  return { name, title: entry.title, keyword: entry.keyword, prompt: entry.message, link: entry.url, video: entry.link };
 }
 
-export function buildInstagramDM(entry: LibraryEntry, name: string | undefined): string {
-  const greeting = `Hey${name ? ` @${name}` : ""}! Here's the ${entry.title} you asked for 👇\n\n`;
-  const footer = deliveryFooter(entry);
-  const full = `${greeting}${entry.message}${footer}`;
-  if (full.length <= INSTAGRAM_DM_LIMIT) return full;
-  // Too long for one DM, and Instagram only allows one private reply per comment, so send the
-  // start plus the link to the full page.
-  const fullLink = entry.url ?? entry.link;
-  const tail = fullLink ? `…\n\n📄 Full prompt here 👉 ${fullLink}` : "…";
-  const room = INSTAGRAM_DM_LIMIT - greeting.length - tail.length;
-  return `${greeting}${entry.message.slice(0, Math.max(0, room)).trimEnd()}${tail}`;
+export function buildInstagramDM(entry: LibraryEntry, name: string | undefined, templates: ReplyTemplates = DEFAULT_TEMPLATES): string {
+  return renderDelivery(templates.igDm, deliveryVars(entry, name), INSTAGRAM_DM_LIMIT);
 }
 
-export function buildYouTubeKeywordReply(entry: LibraryEntry, name: string | undefined): string {
-  const head = `Here you go${name ? ` ${name.startsWith("@") ? name : `@${name}`}` : ""} 👇 ${entry.title}\n\n`;
-  const footer = deliveryFooter(entry);
-  return clip(`${head}${entry.message}`, YOUTUBE_COMMENT_LIMIT - footer.length) + footer;
+export function buildYouTubeKeywordReply(entry: LibraryEntry, name: string | undefined, templates: ReplyTemplates = DEFAULT_TEMPLATES): string {
+  return renderDelivery(templates.youtubeKeywordReply, deliveryVars(entry, name), YOUTUBE_COMMENT_LIMIT);
 }
 
 interface AIDecision {
@@ -88,7 +59,7 @@ export function buildSystemPrompt(platform: Platform, library: PromptLibrary): s
     keywordList,
     "",
     "Rules:",
-    "- Reply in English, in a warm, casual, helpful creator voice. 1-3 short sentences, under 400 characters. At most one emoji.",
+    `- Reply in English. Style: ${(library.templates ?? DEFAULT_TEMPLATES).aiStyle} Always under 400 characters.`,
     "- Answer the actual question using only the notes and the video details given. If you don't know, say so honestly and suggest checking the description or that it may be covered in a future video. Never invent facts, prices, dates, links or promises.",
     "- Don't include links. Don't use hashtags. Don't ask for likes or subscribes unless it fits naturally.",
     "- If the viewer asks for a prompt, template or resource that matches one of the keywords above, set \"keyword\" to that keyword (they will be sent it automatically) and keep the reply short.",
@@ -156,6 +127,7 @@ function pickIndex(n: number, pick?: (n: number) => number): number {
 export async function planReply(input: RespondInput): Promise<ReplyPlan> {
   const { comment, library, llm } = input;
   const name = comment.authorName?.replace(/^@/, "");
+  const templates = library.templates ?? DEFAULT_TEMPLATES;
   const text = comment.text.trim();
   if (!text) return { action: "NONE", skipReason: "Empty comment" };
 
@@ -191,15 +163,16 @@ export async function planReply(input: RespondInput): Promise<ReplyPlan> {
   if (entry) {
     const action: ReplyPlan["action"] = aiReply ? "KEYWORD_AND_ANSWER" : "KEYWORD";
     if (comment.platform === "INSTAGRAM") {
-      const note = fill(IG_PUBLIC_VARIANTS[pickIndex(IG_PUBLIC_VARIANTS.length, input.pick)]!, { name, title: entry.title });
+      const variants = templates.igPublicReplies.length ? templates.igPublicReplies : DEFAULT_TEMPLATES.igPublicReplies;
+      const note = fillTemplate(variants[pickIndex(variants.length, input.pick)]!, { name, title: entry.title, keyword: entry.keyword });
       return {
         action,
         matchedKeyword: entry.keyword,
-        privateReply: buildInstagramDM(entry, name),
+        privateReply: buildInstagramDM(entry, name, templates),
         publicReply: clip(aiReply ? `${aiReply}\n\n${note}` : note, INSTAGRAM_COMMENT_LIMIT),
       };
     }
-    const delivery = buildYouTubeKeywordReply(entry, name);
+    const delivery = buildYouTubeKeywordReply(entry, name, templates);
     return {
       action,
       matchedKeyword: entry.keyword,

@@ -1,5 +1,6 @@
 import Link from "next/link";
-import type { SiteSettings } from "@/lib/site";
+import { getFollowLinks, type SiteSettings } from "@/lib/site";
+import { FollowCta } from "./follow-cta";
 
 function YouTubeIcon() {
   return (
@@ -35,7 +36,8 @@ export function SocialLinks({ settings }: { settings: SiteSettings }) {
   );
 }
 
-export function PublicHeader({ settings }: { settings: SiteSettings }) {
+export async function PublicHeader({ settings }: { settings: SiteSettings }) {
+  const links = await getFollowLinks(settings);
   return (
     <header className="border-b border-border-subtle">
       <div className="mx-auto max-w-5xl px-4 h-16 flex items-center justify-between">
@@ -43,7 +45,12 @@ export function PublicHeader({ settings }: { settings: SiteSettings }) {
           <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-accent-cyan to-accent-purple" />
           <span className="font-semibold">{settings.siteName}</span>
         </Link>
-        <SocialLinks settings={settings} />
+        <div className="flex items-center gap-2">
+          <div className="hidden sm:block">
+            <FollowCta links={links} size="sm" />
+          </div>
+          <SocialLinks settings={settings} />
+        </div>
       </div>
     </header>
   );

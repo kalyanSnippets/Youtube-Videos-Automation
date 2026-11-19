@@ -5,7 +5,8 @@ import { notFound } from "next/navigation";
 import { and, eq } from "drizzle-orm";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { db, schema } from "@yaos/database";
-import { getSiteSettings } from "@/lib/site";
+import { getFollowLinks, getSiteSettings } from "@/lib/site";
+import { FollowCta } from "@/components/public/follow-cta";
 import { PublicFooter, PublicHeader } from "@/components/public/site-chrome";
 import { CopyButton } from "@/components/public/copy-button";
 import { NewsletterForm } from "@/components/public/newsletter-form";
@@ -83,6 +84,11 @@ export default async function VideoPage({ params }: { params: Promise<{ slug: st
             Tip: comment <span className="text-accent-cyan font-medium">{video.keyword}</span> on the {video.platform === "YOUTUBE" ? "video" : "post"} and I&apos;ll send this to you.
           </p>
         )}
+
+        <section className="panel p-5 space-y-3">
+          <p className="font-semibold">Enjoyed this? Get the next one first.</p>
+          <FollowCta links={await getFollowLinks(settings)} />
+        </section>
 
         {settings.newsletterEnabled && <NewsletterForm source={video.slug} />}
       </main>

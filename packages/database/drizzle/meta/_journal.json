@@ -50,6 +50,13 @@
       "when": 1795056809934,
       "tag": "0006_video_formats_stats",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1795057961922,
+      "tag": "0007_templates_instagram_link",
+      "breakpoints": true
     }
   ]
 }

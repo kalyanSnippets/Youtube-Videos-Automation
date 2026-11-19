@@ -5,15 +5,13 @@ import { Search } from "lucide-react";
 import { CardGrid, matches, type CardShape, type GridItem } from "./resource-grid";
 
 export interface ChannelData {
-  youtube: { long: GridItem[]; shorts: GridItem[]; subscribers: number | null; url: string | null };
-  instagram: { reels: GridItem[]; posts: GridItem[]; followers: number | null; url: string | null };
+  youtube: { long: GridItem[]; shorts: GridItem[] };
+  instagram: { reels: GridItem[]; posts: GridItem[] };
   prompts: GridItem[];
 }
 
 type TabId = "youtube" | "instagram" | "prompts";
 type SubId = "long" | "shorts" | "reels" | "posts";
-
-const compact = new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 });
 
 const SUBS: Record<"youtube" | "instagram", { id: SubId; label: string; shape: CardShape }[]> = {
   youtube: [
@@ -112,8 +110,8 @@ export function ChannelBrowser({ data }: { data: ChannelData }) {
       ) : (
         <>
           <div className="flex flex-wrap gap-2">
-            {tabButton("youtube", "YouTube", data.youtube.subscribers !== null ? `${compact.format(data.youtube.subscribers)} subscribers` : null)}
-            {tabButton("instagram", "Instagram", data.instagram.followers !== null ? `${compact.format(data.instagram.followers)} followers` : null)}
+            {tabButton("youtube", "YouTube")}
+            {tabButton("instagram", "Instagram")}
             {data.prompts.length > 0 && tabButton("prompts", "Prompts", String(data.prompts.length))}
           </div>
 
@@ -130,16 +128,7 @@ export function ChannelBrowser({ data }: { data: ChannelData }) {
                   {s.label} <span className="opacity-70">{lists[s.id].length}</span>
                 </button>
               ))}
-              {(tab === "youtube" ? data.youtube.url : data.instagram.url) && (
-                <a
-                  href={(tab === "youtube" ? data.youtube.url : data.instagram.url)!}
-                  target="_blank"
-                  rel="noopener"
-                  className="ml-auto text-xs text-accent-cyan hover:underline"
-                >
-                  {tab === "youtube" ? "Subscribe on YouTube ↗" : "Follow on Instagram ↗"}
-                </a>
-              )}
+
             </div>
           )}
 

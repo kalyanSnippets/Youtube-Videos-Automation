@@ -1,7 +1,7 @@
 import { resolveLLM } from "./llm";
 import { loadPromptLibrary } from "./library";
 import { processComment, type ProcessDeps, type ProcessOutcome } from "./processor";
-import { dbStore, getConnection, rowToComment, updateConnectionToken, type ConnectionRow } from "./store";
+import { dbStore, getCommentRow, getConnection, reopenComment, rowToComment, updateConnectionToken, type ConnectionRow } from "./store";
 import {
   getInstagramMediaContext,
   instagramGraphBase,
@@ -139,4 +139,58 @@ export async function refreshInstagramTokenIfNeeded() {
   const token = await refreshInstagramToken(conn.accessToken);
   await updateConnectionToken("INSTAGRAM", token.access_token, new Date(Date.now() + token.expires_in * 1000));
   return { refreshed: true };
+}
+
+// ---------------------------------------------------------------- One comment, on demand
+
+export interface ProcessNowResult {
+  outcome: ProcessOutcome | "NOT_FOUND" | "NOT_CONNECTED" | "PAUSED";
+  status?: string;
+  publicReply?: string | null;
+  privateReply?: string | null;
+  error?: string | null;
+  skipReason?: string | null;
+}
+
+/** "Retry" / "Send now" from the Comment Bot page: process one stored comment immediately. */
+export async function processStoredComment(id: string): Promise<ProcessNowResult> {
+  if (botPaused()) return { outcome: "PAUSED" };
+  const row = await getCommentRow(id);
+  if (!row) return { outcome: "NOT_FOUND" };
+  if (row.status === "REPLIED") return { outcome: "ALREADY_HANDLED", status: row.status, publicReply: row.publicReply, privateReply: row.privateReply };
+  await reopenComment(id);
+  const comment = rowToComment(row);
+  const conn = await getConnection(comment.platform);
+  if (!conn?.accessToken && comment.platform === "INSTAGRAM") return { outcome: "NOT_CONNECTED" };
+  if (!conn) return { outcome: "NOT_CONNECTED" };
+
+  let deps: ProcessDeps;
+  try {
+    if (comment.platform === "INSTAGRAM") {
+      deps = instagramDeps(conn, await baseDeps());
+    } else {
+      const token = await youtubeAccessToken(conn);
+      const videos = comment.mediaId ? await getVideoContexts(token, [comment.mediaId]).catch(() => new Map<string, MediaContext>()) : new Map<string, MediaContext>();
+      deps = {
+        ...(await baseDeps()),
+        getMedia: async (c) => (c.mediaId ? videos.get(c.mediaId) : undefined),
+        senders: { publicReply: async (c, text) => void (await replyToYouTubeComment(token, c.commentId, text)) },
+      };
+    }
+  } catch (error) {
+    // Couldn't even start (e.g. the login needs reconnecting): record why on the comment.
+    const message = (error as Error).message;
+    await dbStore.update(comment.platform, comment.commentId, { status: "FAILED", error: message }).catch(() => undefined);
+    return { outcome: "FAILED", status: "FAILED", error: message };
+  }
+  const outcome = await processComment(deps, comment);
+  const after = await getCommentRow(id);
+  return {
+    outcome,
+    status: after?.status,
+    publicReply: after?.publicReply,
+    privateReply: after?.privateReply,
+    error: after?.error,
+    skipReason: after?.skipReason,
+  };
 }

@@ -1,5 +1,6 @@
 import { and, asc, eq, isNotNull } from "drizzle-orm";
-import { db, schema } from "@yaos/database";
+import { db, ensureSchemaPatches, schema } from "@yaos/database";
+import { normaliseTemplates } from "./templates";
 import type { LibraryEntry, PromptLibrary } from "./types";
 
 /** Public base URL of the site (Netlify sets URL on every deploy). */
@@ -53,7 +54,7 @@ export function toLibrary(rows: ResourceRow[], about: string, base = siteBaseUrl
       keyword: keywords[0]!,
       keywords,
       title: row.title,
-      link: row.link ?? undefined,
+      link: row.link ?? row.videoUrl ?? row.instagramUrl ?? undefined,
       message: row.body,
       url: resourceUrl(row.slug, base),
     });
@@ -69,6 +70,7 @@ const CACHE_MS = 30 * 1000;
 /** Published resources + About notes, cached briefly so a burst of comments doesn't re-query. */
 export async function loadPromptLibrary(options: { force?: boolean } = {}): Promise<PromptLibrary> {
   if (!options.force && cache && Date.now() - cache.at < CACHE_MS) return cache.library;
+  await ensureSchemaPatches();
   const [rows, settings, videoRows] = await Promise.all([
     db.select().from(schema.resources).where(eq(schema.resources.published, true)).orderBy(asc(schema.resources.sortOrder), asc(schema.resources.createdAt)),
     db.select().from(schema.siteSettings).where(eq(schema.siteSettings.id, 1)),
@@ -81,9 +83,13 @@ export async function loadPromptLibrary(options: { force?: boolean } = {}): Prom
   const base = siteBaseUrl();
   const resourceLib = toLibrary(rows, settings[0]?.about ?? "", base);
   const seen = new Set(resourceLib.entries.flatMap((e) => e.keywords));
+  // A resource made from a video shares its keyword on purpose; only warn when they're unrelated.
+  const linkedToResource = new Set(rows.flatMap((r) => [r.videoUrl, r.instagramUrl].filter((u): u is string => Boolean(u))));
   const extra = videosToEntries(videoRows, base).filter((e) => {
     if (seen.has(e.keyword)) {
-      resourceLib.warnings.push(`Keyword ${e.keyword} is on a video and a resource; the resource wins.`);
+      if (!e.link || !linkedToResource.has(e.link)) {
+        resourceLib.warnings.push(`Keyword ${e.keyword} is on a video and an unrelated resource; the resource wins.`);
+      }
       return false;
     }
     seen.add(e.keyword);
@@ -92,7 +98,7 @@ export async function loadPromptLibrary(options: { force?: boolean } = {}): Prom
   const entries = [...resourceLib.entries, ...extra];
   const warnings = resourceLib.warnings.filter((w) => !w.startsWith("No published resources"));
   if (!entries.length) warnings.push("No keywords yet: upload a prompt to a video, or add a resource.");
-  const library = { about: resourceLib.about, entries, warnings };
+  const library = { about: resourceLib.about, entries, warnings, templates: normaliseTemplates(settings[0]?.botTemplates) };
   cache = { at: Date.now(), library };
   return library;
 }

@@ -20,6 +20,8 @@ export interface PromptLibrary {
   entries: LibraryEntry[];
   /** Problems worth showing on the Comment Bot page (e.g. no resources yet). */
   warnings: string[];
+  /** Reply wording from the admin "Reply messages" page; defaults when absent. */
+  templates?: import("./templates").ReplyTemplates;
 }
 
 /** A comment normalised across platforms. */

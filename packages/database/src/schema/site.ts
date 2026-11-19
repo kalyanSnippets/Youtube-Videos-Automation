@@ -16,8 +16,10 @@ export const resources = pgTable("resources", {
   body: text("body").notNull(),
   /** Optional external link (a tool, a download, the video). */
   link: varchar("link", { length: 500 }),
-  /** Optional video this resource belongs to (YouTube or Instagram URL). */
+  /** Optional YouTube video this resource belongs to. */
   videoUrl: varchar("video_url", { length: 500 }),
+  /** Optional Instagram Reel/post this resource belongs to. */
+  instagramUrl: varchar("instagram_url", { length: 500 }),
   published: boolean("published").notNull().default(true),
   sortOrder: integer("sort_order").notNull().default(0),
   views: integer("views").notNull().default(0),
@@ -35,6 +37,8 @@ export const siteSettings = pgTable("site_settings", {
   youtubeUrl: varchar("youtube_url", { length: 300 }),
   instagramUrl: varchar("instagram_url", { length: 300 }),
   newsletterEnabled: boolean("newsletter_enabled").notNull().default(true),
+  /** Comment bot reply wording (see packages/comment-bot ReplyTemplates). Null = built-in defaults. */
+  botTemplates: jsonb("bot_templates").$type<Record<string, unknown>>(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

@@ -2,7 +2,7 @@ import { listConnections, loadPromptLibrary, recentComments, replyStats, resolve
 import { Badge } from "@/components/ui/badge";
 import { formatRelativeTime } from "@/lib/utils";
 import { TestReplyForm } from "./test-form";
-import { retryFailedComments } from "@/lib/actions/comment-bot";
+import { RowSend, SendProgress, type PendingComment } from "./send-progress";
 
 const STATUS_VARIANT = { REPLIED: "success", SKIPPED: "default", FAILED: "danger", PROCESSING: "cyan", DRY_RUN: "purple" } as const;
 
@@ -43,6 +43,9 @@ export default async function CommentBotPage() {
             the prompt and its page link (by DM on Instagram); other comments get a short AI answer. Setup guide: <code>docs/SETUP.md</code>.
           </p>
         </div>
+        <a href="/comment-bot/templates" className="rounded-lg border border-border px-3.5 py-2 text-sm text-text-dim hover:text-text hover:border-accent-cyan/40">
+          Reply messages ✎
+        </a>
         {paused && <Badge variant="warning">Paused</Badge>}
         {dryRun && <Badge variant="purple">Dry run: nothing is posted</Badge>}
       </div>
@@ -115,12 +118,12 @@ export default async function CommentBotPage() {
         <TestReplyForm />
       </section>
 
-      {(stats.FAILED ?? 0) > 0 || comments.some((c) => c.status === "FAILED") ? (
-        <form action={retryFailedComments} className="flex flex-wrap items-center gap-3">
-          <button className="rounded-lg border border-status-danger/40 text-status-danger px-3.5 py-2 text-sm hover:bg-status-danger/10">Retry failed comments</button>
-          <span className="text-xs text-text-dim">They are picked up again within about a minute.</span>
-        </form>
-      ) : null}
+      <SendProgress
+        label="Retry all failed"
+        items={comments
+          .filter((c) => c.status === "FAILED")
+          .map((c): PendingComment => ({ id: c.id, platform: c.platform, author: c.authorName, text: c.commentText, status: c.status }))}
+      />
 
       <section className="panel overflow-x-auto">
         <table className="w-full text-sm">
@@ -151,6 +154,9 @@ export default async function CommentBotPage() {
                 <td className="p-3">
                   <Badge variant={STATUS_VARIANT[c.status as keyof typeof STATUS_VARIANT] ?? "default"}>{c.status}</Badge>
                   {c.matchedKeyword && <p className="text-xs text-text-dim mt-1">{c.matchedKeyword}</p>}
+                  {(c.status === "FAILED" || c.status === "SKIPPED" || c.status === "DRY_RUN") && (
+                    <RowSend item={{ id: c.id, platform: c.platform, author: c.authorName, text: c.commentText, status: c.status }} />
+                  )}
                 </td>
               </tr>
             ))}

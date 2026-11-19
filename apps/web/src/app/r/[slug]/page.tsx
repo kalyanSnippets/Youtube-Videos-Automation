@@ -3,8 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { and, eq, sql } from "drizzle-orm";
 import { ArrowLeft, ExternalLink, PlayCircle } from "lucide-react";
-import { db, schema } from "@yaos/database";
-import { getSiteSettings } from "@/lib/site";
+import { db, ensureSchemaPatches, schema } from "@yaos/database";
+import { getFollowLinks, getSiteSettings } from "@/lib/site";
+import { FollowCta } from "@/components/public/follow-cta";
 import { PublicFooter, PublicHeader } from "@/components/public/site-chrome";
 import { CopyButton } from "@/components/public/copy-button";
 import { NewsletterForm } from "@/components/public/newsletter-form";
@@ -12,6 +13,7 @@ import { NewsletterForm } from "@/components/public/newsletter-form";
 export const dynamic = "force-dynamic";
 
 async function getResource(slug: string) {
+  await ensureSchemaPatches();
   const [r] = await db.select().from(schema.resources).where(and(eq(schema.resources.slug, slug), eq(schema.resources.published, true)));
   return r ?? null;
 }
@@ -48,11 +50,16 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
           <pre className="p-4 sm:p-5 whitespace-pre-wrap break-words font-mono text-[13px] leading-relaxed text-text">{resource.body}</pre>
         </div>
 
-        {(resource.videoUrl || resource.link) && (
+        {(resource.videoUrl || resource.instagramUrl || resource.link) && (
           <div className="flex flex-wrap gap-3">
             {resource.videoUrl && (
               <a href={resource.videoUrl} target="_blank" rel="noopener" className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3.5 py-2 text-sm hover:border-accent-cyan/40">
-                <PlayCircle size={15} /> Watch the video
+                <PlayCircle size={15} /> Watch on YouTube
+              </a>
+            )}
+            {resource.instagramUrl && (
+              <a href={resource.instagramUrl} target="_blank" rel="noopener" className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3.5 py-2 text-sm hover:border-accent-cyan/40">
+                <PlayCircle size={15} /> View on Instagram
               </a>
             )}
             {resource.link && (
@@ -68,6 +75,11 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
             Tip: comment <span className="text-accent-cyan font-medium">{resource.keywords[0]}</span> on my videos and I'll send this straight to you.
           </p>
         )}
+
+        <section className="panel p-5 space-y-3">
+          <p className="font-semibold">Enjoyed this? Get the next one first.</p>
+          <FollowCta links={await getFollowLinks(settings)} />
+        </section>
 
         {settings.newsletterEnabled && <NewsletterForm source={resource.slug} />}
       </main>

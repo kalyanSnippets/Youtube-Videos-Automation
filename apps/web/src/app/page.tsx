@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { desc, eq } from "drizzle-orm";
 import { db, schema } from "@yaos/database";
-import { getSiteSettings, listResources } from "@/lib/site";
-import { latestStats } from "@/lib/channel-stats";
+import { getFollowLinks, getSiteSettings, listResources } from "@/lib/site";
+import { FollowCta } from "@/components/public/follow-cta";
 import { PublicFooter, PublicHeader } from "@/components/public/site-chrome";
 import { ChannelBrowser } from "@/components/public/channel-browser";
 import type { GridItem } from "@/components/public/resource-grid";
@@ -31,12 +31,12 @@ function toItem(v: VideoRow): GridItem {
 }
 
 export default async function HomePage() {
-  const [settings, resources, videos, stats] = await Promise.all([
+  const [settings, resources, videos] = await Promise.all([
     getSiteSettings(),
     listResources({ publishedOnly: true }),
     db.select().from(schema.videos).where(eq(schema.videos.hidden, false)).orderBy(desc(schema.videos.publishedAt)).catch(() => [] as VideoRow[]),
-    latestStats(),
   ]);
+  const followLinks = await getFollowLinks(settings);
   const yt = videos.filter((v) => v.platform === "YOUTUBE");
   const ig = videos.filter((v) => v.platform === "INSTAGRAM");
 
@@ -49,6 +49,9 @@ export default async function HomePage() {
             Free prompts from <span className="bg-gradient-to-r from-accent-cyan to-accent-purple bg-clip-text text-transparent">{settings.siteName}</span>
           </h1>
           <p className="text-text-dim">{settings.tagline}</p>
+          <div className="pt-2">
+            <FollowCta links={followLinks} />
+          </div>
         </section>
         <ChannelBrowser
           data={{
@@ -56,14 +59,12 @@ export default async function HomePage() {
               // Not yet classified (format null) counts as a normal video until the next sync sorts it.
               long: yt.filter((v) => v.format !== "SHORT").map(toItem),
               shorts: yt.filter((v) => v.format === "SHORT").map(toItem),
-              subscribers: stats.youtube?.followers ?? null,
-              url: settings.youtubeUrl,
+
             },
             instagram: {
               reels: ig.filter((v) => v.format === "REEL").map(toItem),
               posts: ig.filter((v) => v.format !== "REEL").map(toItem),
-              followers: stats.instagram?.followers ?? null,
-              url: settings.instagramUrl,
+
             },
             prompts: resources.map((r) => ({ href: `/r/${r.slug}`, title: r.title, summary: r.summary, keywords: r.keywords ?? [] })),
           }}

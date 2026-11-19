@@ -930,6 +930,51 @@ CREATE TABLE IF NOT EXISTS "site_settings" (
 );
 INSERT INTO "drizzle"."__drizzle_migrations" (hash, created_at) VALUES ('921247fd75ecabfdcc787b90d2115bb47ca41e340f6ee8abfde3a7a0c050937e', 1794972027459);
 
+-- 0005_videos
+CREATE TABLE IF NOT EXISTS "videos" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"platform" varchar(20) NOT NULL,
+	"external_id" varchar(200) NOT NULL,
+	"slug" varchar(160) NOT NULL,
+	"title" varchar(300) NOT NULL,
+	"description" text,
+	"watch_url" varchar(500) NOT NULL,
+	"thumbnail_url" varchar(1000),
+	"published_at" timestamp with time zone,
+	"keyword" varchar(100),
+	"prompt" text,
+	"prompt_source" varchar(40),
+	"prompt_filename" varchar(300),
+	"hidden" boolean DEFAULT false NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "videos_slug_unique" UNIQUE("slug")
+);
+--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS "videos_platform_external_idx" ON "videos" USING btree ("platform","external_id");
+INSERT INTO "drizzle"."__drizzle_migrations" (hash, created_at) VALUES ('0aa9c5bed86f7aa454cabc44c9148e75662c4e076972acd60bd061ee05dccbe9', 1795056012817);
+
+-- 0006_video_formats_stats
+CREATE TABLE IF NOT EXISTS "channel_stats" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"platform" varchar(20) NOT NULL,
+	"day" date NOT NULL,
+	"followers" integer,
+	"posts" integer,
+	"views" bigint,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+ALTER TABLE "videos" ADD COLUMN "format" varchar(20);--> statement-breakpoint
+ALTER TABLE "videos" ADD COLUMN "duration_seconds" integer;--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS "channel_stats_platform_day_idx" ON "channel_stats" USING btree ("platform","day");
+INSERT INTO "drizzle"."__drizzle_migrations" (hash, created_at) VALUES ('21984e0e52143cbe16ca29040afa7cdb7e8adbd0d406b266d643253603aedee0', 1795056809934);
+
+-- 0007_templates_instagram_link
+ALTER TABLE "resources" ADD COLUMN IF NOT EXISTS "instagram_url" varchar(500);--> statement-breakpoint
+ALTER TABLE "site_settings" ADD COLUMN IF NOT EXISTS "bot_templates" jsonb;
+INSERT INTO "drizzle"."__drizzle_migrations" (hash, created_at) VALUES ('51f3dea35b6e9a5853b7abca7885ae7122c0b8913fef087806107be12c7aa85b', 1795057961922);
+
 -- Supabase exposes the public schema through its Data API. The app talks to Postgres directly
 -- (and bypasses row level security), so lock every table to the Data API.
 DO $$ DECLARE t record; BEGIN

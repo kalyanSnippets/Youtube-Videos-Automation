@@ -3,7 +3,7 @@
 import { and, eq, ne } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { db, schema } from "@yaos/database";
+import { db, ensureSchemaPatches, schema } from "@yaos/database";
 import { clearPromptLibraryCache, normaliseKeyword } from "@yaos/comment-bot";
 import { requireAdmin } from "@/lib/admin";
 import { slugify } from "@/lib/site";
@@ -35,6 +35,7 @@ function refresh() {
 
 export async function saveResource(_prev: FormState, form: FormData): Promise<FormState> {
   await requireAdmin();
+  await ensureSchemaPatches();
   const id = str(form, "id");
   try {
     const title = str(form, "title");
@@ -50,6 +51,16 @@ export async function saveResource(_prev: FormState, form: FormData): Promise<Fo
       const clash = others.find((o) => (o.keywords ?? []).includes(kw));
       if (clash) return { error: `Keyword ${kw} is already used by "${clash.title}".` };
     }
+    // A video may use the same keyword only if it's the video this resource is about.
+    const linked = new Set([str(form, "videoUrl"), str(form, "instagramUrl")].filter(Boolean));
+    const videos = await db
+      .select({ title: schema.videos.title, keyword: schema.videos.keyword, watchUrl: schema.videos.watchUrl })
+      .from(schema.videos)
+      .catch(() => [] as { title: string; keyword: string | null; watchUrl: string }[]);
+    for (const kw of keywords) {
+      const clash = videos.find((v) => v.keyword === kw && !linked.has(v.watchUrl));
+      if (clash) return { error: `Keyword ${kw} is already used by the video "${clash.title}". Link that video here, or pick another keyword.` };
+    }
     const slugClash = await db.select({ id: schema.resources.id }).from(schema.resources).where(id ? and(eq(schema.resources.slug, slug), ne(schema.resources.id, id)) : eq(schema.resources.slug, slug));
     if (slugClash.length) return { error: `The page address /r/${slug} is taken. Change the page address.` };
 
@@ -60,7 +71,8 @@ export async function saveResource(_prev: FormState, form: FormData): Promise<Fo
       summary: str(form, "summary") || null,
       body,
       link: optionalUrl(str(form, "link"), "Extra link"),
-      videoUrl: optionalUrl(str(form, "videoUrl"), "Video link"),
+      videoUrl: optionalUrl(str(form, "videoUrl"), "YouTube link"),
+      instagramUrl: optionalUrl(str(form, "instagramUrl"), "Instagram link"),
       published: form.get("published") === "on",
       sortOrder: Number(str(form, "sortOrder")) || 0,
       updatedAt: new Date(),

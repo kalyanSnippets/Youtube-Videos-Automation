@@ -2,7 +2,7 @@
 
 import { and, eq, ne } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import { db, schema } from "@yaos/database";
+import { db, ensureSchemaPatches, schema } from "@yaos/database";
 import { clearPromptLibraryCache, normaliseKeyword } from "@yaos/comment-bot";
 import { requireAdmin } from "@/lib/admin";
 import { fetchGoogleDoc, googleDocId, readUpload, tidy, takeKeywordLine, type ImportedPrompt } from "@/lib/prompt-import";
@@ -22,15 +22,18 @@ function refresh(videoId?: string) {
 }
 
 /** Keyword must be unique across videos and resources, because the bot needs one answer per word. */
-async function keywordClash(keyword: string, videoId: string): Promise<string | null> {
+async function keywordClash(keyword: string, videoId: string, watchUrl: string): Promise<string | null> {
   const [video] = await db
     .select({ title: schema.videos.title })
     .from(schema.videos)
     .where(and(eq(schema.videos.keyword, keyword), ne(schema.videos.id, videoId)))
     .limit(1);
   if (video) return `Keyword ${keyword} is already used by the video "${video.title}".`;
-  const resources = await db.select({ title: schema.resources.title, keywords: schema.resources.keywords }).from(schema.resources);
-  const resource = resources.find((r) => (r.keywords ?? []).includes(keyword));
+  const resources = await db
+    .select({ title: schema.resources.title, keywords: schema.resources.keywords, videoUrl: schema.resources.videoUrl, instagramUrl: schema.resources.instagramUrl })
+    .from(schema.resources);
+  // Fine if the resource is about this very video (made with "Fill in from a video").
+  const resource = resources.find((r) => (r.keywords ?? []).includes(keyword) && r.videoUrl !== watchUrl && r.instagramUrl !== watchUrl);
   if (resource) return `Keyword ${keyword} is already used by the resource "${resource.title}".`;
   return null;
 }
@@ -41,6 +44,7 @@ async function keywordClash(keyword: string, videoId: string): Promise<string | 
  */
 export async function saveVideo(_prev: VideoFormState, form: FormData): Promise<VideoFormState> {
   await requireAdmin();
+  await ensureSchemaPatches();
   const videoId = String(form.get("id") ?? "");
   const [video] = await db.select().from(schema.videos).where(eq(schema.videos.id, videoId));
   if (!video) return { error: "That video no longer exists. Refresh the page." };
@@ -64,7 +68,7 @@ export async function saveVideo(_prev: VideoFormState, form: FormData): Promise<
     const typedKeyword = normaliseKeyword(String(form.get("keyword") ?? ""));
     const keyword = typedKeyword || imported?.keyword || video.keyword || null;
     if (keyword) {
-      const clash = await keywordClash(keyword, video.id);
+      const clash = await keywordClash(keyword, video.id, video.watchUrl);
       if (clash) return { error: clash };
     }
     const hidden = form.get("hidden") === "on";

@@ -1,7 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { loadPromptLibrary, planReply, resetFailedComments, resolveLLM, type Platform, type ReplyPlan } from "@yaos/comment-bot";
+import { db, ensureSchemaPatches, schema } from "@yaos/database";
+import { clearPromptLibraryCache, loadPromptLibrary, normaliseTemplates, planReply, processStoredComment, resetFailedComments, resolveLLM, type Platform, type ProcessNowResult, type ReplyPlan } from "@yaos/comment-bot";
 import { requireAdmin } from "@/lib/admin";
 
 export interface TestReplyState {
@@ -35,4 +36,48 @@ export async function retryFailedComments(): Promise<void> {
   await requireAdmin();
   await resetFailedComments();
   revalidatePath("/comment-bot");
+}
+
+/**
+ * Process one stored comment right now (used by the progress bar on the Comment Bot page, which
+ * calls this once per comment so each result can be shown as it happens).
+ */
+export async function processCommentNow(id: string): Promise<ProcessNowResult> {
+  await requireAdmin();
+  try {
+    return await processStoredComment(id);
+  } catch (error) {
+    return { outcome: "FAILED", error: (error as Error).message };
+  }
+}
+
+export interface TemplatesFormState {
+  error?: string;
+  saved?: boolean;
+}
+
+/** Saves the reply wording from the "Reply messages" page. */
+export async function saveTemplates(_prev: TemplatesFormState, form: FormData): Promise<TemplatesFormState> {
+  await requireAdmin();
+  try {
+    const templates = normaliseTemplates({
+      igPublicReplies: String(form.get("igPublicReplies") ?? "").split("\n"),
+      igDm: String(form.get("igDm") ?? ""),
+      youtubeKeywordReply: String(form.get("youtubeKeywordReply") ?? ""),
+      aiStyle: String(form.get("aiStyle") ?? ""),
+    });
+    if (!templates.igDm.includes("{prompt}") || !templates.youtubeKeywordReply.includes("{prompt}")) {
+      return { error: "The Instagram DM and the YouTube reply must both contain {prompt}, or viewers won't get the prompt." };
+    }
+    await ensureSchemaPatches();
+    await db
+      .insert(schema.siteSettings)
+      .values({ id: 1, botTemplates: templates as unknown as Record<string, unknown> })
+      .onConflictDoUpdate({ target: schema.siteSettings.id, set: { botTemplates: templates as unknown as Record<string, unknown>, updatedAt: new Date() } });
+    clearPromptLibraryCache();
+    revalidatePath("/comment-bot");
+    return { saved: true };
+  } catch (error) {
+    return { error: (error as Error).message };
+  }
 }

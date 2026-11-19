@@ -184,3 +184,11 @@ Run [`docs/supabase-migration-2-formats-stats.sql`](supabase-migration-2-formats
 - Instagram posts are sorted into **Reels** and **Posts** using Instagram's own label.
 - Each sync also saves your YouTube subscriber count and Instagram follower count (one row per day in `channel_stats`). The Videos page shows them with the 7-day change, and the public site shows them on the YouTube and Instagram tabs.
 - Thumbnails are served through `/api/thumb/<id>`. Instagram's image links expire after a few days, so when one fails the site fetches a fresh link from Instagram automatically.
+
+### Subscribe & Follow button, reply messages, progress bar, video picker
+
+- **Subscribe & Follow** (header, home page, every video and resource page). YouTube and Instagram don't let a website subscribe or follow for a viewer, so it's two taps: the button opens YouTube's own "Subscribe?" confirmation, and when the viewer comes back a highlighted "Follow on Instagram" button is waiting. Subscriber and follower counts are only shown in the admin area.
+- **Comment Bot → Reply messages** sets what the bot says: the Instagram public reply (several, picked at random), the Instagram DM, the YouTube reply and the AI's tone. Start from a template (Friendly, Short & sweet, Helpful teacher, High energy) and watch the preview. Placeholders: `{name}` `{title}` `{keyword}` `{prompt}` `{link}` `{video}`.
+- **Retry all failed** / **Retry** / **Send reply** on the Comment Bot page now send immediately, one comment at a time, with a progress bar and the result for each.
+- **Resources → New resource** starts with "Fill in from a video": pick a YouTube video or Instagram Reel/post and the title, description, keyword, prompt and both links are filled in. The matching video on the other platform is found automatically.
+- Database: the app adds the two new columns it needs by itself. `docs/supabase-migration-3-templates.sql` does the same by hand and is safe to run even after that.

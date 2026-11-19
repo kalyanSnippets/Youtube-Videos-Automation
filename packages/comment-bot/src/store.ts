@@ -187,3 +187,18 @@ export async function resetFailedComments(): Promise<number> {
     .returning({ id: t.id });
   return rows.length;
 }
+
+export async function getCommentRow(id: string): Promise<CommentRow | null> {
+  const [row] = await db.select().from(t).where(eq(t.id, id));
+  return row ?? null;
+}
+
+/** Let a FAILED or SKIPPED comment be processed again right now. Never re-opens one that was already answered. */
+export async function reopenComment(id: string): Promise<boolean> {
+  const rows = await db
+    .update(t)
+    .set({ status: "FAILED", attempts: 0, error: null, skipReason: null, updatedAt: new Date() })
+    .where(and(eq(t.id, id), or(eq(t.status, "FAILED"), eq(t.status, "SKIPPED"), eq(t.status, "DRY_RUN"))))
+    .returning({ id: t.id });
+  return rows.length > 0;
+}
