@@ -57,11 +57,11 @@ export const DEFAULT_TEMPLATES: ReplyTemplates = {
   igPublicReplies: [
     "Sent! Check your DMs 📩",
     "Just sent it to your DMs, {name} 🙌",
-    "Done! The {title} is in your DMs 📬",
-    "Check your inbox, {name}! Sent it over 🚀",
+    "Done! The prompt is in your DMs 📬",
+    "Check your DMs, {name}! Sent it over 🚀",
     "It's in your DMs ✅ Enjoy!",
   ],
-  igDm: "Hey {name}! Here's the {title} you asked for 👇\n\n{prompt}\n\n📄 Copy it here: {link}\n🌐 More free prompts and videos: {site}",
+  igDm: "Hey {name}! 👋 Here's the prompt you asked for 👇\n\n{prompt}\n\n📄 Copy it here: {link}\n🌐 More free prompts and videos: {site}",
   youtubeKeywordReply: "Here you go {name} 👇 You can find the prompt here:\n{link}",
   aiStyle: "Warm, casual and helpful, like a friendly creator. 1-3 short sentences. At most one emoji.",
   generalMode: "fixed",
@@ -113,9 +113,18 @@ export const TEMPLATE_PRESETS: { id: string; label: string; description: string;
 
 const MAX_TEMPLATE = 2000;
 
+const OLD_DEFAULT_IG_PUBLIC = [
+  "Sent! Check your DMs 📩",
+  "Just sent it to your DMs, {name} 🙌",
+  "Done! The {title} is in your DMs 📬",
+  "Check your inbox, {name}! Sent it over 🚀",
+  "It's in your DMs ✅ Enjoy!",
+];
+
 /** Earlier built-in wording; a saved copy of one is upgraded to the current version. Custom wording is kept. */
 const LEGACY_IG_DMS: Record<string, string> = {
-  ["Hey {name}! Here's the {title} you asked for 👇\n\n{prompt}\n\n📄 Copy it here: {link}\n🔗 {video}"]: "Hey {name}! Here's the {title} you asked for 👇\n\n{prompt}\n\n📄 Copy it here: {link}\n🌐 More free prompts and videos: {site}",
+  ["Hey {name}! Here's the {title} you asked for 👇\n\n{prompt}\n\n📄 Copy it here: {link}\n🌐 More free prompts and videos: {site}"]: "Hey {name}! 👋 Here's the prompt you asked for 👇\n\n{prompt}\n\n📄 Copy it here: {link}\n🌐 More free prompts and videos: {site}",
+  ["Hey {name}! Here's the {title} you asked for 👇\n\n{prompt}\n\n📄 Copy it here: {link}\n🔗 {video}"]: "Hey {name}! 👋 Here's the prompt you asked for 👇\n\n{prompt}\n\n📄 Copy it here: {link}\n🌐 More free prompts and videos: {site}",
   ["Hi {name}! Here's the {title} 👇\n\n{prompt}\n\nHow to use it: copy it into ChatGPT, Claude or Gemini and replace anything in [brackets] with your own details.\n\n📄 Easy-copy version: {link}\n▶️ Rewatch the video: {video}"]:
     "Hi {name}! Here's the {title} 👇\n\n{prompt}\n\nHow to use it: copy it into ChatGPT, Claude or Gemini and replace anything in [brackets] with your own details.\n\n📄 Easy-copy version: {link}\n🌐 More free prompts and videos: {site}",
 };
@@ -142,7 +151,9 @@ export function normaliseTemplates(raw: unknown): ReplyTemplates {
   const r = (raw && typeof raw === "object" ? raw : {}) as Partial<Record<keyof ReplyTemplates, unknown>>;
   const lines = (v: unknown) =>
     Array.isArray(v) ? v.filter((x): x is string => typeof x === "string").map((x) => x.trim()).filter(Boolean).slice(0, 20).map((x) => x.slice(0, 300)) : [];
-  const replies = lines(r.igPublicReplies);
+  const savedReplies = lines(r.igPublicReplies);
+  // The earlier built-in list used {title}, which reads badly with long video titles: upgrade it.
+  const replies = JSON.stringify(savedReplies) === JSON.stringify(OLD_DEFAULT_IG_PUBLIC) ? DEFAULT_TEMPLATES.igPublicReplies : savedReplies;
   const general = lines(r.generalReplies);
   const mode = r.generalMode === "ai" || r.generalMode === "off" || r.generalMode === "fixed" ? r.generalMode : DEFAULT_TEMPLATES.generalMode;
   return {
