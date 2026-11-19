@@ -6,7 +6,7 @@ export const metadata = { title: "Sign in" };
 
 const ERRORS: Record<string, string> = {
   "not-allowed": "That Google account isn't allowed. Sign in with the email listed in ADMIN_EMAILS.",
-  expired: "The sign-in took too long or was opened in another browser. Please try again.",
+  expired: "The sign-in couldn't be finished (it took too long, or was started from a different web address). Please try again from this page.",
   google: "Google didn't confirm the sign-in. Please try again.",
   setup: "Sign-in isn't set up yet: add GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, APP_SECRET and ADMIN_EMAILS in Netlify, then redeploy.",
 };

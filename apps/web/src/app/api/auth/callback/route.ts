@@ -5,7 +5,7 @@ import { botBaseUrl } from "@/lib/comment-bot";
 export const dynamic = "force-dynamic";
 
 function fail(request: NextRequest, error: string) {
-  return NextResponse.redirect(new URL(`/login?error=${error}`, request.url));
+  return NextResponse.redirect(new URL(`/login?error=${error}`, botBaseUrl(request)));
 }
 
 export async function GET(request: NextRequest) {
@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
   if (!adminEmails().includes(email)) return fail(request, "not-allowed");
 
   const next = request.cookies.get("yaos_oauth_next")?.value ?? "/videos";
-  const res = NextResponse.redirect(new URL(next.startsWith("/") && !next.startsWith("//") ? next : "/videos", request.url));
+  const res = NextResponse.redirect(new URL(next.startsWith("/") && !next.startsWith("//") ? next : "/videos", botBaseUrl(request)));
   res.cookies.set(SESSION_COOKIE, await createSessionToken(email, secret), {
     httpOnly: true,
     secure: true,
