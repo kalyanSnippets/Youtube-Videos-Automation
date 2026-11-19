@@ -2,15 +2,36 @@ import { desc } from "drizzle-orm";
 import { db, schema } from "@yaos/database";
 import { listConnections } from "@yaos/comment-bot";
 import { SyncButton } from "./sync-button";
-import { VideoCard, type VideoCardData } from "./video-card";
+import type { VideoCardData } from "./video-card";
+import { VideoList } from "./video-list";
+import { latestStats, type PlatformStats } from "@/lib/channel-stats";
+
+const fmt = new Intl.NumberFormat("en");
+
+function StatTile({ label, unit, stats }: { label: string; unit: string; stats: PlatformStats | null }) {
+  const change = stats?.followersChange7d;
+  return (
+    <div className="panel p-4 min-w-[180px] flex-1">
+      <p className="text-xs uppercase tracking-wide text-text-dim">{label}</p>
+      <p className="text-2xl font-semibold mt-1">{stats?.followers !== null && stats?.followers !== undefined ? fmt.format(stats.followers) : "—"}</p>
+      <p className="text-xs text-text-dim">
+        {unit}
+        {change !== null && change !== undefined && (
+          <span className={change >= 0 ? "text-status-success" : "text-status-danger"}> · {change >= 0 ? "+" : ""}{fmt.format(change)} in 7 days</span>
+        )}
+      </p>
+      {stats?.posts !== null && stats?.posts !== undefined && <p className="text-xs text-text-faint mt-1">{fmt.format(stats.posts)} {label === "YouTube" ? "videos" : "posts"}{stats.views ? ` · ${fmt.format(stats.views)} views` : ""}</p>}
+    </div>
+  );
+}
 
 export const dynamic = "force-dynamic";
 
 export default async function VideosPage() {
-  const [rows, connections, migrated] = await Promise.all([
+  const [rows, connections, stats] = await Promise.all([
     db.select().from(schema.videos).orderBy(desc(schema.videos.publishedAt)).catch(() => null),
     listConnections().catch(() => []),
-    Promise.resolve(true),
+    latestStats(),
   ]);
   const cards: VideoCardData[] = (rows ?? []).map((v) => ({
     id: v.id,
@@ -26,6 +47,7 @@ export default async function VideosPage() {
     promptPreview: v.prompt ? v.prompt.slice(0, 300) : null,
     hidden: v.hidden,
     slug: v.slug,
+    format: v.format,
   }));
   const needs = cards.filter((c) => !c.hasPrompt && !c.hidden).length;
   const lastSync = connections
@@ -45,6 +67,11 @@ export default async function VideosPage() {
         <a href="/" target="_blank" className="rounded-lg border border-border px-3.5 py-2 text-sm text-text-dim hover:text-text">View site ↗</a>
       </div>
 
+      <div className="flex flex-wrap gap-3">
+        <StatTile label="YouTube" unit="subscribers" stats={stats.youtube} />
+        <StatTile label="Instagram" unit="followers" stats={stats.instagram} />
+      </div>
+
       <div className="panel p-4 flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm">
           <span className="font-semibold">{cards.length}</span> videos · <span className="font-semibold">{needs}</span> need a prompt
@@ -62,16 +89,13 @@ export default async function VideosPage() {
         </p>
       )}
 
-      <div className="space-y-4">
-        {cards.map((c) => (
-          <VideoCard key={c.id} video={c} />
-        ))}
-        {rows !== null && cards.length === 0 && (
-          <p className="panel p-6 text-center text-sm text-text-dim">
-            No videos yet. Connect YouTube or Instagram on the Comment Bot page, then click Sync now.
-          </p>
-        )}
-      </div>
+      {rows !== null && cards.length === 0 ? (
+        <p className="panel p-6 text-center text-sm text-text-dim">
+          No videos yet. Connect YouTube or Instagram on the Comment Bot page, then click Sync now.
+        </p>
+      ) : (
+        <VideoList cards={cards} />
+      )}
     </div>
   );
 }

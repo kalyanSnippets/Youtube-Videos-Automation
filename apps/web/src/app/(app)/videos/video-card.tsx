@@ -20,6 +20,12 @@ export interface VideoCardData {
   promptPreview: string | null;
   hidden: boolean;
   slug: string;
+  format: string | null;
+}
+
+export function formatLabel(v: Pick<VideoCardData, "platform" | "format">): string {
+  if (v.platform === "YOUTUBE") return v.format === "SHORT" ? "YouTube Short" : "YouTube video";
+  return v.format === "REEL" ? "Instagram Reel" : "Instagram post";
 }
 
 function statusOf(v: VideoCardData): { label: string; variant: "success" | "warning" | "default" | "danger" } {
@@ -38,11 +44,11 @@ export function VideoCard({ video }: { video: VideoCardData }) {
     <article className="panel p-4 sm:p-5 space-y-4">
       <div className="flex gap-4">
         <div className="relative h-20 w-36 shrink-0 overflow-hidden rounded-lg bg-bg-raised">
-          {video.thumbnailUrl && <Image src={video.thumbnailUrl} alt="" fill sizes="144px" className="object-cover" unoptimized />}
+          <Image src={`/api/thumb/${video.id}`} alt="" fill sizes="144px" className="object-cover" unoptimized />
         </div>
         <div className="min-w-0 space-y-1.5">
           <div className="flex flex-wrap items-center gap-2">
-            <Badge variant={video.platform === "YOUTUBE" ? "danger" : "purple"}>{video.platform === "YOUTUBE" ? "YouTube" : "Instagram"}</Badge>
+            <Badge variant={video.platform === "YOUTUBE" ? "danger" : "purple"}>{formatLabel(video)}</Badge>
             <Badge variant={status.variant}>{status.label}</Badge>
             {date && <span className="text-xs text-text-dim">{date}</span>}
           </div>

@@ -1,4 +1,4 @@
-import { boolean, pgTable, text, timestamp, uniqueIndex, uuid, varchar } from "drizzle-orm/pg-core";
+import { bigint, boolean, date, integer, pgTable, text, timestamp, uniqueIndex, uuid, varchar } from "drizzle-orm/pg-core";
 
 /**
  * One row per video on the creator's YouTube channel or Instagram account. Rows are created and
@@ -20,6 +20,9 @@ export const videos = pgTable(
     /** Where viewers go to watch: youtu.be link or Instagram permalink. */
     watchUrl: varchar("watch_url", { length: 500 }).notNull(),
     thumbnailUrl: varchar("thumbnail_url", { length: 1000 }),
+    /** YouTube: "LONG" | "SHORT". Instagram: "REEL" | "POST". Null until the sync classifies it. */
+    format: varchar("format", { length: 20 }),
+    durationSeconds: integer("duration_seconds"),
     publishedAt: timestamp("published_at", { withTimezone: true }),
     /** Upper-cased trigger word, e.g. "EDIT". Unique across videos and resources (enforced by the app). */
     keyword: varchar("keyword", { length: 100 }),
@@ -36,4 +39,23 @@ export const videos = pgTable(
   (t) => ({
     platformExternal: uniqueIndex("videos_platform_external_idx").on(t.platform, t.externalId),
   }),
+);
+
+/** One row per platform per day: subscriber/follower counts, so growth can be shown over time. */
+export const channelStats = pgTable(
+  "channel_stats",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    /** "YOUTUBE" | "INSTAGRAM" */
+    platform: varchar("platform", { length: 20 }).notNull(),
+    day: date("day").notNull(),
+    /** YouTube subscribers, or Instagram followers. */
+    followers: integer("followers"),
+    /** Videos on the channel, or posts on the account. */
+    posts: integer("posts"),
+    /** YouTube total views (Instagram doesn't report this). */
+    views: bigint("views", { mode: "number" }),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({ platformDay: uniqueIndex("channel_stats_platform_day_idx").on(t.platform, t.day) }),
 );

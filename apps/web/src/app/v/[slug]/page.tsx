@@ -37,15 +37,19 @@ export default async function VideoPage({ params }: { params: Promise<{ slug: st
           <ArrowLeft size={14} /> All videos and prompts
         </Link>
 
-        {video.thumbnailUrl && (
-          <div className="relative aspect-video overflow-hidden rounded-2xl border border-border bg-bg-raised">
-            <Image src={video.thumbnailUrl} alt="" fill sizes="(min-width: 768px) 768px, 100vw" className="object-cover" unoptimized priority />
-          </div>
-        )}
+        <div
+          className={`relative overflow-hidden rounded-2xl border border-border bg-bg-raised ${
+            video.format === "SHORT" || video.format === "REEL" ? "aspect-[9/16] max-w-xs" : video.platform === "INSTAGRAM" ? "aspect-square max-w-md" : "aspect-video"
+          }`}
+        >
+          <Image src={`/api/thumb/${video.id}`} alt="" fill sizes="(min-width: 768px) 768px, 100vw" className="object-cover" unoptimized priority />
+        </div>
 
         <div className="space-y-2">
           <div className="flex flex-wrap items-center gap-2 text-xs text-text-dim">
-            <span className="badge border bg-bg-raised text-text-dim border-border">{video.platform === "YOUTUBE" ? "YouTube" : "Instagram"}</span>
+            <span className="badge border bg-bg-raised text-text-dim border-border">
+              {video.platform === "YOUTUBE" ? (video.format === "SHORT" ? "YouTube Short" : "YouTube") : video.format === "REEL" ? "Instagram Reel" : "Instagram post"}
+            </span>
             {date && <span>{date}</span>}
           </div>
           <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">{video.title}</h1>

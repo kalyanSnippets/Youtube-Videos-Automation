@@ -14,6 +14,7 @@ const PUBLIC_PREFIXES = [
   "/api/comment-bot/instagram/webhook", // Meta (checks its own signature)
   "/api/comment-bot/run", // scheduler (checks APP_SECRET bearer)
   "/api/videos/sync", // scheduler (checks APP_SECRET bearer)
+  "/api/thumb/", // video thumbnails (public images)
   "/_next/",
 ];
 

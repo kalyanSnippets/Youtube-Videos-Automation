@@ -175,3 +175,12 @@ Every YouTube video and Instagram post becomes a card automatically: in the admi
    - If the first line of the file is `KEYWORD: EDIT`, the keyword is filled in for you and that line is left out of the prompt.
 4. Cards without a prompt show "Prompt coming soon" publicly. Once a prompt is added, the card's page (`/v/<name>`) shows it with a Copy button and a link back to YouTube or Instagram, and the comment bot answers that keyword with it.
 5. Tick **Hide** on a card to keep it off the site and away from the bot.
+
+### Shorts, Reels and follower counts
+
+Run [`docs/supabase-migration-2-formats-stats.sql`](supabase-migration-2-formats-stats.sql) once in Supabase's SQL Editor (after the videos migration), then click **Sync now** on the Videos page.
+
+- YouTube videos are sorted into **Videos** and **Shorts**. YouTube's API doesn't label Shorts, so the sync checks `youtube.com/shorts/<id>` for anything 3 minutes or shorter (a Short opens there; a normal video redirects to /watch).
+- Instagram posts are sorted into **Reels** and **Posts** using Instagram's own label.
+- Each sync also saves your YouTube subscriber count and Instagram follower count (one row per day in `channel_stats`). The Videos page shows them with the 7-day change, and the public site shows them on the YouTube and Instagram tabs.
+- Thumbnails are served through `/api/thumb/<id>`. Instagram's image links expire after a few days, so when one fails the site fetches a fresh link from Instagram automatically.

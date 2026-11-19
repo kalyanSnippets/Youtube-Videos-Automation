@@ -26,6 +26,8 @@ export function SyncButton() {
       {report && (
         <p className="text-xs text-text-dim">
           YouTube: {describe(report.youtube)} · Instagram: {describe(report.instagram)}
+          {report.stats?.youtube && "subscribers" in report.stats.youtube && report.stats.youtube.subscribers !== null && ` · ${report.stats.youtube.subscribers.toLocaleString()} subscribers`}
+          {report.stats?.instagram && "followers" in report.stats.instagram && report.stats.instagram.followers !== null && ` · ${report.stats.instagram.followers.toLocaleString()} followers`}
         </p>
       )}
     </div>
