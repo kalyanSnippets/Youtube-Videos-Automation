@@ -12,6 +12,8 @@ export interface LibraryEntry {
   message: string;
   /** Public page for this resource on the site, e.g. https://site/r/fable. Linked in every delivery. */
   url?: string;
+  /** Video/post ids this entry belongs to. When two entries share a keyword, a comment on one of these wins. */
+  mediaIds?: string[];
 }
 
 export interface PromptLibrary {
@@ -46,7 +48,7 @@ export interface MediaContext {
 
 /** What the bot decided to say. Either side may be absent. */
 export interface ReplyPlan {
-  action: "KEYWORD" | "AI_ANSWER" | "KEYWORD_AND_ANSWER" | "NONE";
+  action: "KEYWORD" | "AI_ANSWER" | "KEYWORD_AND_ANSWER" | "GENERAL" | "NONE";
   matchedKeyword?: string;
   /** Posted publicly under the comment. */
   publicReply?: string;

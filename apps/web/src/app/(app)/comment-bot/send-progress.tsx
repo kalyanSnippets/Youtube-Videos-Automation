@@ -51,8 +51,11 @@ const DOT: Record<ItemState, string> = {
 };
 
 /** Sends replies one comment at a time and shows a live progress bar with each result. */
-export function SendProgress({ items, label }: { items: PendingComment[]; label: string }) {
+export function SendProgress({ items: liveItems, label }: { items: PendingComment[]; label: string }) {
   const router = useRouter();
+  // The page refreshes after a run (and the failed list changes), so keep the list this run was started with.
+  const [runItems, setRunItems] = useState<PendingComment[] | null>(null);
+  const items = runItems ?? liveItems;
   const [states, setStates] = useState<Record<string, { state: ItemState; note?: string }>>({});
   const [running, setRunning] = useState(false);
   const done = Object.values(states).filter((s) => s.state !== "waiting" && s.state !== "sending").length;
@@ -62,9 +65,11 @@ export function SendProgress({ items, label }: { items: PendingComment[]; label:
   const tally = (s: ItemState) => Object.values(states).filter((x) => x.state === s).length;
 
   async function run() {
+    const batch = running ? items : liveItems.length ? liveItems : items;
+    setRunItems(batch);
     setRunning(true);
-    setStates(Object.fromEntries(items.map((i) => [i.id, { state: "waiting" as ItemState }])));
-    for (const item of items) {
+    setStates(Object.fromEntries(batch.map((i) => [i.id, { state: "waiting" as ItemState }])));
+    for (const item of batch) {
       setStates((prev) => ({ ...prev, [item.id]: { state: "sending" } }));
       const result = await processCommentNow(item.id).catch((e: Error) => ({ outcome: "FAILED", error: e.message }) as ProcessNowResult);
       setStates((prev) => ({ ...prev, [item.id]: { state: stateOf(result), note: explain(result) } }));

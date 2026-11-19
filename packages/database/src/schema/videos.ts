@@ -26,6 +26,10 @@ export const videos = pgTable(
     publishedAt: timestamp("published_at", { withTimezone: true }),
     /** Upper-cased trigger word, e.g. "EDIT". Unique across videos and resources (enforced by the app). */
     keyword: varchar("keyword", { length: 100 }),
+    /** Friendly name for the prompt, used in the bot's messages and on the page ("Fable 5.2 starter prompts"). Falls back to the video title. */
+    resourceTitle: varchar("resource_title", { length: 200 }),
+    /** Optional extra link shown with the prompt (a tool, a download). */
+    extraLink: varchar("extra_link", { length: 500 }),
     /** Prompt text converted from the uploaded doc/file. Null means "Prompt coming soon". */
     prompt: text("prompt"),
     /** "google-doc" | "docx" | "pdf" | "text" */

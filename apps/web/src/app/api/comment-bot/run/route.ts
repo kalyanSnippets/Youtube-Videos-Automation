@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { refreshInstagramTokenIfNeeded, retryInstagramFailures, runYouTubePoll } from "@yaos/comment-bot";
+import { failStaleProcessing, refreshInstagramTokenIfNeeded, retryInstagramFailures, runYouTubePoll } from "@yaos/comment-bot";
 import { isAuthorised, notAuthorised } from "@/lib/comment-bot";
 
 export const dynamic = "force-dynamic";
@@ -18,10 +18,12 @@ async function run(request: Request) {
       return { error: (error as Error).message };
     }
   };
-  const youtube = await settle(() => runYouTubePoll({ timeBudgetMs: 18_000 }));
-  const instagramRetries = await settle(() => retryInstagramFailures());
+  // Netlify stops a request after ~10s: start new replies only in the first 5s, a few per minute.
+  const stale = await settle(() => failStaleProcessing());
+  const youtube = await settle(() => runYouTubePoll({ timeBudgetMs: 5_000, maxComments: 3 }));
+  const instagramRetries = await settle(() => retryInstagramFailures(2));
   const instagramToken = await settle(() => refreshInstagramTokenIfNeeded());
-  const result = { at: new Date().toISOString(), youtube, instagramRetries, instagramToken };
+  const result = { at: new Date().toISOString(), stale, youtube, instagramRetries, instagramToken };
   console.log("[comment-bot] run", JSON.stringify(result));
   return NextResponse.json(result);
 }

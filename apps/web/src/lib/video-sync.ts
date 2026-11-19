@@ -1,5 +1,5 @@
 import { and, eq, inArray, isNotNull } from "drizzle-orm";
-import { db, schema } from "@yaos/database";
+import { db, ensureSchemaPatches, schema } from "@yaos/database";
 import {
   getConnection,
   instagramGraphBase,
@@ -362,6 +362,7 @@ export interface SyncReport {
 
 /** Runs both platforms. A failure on one never stops the other. */
 export async function runVideoSync(): Promise<SyncReport> {
+  await ensureSchemaPatches();
   const report: SyncReport = {};
   const yt = await getConnection("YOUTUBE");
   report.youtube = yt ? await syncYouTube(yt).catch(async (e: Error) => {

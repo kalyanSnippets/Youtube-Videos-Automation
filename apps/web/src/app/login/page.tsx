@@ -13,7 +13,7 @@ const ERRORS: Record<string, string> = {
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string; error?: string }> }) {
   const { next, error } = await searchParams;
-  if (await currentAdminEmail()) redirect(next?.startsWith("/") ? next : "/dashboard");
+  if (await currentAdminEmail()) redirect(next?.startsWith("/") ? next : "/videos");
   const href = `/api/auth/google${next ? `?next=${encodeURIComponent(next)}` : ""}`;
   return (
     <main className="min-h-screen grid place-items-center px-4">

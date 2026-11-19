@@ -5,44 +5,78 @@ import { testReply, type TestReplyState } from "@/lib/actions/comment-bot";
 
 const input = "w-full rounded-lg bg-bg-raised border border-border px-3 py-2 text-sm";
 
+const EXAMPLES = ["FABLE", "nice content bro 🔥", "what mic do you use?", "FABLE does this work on Windows?", "check my channel sub4sub"];
+
+function describe(state: TestReplyState): string {
+  const p = state.plan!;
+  const where = state.platform === "INSTAGRAM" ? "Instagram" : "YouTube";
+  switch (p.action) {
+    case "KEYWORD":
+      return state.platform === "INSTAGRAM"
+        ? `Keyword ${p.matchedKeyword}: sends the prompt by DM and posts a short public reply.`
+        : `Keyword ${p.matchedKeyword}: posts the prompt as a public reply (YouTube has no DMs).`;
+    case "KEYWORD_AND_ANSWER":
+      return `Keyword ${p.matchedKeyword} plus a question: answers it and sends the prompt.`;
+    case "AI_ANSWER":
+      return `A question: the AI answers it publicly on ${where}.`;
+    case "GENERAL":
+      return `A general comment: replies with a short thank-you on ${where}.`;
+    default:
+      return "No reply.";
+  }
+}
+
 export function TestReplyForm() {
   const [state, action, pending] = useActionState<TestReplyState, FormData>(testReply, {});
   return (
-    <form action={action} className="space-y-3">
-      <div className="grid gap-3 sm:grid-cols-[1fr_160px]">
-        <input name="comment" placeholder='Try "FABLE" or "does this work on Windows?"' className={input} />
-        <select name="platform" className={input} defaultValue="INSTAGRAM">
-          <option value="INSTAGRAM">Instagram</option>
-          <option value="YOUTUBE">YouTube</option>
-        </select>
+    <form action={action} className="space-y-4">
+      <div className="grid gap-3 sm:grid-cols-[1fr_170px]">
+        <label className="block space-y-1">
+          <span className="text-xs font-medium">A comment someone might write</span>
+          <input name="comment" list="test-examples" required placeholder='e.g. "FABLE" or "nice video!"' className={input} />
+          <datalist id="test-examples">
+            {EXAMPLES.map((e) => (
+              <option key={e} value={e} />
+            ))}
+          </datalist>
+        </label>
+        <label className="block space-y-1">
+          <span className="text-xs font-medium">Where</span>
+          <select name="platform" className={input} defaultValue="INSTAGRAM">
+            <option value="INSTAGRAM">Instagram</option>
+            <option value="YOUTUBE">YouTube</option>
+          </select>
+        </label>
       </div>
-      <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
-        <input name="title" placeholder="Video title (optional, gives the AI context)" className={input} />
-        <button disabled={pending} className="rounded-lg bg-accent-cyan/20 border border-accent-cyan/40 px-4 py-2 text-sm text-accent-cyan disabled:opacity-50">
-          {pending ? "Thinking…" : "Preview reply"}
+      <label className="block space-y-1">
+        <span className="text-xs font-medium">Video title (optional: gives the AI context for questions)</span>
+        <input name="title" placeholder="e.g. Claude Fable 5.2 Built an Entire OS" className={input} />
+      </label>
+      <div className="flex flex-wrap items-center gap-3">
+        <button disabled={pending} className="rounded-lg bg-accent-cyan text-bg font-medium text-sm px-5 py-2 disabled:opacity-50">
+          {pending ? "Thinking…" : "Show me the reply"}
         </button>
+        <span className="text-xs text-text-dim">Try: {EXAMPLES.slice(0, 3).map((e) => `“${e}”`).join(", ")}</span>
       </div>
-      {state.error && <p className="text-sm text-status-danger">{state.error}</p>}
+
+      {state.error && <p className="rounded-lg border border-status-danger/30 bg-status-danger/10 p-3 text-sm text-status-danger">{state.error}</p>}
       {state.plan && (
         <div className="panel-raised p-4 space-y-3 text-sm">
-          <p className="text-text-dim">
-            Action: <span className="text-text">{state.plan.action}</span>
-            {state.plan.matchedKeyword && <> · keyword <span className="text-text">{state.plan.matchedKeyword}</span></>}
-          </p>
-          {state.plan.publicReply && (
-            <div>
-              <p className="text-xs uppercase tracking-wide text-text-dim mb-1">Public reply</p>
-              <p className="whitespace-pre-wrap">{state.plan.publicReply}</p>
-            </div>
-          )}
+          <p className="font-medium">{describe(state)}</p>
           {state.plan.privateReply && (
             <div>
-              <p className="text-xs uppercase tracking-wide text-text-dim mb-1">Instagram DM</p>
-              <p className="whitespace-pre-wrap">{state.plan.privateReply}</p>
+              <p className="text-[11px] uppercase tracking-wide text-text-faint mb-1">Instagram DM</p>
+              <p className="whitespace-pre-wrap rounded-lg bg-bg p-3">{state.plan.privateReply}</p>
             </div>
           )}
-          {state.plan.skipReason && <p className="text-status-warning">Skipped: {state.plan.skipReason}</p>}
-          <p className="text-xs text-text-dim">Preview only. Nothing was posted.</p>
+          {state.plan.publicReply && (
+            <div>
+              <p className="text-[11px] uppercase tracking-wide text-text-faint mb-1">Public reply under the comment</p>
+              <p className="whitespace-pre-wrap rounded-lg bg-bg p-3">{state.plan.publicReply}</p>
+            </div>
+          )}
+          {state.plan.skipReason && <p className="text-status-warning">Why no reply: {state.plan.skipReason}</p>}
+          <p className="text-xs text-text-dim">Preview only. Nothing was posted. Change the wording in Reply messages.</p>
         </div>
       )}
     </form>

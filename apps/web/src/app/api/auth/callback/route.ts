@@ -43,8 +43,8 @@ export async function GET(request: NextRequest) {
   if (claims.aud !== process.env.GOOGLE_CLIENT_ID || !email || !claims.email_verified) return fail(request, "google");
   if (!adminEmails().includes(email)) return fail(request, "not-allowed");
 
-  const next = request.cookies.get("yaos_oauth_next")?.value ?? "/dashboard";
-  const res = NextResponse.redirect(new URL(next.startsWith("/") && !next.startsWith("//") ? next : "/dashboard", request.url));
+  const next = request.cookies.get("yaos_oauth_next")?.value ?? "/videos";
+  const res = NextResponse.redirect(new URL(next.startsWith("/") && !next.startsWith("//") ? next : "/videos", request.url));
   res.cookies.set(SESSION_COOKIE, await createSessionToken(email, secret), {
     httpOnly: true,
     secure: true,

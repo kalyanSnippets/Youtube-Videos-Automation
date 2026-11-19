@@ -1,197 +1,114 @@
-import { listConnections, loadPromptLibrary, recentComments, replyStats, resolveLLM } from "@yaos/comment-bot";
-import { Badge } from "@/components/ui/badge";
+import { listConnections, recentComments, replyStats, resolveLLM, type CommentRow } from "@yaos/comment-bot";
 import { formatRelativeTime } from "@/lib/utils";
-import { TestReplyForm } from "./test-form";
+import { BotHeader } from "./bot-header";
 import { RowSend, SendProgress, type PendingComment } from "./send-progress";
 
-const STATUS_VARIANT = { REPLIED: "success", SKIPPED: "default", FAILED: "danger", PROCESSING: "cyan", DRY_RUN: "purple" } as const;
+export const dynamic = "force-dynamic";
 
-function EnvRow({ name, hint }: { name: string; hint: string }) {
-  const set = Boolean(process.env[name]);
-  return (
-    <li className="flex items-start gap-3 py-1.5">
-      <Badge variant={set ? "success" : "warning"}>{set ? "set" : "missing"}</Badge>
-      <div>
-        <code className="text-xs">{name}</code>
-        <p className="text-xs text-text-dim">{hint}</p>
-      </div>
-    </li>
-  );
+const STUCK_MS = 60_000;
+
+function isStuck(c: CommentRow): boolean {
+  return c.status === "PROCESSING" && Date.now() - c.updatedAt.getTime() > STUCK_MS;
 }
 
-export default async function CommentBotPage() {
-  const [connections, library, comments, stats] = await Promise.all([
+function statusPill(c: CommentRow): { label: string; className: string } {
+  if (isStuck(c)) return { label: "Stuck", className: "bg-status-danger/10 text-status-danger border-status-danger/30" };
+  switch (c.status) {
+    case "REPLIED":
+      return { label: "Replied", className: "bg-status-success/10 text-status-success border-status-success/30" };
+    case "FAILED":
+      return { label: "Failed", className: "bg-status-danger/10 text-status-danger border-status-danger/30" };
+    case "SKIPPED":
+      return { label: "No reply", className: "bg-bg-raised text-text-dim border-border" };
+    case "DRY_RUN":
+      return { label: "Dry run", className: "bg-accent-purple/10 text-accent-purple border-accent-purple/30" };
+    default:
+      return { label: "Sending…", className: "bg-accent-cyan/10 text-accent-cyan border-accent-cyan/30" };
+  }
+}
+
+function whatHappened(c: CommentRow): string | null {
+  switch (c.action) {
+    case "KEYWORD":
+      return `Sent the ${c.matchedKeyword} prompt`;
+    case "KEYWORD_AND_ANSWER":
+      return `Answered and sent the ${c.matchedKeyword} prompt`;
+    case "AI_ANSWER":
+      return "Answered the question";
+    case "GENERAL":
+      return "Said thanks";
+    default:
+      return null;
+  }
+}
+
+function toPending(c: CommentRow): PendingComment {
+  return { id: c.id, platform: c.platform, author: c.authorName, text: c.commentText, status: isStuck(c) ? "FAILED" : c.status };
+}
+
+export default async function CommentBotActivityPage() {
+  const [connections, comments, stats] = await Promise.all([
     listConnections().catch(() => []),
-    loadPromptLibrary(),
-    recentComments(50).catch(() => []),
+    recentComments(60).catch(() => [] as CommentRow[]),
     replyStats().catch(() => ({}) as Record<string, number>),
   ]);
   const llm = resolveLLM();
   const yt = connections.find((c) => c.platform === "YOUTUBE");
   const ig = connections.find((c) => c.platform === "INSTAGRAM");
-  const paused = /^(1|true|yes)$/i.test(process.env.COMMENT_BOT_PAUSED ?? "");
-  const dryRun = /^(1|true|yes)$/i.test(process.env.COMMENT_BOT_DRY_RUN ?? "");
-  const igDays = ig?.accessTokenExpiresAt ? Math.round((ig.accessTokenExpiresAt.getTime() - Date.now()) / 86_400_000) : null;
+  const needsRetry = comments.filter((c) => c.status === "FAILED" || isStuck(c));
+
+  const chip = (ok: boolean, label: string) => (
+    <span className={`badge border ${ok ? "bg-status-success/10 text-status-success border-status-success/30" : "bg-status-warning/10 text-status-warning border-status-warning/30"}`}>
+      {ok ? "✓" : "!"} {label}
+    </span>
+  );
 
   return (
     <div className="p-6 space-y-6 max-w-5xl">
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="flex-1 min-w-[240px]">
-          <h1 className="text-xl font-semibold mb-1">Comment Bot</h1>
-          <p className="text-sm text-text-dim">
-            Replies to YouTube and Instagram comments automatically. Keywords from your <a className="text-accent-cyan" href="/resources">Resources</a> get
-            the prompt and its page link (by DM on Instagram); other comments get a short AI answer. Setup guide: <code>docs/SETUP.md</code>.
-          </p>
-        </div>
-        <a href="/comment-bot/templates" className="rounded-lg border border-border px-3.5 py-2 text-sm text-text-dim hover:text-text hover:border-accent-cyan/40">
-          Reply messages ✎
-        </a>
-        {paused && <Badge variant="warning">Paused</Badge>}
-        {dryRun && <Badge variant="purple">Dry run: nothing is posted</Badge>}
+      <BotHeader subtitle="Every comment the bot saw, what it replied, and anything that needs a retry." />
+
+      <div className="flex flex-wrap items-center gap-2 text-sm">
+        {chip(Boolean(yt), yt ? `YouTube: ${yt.accountName}` : "YouTube not connected")}
+        {chip(Boolean(ig), ig ? `Instagram: ${ig.accountName}` : "Instagram not connected")}
+        {chip(Boolean(llm), llm ? "AI replies on" : "AI off (no key)")}
+        <span className="ml-auto text-text-dim">
+          Last 24 hours: <span className="text-text font-medium">{stats.REPLIED ?? 0}</span> replied · {stats.SKIPPED ?? 0} no reply ·{" "}
+          <span className={stats.FAILED ? "text-status-danger" : ""}>{stats.FAILED ?? 0} failed</span>
+        </span>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <div className="panel p-5 space-y-2">
-          <p className="text-xs uppercase tracking-wide text-text-dim">YouTube</p>
-          {yt ? (
-            <>
-              <p className="font-medium">{yt.accountName}</p>
-              <Badge variant="success">Connected</Badge>
-              <p className="text-xs text-text-dim">Checked every minute.</p>
-            </>
-          ) : (
-            <Badge variant="warning">Not connected</Badge>
-          )}
-          <ConnectForm action="/api/comment-bot/youtube/connect" label={yt ? "Reconnect YouTube" : "Connect YouTube"} />
-        </div>
-        <div className="panel p-5 space-y-2">
-          <p className="text-xs uppercase tracking-wide text-text-dim">Instagram</p>
-          {ig ? (
-            <>
-              <p className="font-medium">{ig.accountName}</p>
-              <Badge variant={igDays !== null && igDays < 5 ? "warning" : "success"}>Connected</Badge>
-              {(ig.metadata as { mode?: string } | null)?.mode === "unified" ? (
-                <p className="text-xs text-text-dim">Unified login: the connection doesn't expire.</p>
-              ) : (
-                igDays !== null && <p className="text-xs text-text-dim">Token renews itself; {igDays} days left.</p>
-              )}
-            </>
-          ) : (
-            <Badge variant="warning">Not connected</Badge>
-          )}
-          <ConnectForm action="/api/comment-bot/instagram/connect" label={ig ? "Reconnect Instagram" : "Connect Instagram"} />
-        </div>
-        <div className="panel p-5 space-y-2">
-          <p className="text-xs uppercase tracking-wide text-text-dim">Last 24 hours</p>
-          <div className="grid grid-cols-2 gap-2 text-sm">
-            {(["REPLIED", "SKIPPED", "FAILED", "DRY_RUN"] as const).map((s) => (
-              <div key={s}>
-                <p className="text-lg font-semibold">{stats[s] ?? 0}</p>
-                <p className="text-xs text-text-dim">{s.replace("_", " ").toLowerCase()}</p>
+      {needsRetry.length > 0 && <SendProgress label={`Retry ${needsRetry.length} failed`} items={needsRetry.map(toPending)} />}
+
+      <section className="panel divide-y divide-border-subtle overflow-hidden">
+        {comments.map((c) => {
+          const pill = statusPill(c);
+          const what = whatHappened(c);
+          const canSend = c.status === "FAILED" || c.status === "SKIPPED" || c.status === "DRY_RUN" || isStuck(c);
+          return (
+            <div key={c.id} className="p-4 grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
+              <div className="min-w-0">
+                <p className="text-xs text-text-dim">
+                  {c.platform === "YOUTUBE" ? "YouTube" : "Instagram"} · {c.authorName ?? "viewer"} · {formatRelativeTime(c.createdAt)}
+                </p>
+                <p className="mt-1 text-sm line-clamp-3">“{c.commentText}”</p>
               </div>
-            ))}
-          </div>
-          <p className="text-xs text-text-dim">AI: {llm ? llm.name : "none (keywords only)"}</p>
-        </div>
-      </div>
-
-      <section className="panel p-5 space-y-3">
-        <h2 className="text-sm font-semibold text-text-dim uppercase tracking-wide">Keywords the bot listens for</h2>
-        {library.entries.length ? (
-          <div className="flex flex-wrap gap-2">
-            {library.entries.map((e) => (
-              <Badge key={e.keyword} variant="cyan">
-                {e.keywords.join(" / ")} · {e.title}
-              </Badge>
-            ))}
-          </div>
-        ) : (
-          <p className="text-sm text-text-dim">No keywords found yet.</p>
-        )}
-        {library.warnings.map((w) => (
-          <p key={w} className="text-xs text-status-warning">{w}</p>
-        ))}
-      </section>
-
-      <section className="panel p-5 space-y-3">
-        <h2 className="text-sm font-semibold text-text-dim uppercase tracking-wide">Test a reply</h2>
-        <TestReplyForm />
-      </section>
-
-      <SendProgress
-        label="Retry all failed"
-        items={comments
-          .filter((c) => c.status === "FAILED")
-          .map((c): PendingComment => ({ id: c.id, platform: c.platform, author: c.authorName, text: c.commentText, status: c.status }))}
-      />
-
-      <section className="panel overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="text-left text-xs text-text-dim border-b border-border-subtle">
-              <th className="p-3 font-medium">When</th>
-              <th className="p-3 font-medium">Where</th>
-              <th className="p-3 font-medium">Comment</th>
-              <th className="p-3 font-medium">Bot reply</th>
-              <th className="p-3 font-medium">Status</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border-subtle">
-            {comments.map((c) => (
-              <tr key={c.id} className="align-top">
-                <td className="p-3 text-text-dim whitespace-nowrap">{formatRelativeTime(c.createdAt)}</td>
-                <td className="p-3 text-text-dim">{c.platform === "YOUTUBE" ? "YouTube" : "Instagram"}</td>
-                <td className="p-3 max-w-xs">
-                  <p className="text-xs text-text-dim">{c.authorName}</p>
-                  <p className="line-clamp-3">{c.commentText}</p>
-                </td>
-                <td className="p-3 max-w-sm text-text-dim">
-                  {c.privateReply && <p className="line-clamp-2"><span className="text-text">DM:</span> {c.privateReply}</p>}
-                  {c.publicReply && <p className="line-clamp-3">{c.publicReply}</p>}
-                  {c.skipReason && <p className="text-xs">{c.skipReason}</p>}
-                  {c.error && <p className="text-xs text-status-danger">{c.error}</p>}
-                </td>
-                <td className="p-3">
-                  <Badge variant={STATUS_VARIANT[c.status as keyof typeof STATUS_VARIANT] ?? "default"}>{c.status}</Badge>
-                  {c.matchedKeyword && <p className="text-xs text-text-dim mt-1">{c.matchedKeyword}</p>}
-                  {(c.status === "FAILED" || c.status === "SKIPPED" || c.status === "DRY_RUN") && (
-                    <RowSend item={{ id: c.id, platform: c.platform, author: c.authorName, text: c.commentText, status: c.status }} />
-                  )}
-                </td>
-              </tr>
-            ))}
-            {comments.length === 0 && (
-              <tr>
-                <td colSpan={5} className="p-6 text-center text-text-dim">No comments handled yet.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </section>
-
-      <section className="panel p-5">
-        <h2 className="text-sm font-semibold text-text-dim uppercase tracking-wide mb-2">Settings checklist</h2>
-        <ul className="grid gap-x-6 md:grid-cols-2">
-          <EnvRow name="DATABASE_URL" hint="Supabase connection string (Transaction pooler)." />
-          <EnvRow name="APP_SECRET" hint="Random 32+ character secret: signs your login and protects the scheduled job." />
-          <EnvRow name="ADMIN_EMAILS" hint="Your Google email; only this account can sign in." />
-          <EnvRow name="GEMINI_API_KEY" hint="Free key from aistudio.google.com for AI answers (or ANTHROPIC_API_KEY / OPENAI_API_KEY)." />
-          <EnvRow name="GOOGLE_CLIENT_ID" hint="Google Cloud OAuth client for YouTube." />
-          <EnvRow name="GOOGLE_CLIENT_SECRET" hint="Google Cloud OAuth client secret." />
-          <EnvRow name="INSTAGRAM_APP_ID" hint="Meta app → App settings → Basic → App ID." />
-          <EnvRow name="INSTAGRAM_APP_SECRET" hint="Meta app → App settings → Basic → App secret. Also used to verify webhooks." />
-          <EnvRow name="META_LOGIN_CONFIG_ID" hint="Meta app → Facebook Login for Business → Configurations → Configuration ID (Unified login)." />
-          <EnvRow name="INSTAGRAM_WEBHOOK_VERIFY_TOKEN" hint="Any random word; paste the same value in Meta's webhook settings." />
-        </ul>
+              <div className="min-w-0 text-sm text-text-dim">
+                {what && <p className="text-xs font-medium text-text">{what}</p>}
+                {c.privateReply && <p className="mt-1 line-clamp-2"><span className="text-text">DM:</span> {c.privateReply}</p>}
+                {c.publicReply && <p className="mt-1 line-clamp-3"><span className="text-text">Reply:</span> {c.publicReply}</p>}
+                {c.status === "SKIPPED" && c.skipReason && <p className="mt-1 text-xs">Why no reply: {c.skipReason}</p>}
+                {c.error && (c.status === "FAILED" || isStuck(c)) && <p className="mt-1 text-xs text-status-danger">{c.error}</p>}
+                {isStuck(c) && !c.error && <p className="mt-1 text-xs text-status-danger">The server stopped before the reply was sent. Click Retry.</p>}
+              </div>
+              <div className="sm:text-right">
+                <span className={`badge border ${pill.className}`}>{pill.label}</span>
+                {canSend && <RowSend item={toPending(c)} />}
+              </div>
+            </div>
+          );
+        })}
+        {comments.length === 0 && <p className="p-6 text-center text-sm text-text-dim">No comments yet. New comments show up here within a minute.</p>}
       </section>
     </div>
-  );
-}
-
-function ConnectForm({ action, label }: { action: string; label: string }) {
-  return (
-    <a href={action} className="inline-block rounded-lg border border-border px-3 py-1.5 text-xs hover:bg-bg-raised">
-      {label}
-    </a>
   );
 }

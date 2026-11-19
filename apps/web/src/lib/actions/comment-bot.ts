@@ -65,6 +65,8 @@ export async function saveTemplates(_prev: TemplatesFormState, form: FormData): 
       igDm: String(form.get("igDm") ?? ""),
       youtubeKeywordReply: String(form.get("youtubeKeywordReply") ?? ""),
       aiStyle: String(form.get("aiStyle") ?? ""),
+      generalMode: String(form.get("generalMode") ?? "ai"),
+      generalReplies: String(form.get("generalReplies") ?? "").split("\n"),
     });
     if (!templates.igDm.includes("{prompt}") || !templates.youtubeKeywordReply.includes("{prompt}")) {
       return { error: "The Instagram DM and the YouTube reply must both contain {prompt}, or viewers won't get the prompt." };

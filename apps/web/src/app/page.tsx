@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { desc, eq } from "drizzle-orm";
-import { db, schema } from "@yaos/database";
+import { db, ensureSchemaPatches, schema } from "@yaos/database";
 import { getFollowLinks, getSiteSettings, listResources } from "@/lib/site";
 import { FollowCta } from "@/components/public/follow-cta";
 import { PublicFooter, PublicHeader } from "@/components/public/site-chrome";
@@ -31,6 +31,7 @@ function toItem(v: VideoRow): GridItem {
 }
 
 export default async function HomePage() {
+  await ensureSchemaPatches();
   const [settings, resources, videos] = await Promise.all([
     getSiteSettings(),
     listResources({ publishedOnly: true }),

@@ -4,6 +4,8 @@ import { getCurrentUser } from "@/lib/auth";
 import { getAllProviders } from "@yaos/ai-providers";
 import { updateChannelProfile } from "@/lib/actions/settings";
 import { Badge } from "@/components/ui/badge";
+import { SiteSettingsForm } from "@/components/admin/site-settings-form";
+import { getSiteSettings } from "@/lib/site";
 
 const INTEGRATION_LABELS: Record<string, string> = {
   OPENAI: "OpenAI",
@@ -25,6 +27,7 @@ export default async function SettingsPage() {
   const [profile] = await db.select().from(schema.channelProfiles).where(eq(schema.channelProfiles.workspaceId, user.workspaceId));
   const localWorkers = await db.select().from(schema.localWorkerNodes).where(eq(schema.localWorkerNodes.workspaceId, user.workspaceId));
   const providers = getAllProviders();
+  const site = await getSiteSettings();
 
   const integrationStatus: Record<string, "CONNECTED" | "NOT_CONNECTED" | "COMING_SOON"> = {
     OPENAI: providers.find((p) => p.id === "OPENAI")?.isAvailable() ? "CONNECTED" : "NOT_CONNECTED",
@@ -43,8 +46,16 @@ export default async function SettingsPage() {
     <div className="p-6 space-y-8 max-w-3xl">
       <div>
         <h1 className="text-xl font-semibold mb-1">Settings</h1>
-        <p className="text-sm text-text-dim">Channel profile, trust policy, and integration status.</p>
+        <p className="text-sm text-text-dim">Your public website, the comment bot's notes about you, and the studio's channel profile.</p>
       </div>
+
+      <section id="website" className="panel p-6 space-y-4">
+        <div>
+          <h2 className="text-sm font-semibold text-text-dim uppercase tracking-wide">Website</h2>
+          <p className="text-xs text-text-dim mt-1">What viewers see on your public site, plus the private "About me" notes the comment bot uses to answer in your voice.</p>
+        </div>
+        <SiteSettingsForm settings={site} />
+      </section>
 
       {profile ? (
         <form action={updateChannelProfile} className="panel p-6 space-y-4">

@@ -198,7 +198,31 @@ export async function reopenComment(id: string): Promise<boolean> {
   const rows = await db
     .update(t)
     .set({ status: "FAILED", attempts: 0, error: null, skipReason: null, updatedAt: new Date() })
-    .where(and(eq(t.id, id), or(eq(t.status, "FAILED"), eq(t.status, "SKIPPED"), eq(t.status, "DRY_RUN"))))
+    .where(
+      and(
+        eq(t.id, id),
+        or(
+          eq(t.status, "FAILED"),
+          eq(t.status, "SKIPPED"),
+          eq(t.status, "DRY_RUN"),
+          // stuck "working" for over a minute: the request that owned it was cut off
+          and(eq(t.status, "PROCESSING"), lt(t.updatedAt, new Date(Date.now() - 60_000))),
+        ),
+      ),
+    )
     .returning({ id: t.id });
   return rows.length > 0;
+}
+
+/**
+ * A reply that was cut off mid-way (Netlify stopped the request) stays "PROCESSING". After a few
+ * minutes mark it FAILED with an explanation, so it shows a Retry button and is retried automatically.
+ */
+export async function failStaleProcessing(olderThanMs = 3 * 60_000): Promise<number> {
+  const rows = await db
+    .update(t)
+    .set({ status: "FAILED", error: "Timed out: the server stopped before the reply was sent. Click Retry to send it now.", updatedAt: new Date() })
+    .where(and(eq(t.status, "PROCESSING"), lt(t.updatedAt, new Date(Date.now() - olderThanMs))))
+    .returning({ id: t.id });
+  return rows.length;
 }

@@ -31,7 +31,7 @@ const video = (over: Record<string, unknown>) =>
   ({
     id: "v1", platform: "YOUTUBE", externalId: "abc", slug: "great-video-abc123", title: "Great video", description: null,
     watchUrl: "https://youtu.be/abc", thumbnailUrl: null, publishedAt: new Date(), keyword: "EDIT", prompt: "Review my video",
-    promptSource: "docx", promptFilename: "edit.docx", hidden: false, createdAt: new Date(), updatedAt: new Date(), ...over,
+    promptSource: "docx", promptFilename: "edit.docx", hidden: false, resourceTitle: null, extraLink: null, format: "LONG", durationSeconds: 60, createdAt: new Date(), updatedAt: new Date(), ...over,
   }) as never;
 
 describe("videosToEntries", () => {
@@ -44,6 +44,7 @@ describe("videosToEntries", () => {
       link: "https://youtu.be/abc",
       message: "Review my video",
       url: "https://site.example/v/great-video-abc123",
+      mediaIds: ["abc"],
     });
   });
   it("skips videos without a prompt, without a keyword, or that are hidden", () => {

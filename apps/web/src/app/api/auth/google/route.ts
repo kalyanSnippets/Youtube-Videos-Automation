@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
   const clientId = process.env.GOOGLE_CLIENT_ID;
   if (!clientId) return NextResponse.redirect(new URL("/login?error=setup", request.url));
-  const next = new URL(request.url).searchParams.get("next") ?? "/dashboard";
+  const next = new URL(request.url).searchParams.get("next") ?? "/videos";
   const state = b64url(crypto.getRandomValues(new Uint8Array(24)));
   const url = new URL("https://accounts.google.com/o/oauth2/v2/auth");
   url.search = new URLSearchParams({
@@ -22,6 +22,6 @@ export async function GET(request: Request) {
   const res = NextResponse.redirect(url);
   const cookieOpts = { httpOnly: true, secure: true, sameSite: "lax" as const, path: "/api/auth", maxAge: 600 };
   res.cookies.set("yaos_oauth_state", state, cookieOpts);
-  res.cookies.set("yaos_oauth_next", next.startsWith("/") && !next.startsWith("//") ? next : "/dashboard", cookieOpts);
+  res.cookies.set("yaos_oauth_next", next.startsWith("/") && !next.startsWith("//") ? next : "/videos", cookieOpts);
   return res;
 }

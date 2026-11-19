@@ -975,6 +975,11 @@ ALTER TABLE "resources" ADD COLUMN IF NOT EXISTS "instagram_url" varchar(500);--
 ALTER TABLE "site_settings" ADD COLUMN IF NOT EXISTS "bot_templates" jsonb;
 INSERT INTO "drizzle"."__drizzle_migrations" (hash, created_at) VALUES ('51f3dea35b6e9a5853b7abca7885ae7122c0b8913fef087806107be12c7aa85b', 1795057961922);
 
+-- 0008_video_resource_fields
+ALTER TABLE "videos" ADD COLUMN IF NOT EXISTS "resource_title" varchar(200);--> statement-breakpoint
+ALTER TABLE "videos" ADD COLUMN IF NOT EXISTS "extra_link" varchar(500);
+INSERT INTO "drizzle"."__drizzle_migrations" (hash, created_at) VALUES ('e21c0cbd32b31e4c0afde5e80482000c47fa270c80f86aad7d7a17418ee7ea85', 1795060954864);
+
 -- Supabase exposes the public schema through its Data API. The app talks to Postgres directly
 -- (and bypasses row level security), so lock every table to the Data API.
 DO $$ DECLARE t record; BEGIN

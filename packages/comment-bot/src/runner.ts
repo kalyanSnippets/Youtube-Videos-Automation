@@ -51,7 +51,7 @@ export async function runYouTubePoll(options: { timeBudgetMs?: number; maxCommen
   const conn = await getConnection("YOUTUBE");
   if (!conn) return { platform: "YOUTUBE", skipped: "not connected" };
   const started = Date.now();
-  const budget = options.timeBudgetMs ?? 20_000;
+  const budget = options.timeBudgetMs ?? 5_000;
   const accessToken = await youtubeAccessToken(conn);
   const channelId = conn.accountId;
 
@@ -66,7 +66,7 @@ export async function runYouTubePoll(options: { timeBudgetMs?: number; maxCommen
     .filter((t) => !settled.has(t.comment.commentId))
     .map((t) => t.comment)
     .reverse() // oldest first
-    .slice(0, options.maxComments ?? 10);
+    .slice(0, options.maxComments ?? 3);
 
   if (!todo.length) return { platform: "YOUTUBE", seen: threads.length, processed: {} };
 

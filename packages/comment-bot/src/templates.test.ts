@@ -51,3 +51,49 @@ describe("planReply with custom templates", () => {
     expect(plan.privateReply).toBe("Yo @ravi: PROMPT -> https://s/r/fable");
   });
 });
+
+describe("general comments", () => {
+  const base = { about: "", warnings: [], entries: [] };
+  const yt = (text: string) => ({ platform: "YOUTUBE" as const, commentId: "c", text, authorName: "@ravi" });
+  const ai = (reply: string) => ({ name: "fake", complete: async () => JSON.stringify({ action: "reply", reply }) });
+  const skip = { name: "fake", complete: async () => JSON.stringify({ action: "skip", reason: "spam" }) };
+
+  it("ai mode: the AI writes the thank-you", async () => {
+    const plan = await planReply({ comment: yt("nice content bro"), library: { ...base, templates: { ...DEFAULT_TEMPLATES, generalMode: "ai" } }, llm: ai("Thanks Ravi, glad it helped!") });
+    expect(plan).toEqual({ action: "GENERAL", publicReply: "Thanks Ravi, glad it helped!" });
+  });
+  it("fixed mode: uses the creator's line, and the AI still blocks spam", async () => {
+    const templates = { ...DEFAULT_TEMPLATES, generalMode: "fixed" as const, generalReplies: ["Thanks {name}!"] };
+    expect((await planReply({ comment: yt("nice content"), library: { ...base, templates }, llm: ai("whatever"), pick: () => 0 })).publicReply).toBe("Thanks @ravi!");
+    expect((await planReply({ comment: yt("sub4sub check my channel"), library: { ...base, templates }, llm: skip })).action).toBe("NONE");
+    expect((await planReply({ comment: yt("nice content"), library: { ...base, templates }, llm: null, pick: () => 0 })).publicReply).toBe("Thanks @ravi!");
+  });
+  it("fixed mode: questions still get a real AI answer", async () => {
+    const templates = { ...DEFAULT_TEMPLATES, generalMode: "fixed" as const, generalReplies: ["Thanks!"] };
+    const plan = await planReply({ comment: yt("what mic do you use?"), library: { ...base, templates }, llm: ai("A Shure MV7!") });
+    expect(plan).toEqual({ action: "AI_ANSWER", publicReply: "A Shure MV7!" });
+  });
+  it("off mode: no reply and no AI call for general comments", async () => {
+    let called = false;
+    const llm = { name: "x", complete: async () => ((called = true), "{}") };
+    const plan = await planReply({ comment: yt("nice content"), library: { ...base, templates: { ...DEFAULT_TEMPLATES, generalMode: "off" } }, llm });
+    expect(plan.action).toBe("NONE");
+    expect(called).toBe(false);
+  });
+});
+
+describe("shared keywords", () => {
+  it("a comment on a video gets that video's prompt when two videos share the keyword", async () => {
+    const entries = [
+      { keyword: "FABLE", keywords: ["FABLE"], title: "Short", message: "SHORT PROMPT", mediaIds: ["yt1"] },
+      { keyword: "FABLE", keywords: ["FABLE"], title: "Reel", message: "REEL PROMPT", mediaIds: ["ig1"] },
+    ];
+    const plan = await planReply({
+      comment: { platform: "INSTAGRAM", commentId: "c", text: "FABLE", authorName: "ravi", mediaId: "ig1" },
+      library: { about: "", warnings: [], entries },
+      llm: null,
+      pick: () => 0,
+    });
+    expect(plan.privateReply).toContain("REEL PROMPT");
+  });
+});

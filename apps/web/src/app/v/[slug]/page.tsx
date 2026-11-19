@@ -4,7 +4,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { and, eq } from "drizzle-orm";
 import { ArrowLeft, ExternalLink } from "lucide-react";
-import { db, schema } from "@yaos/database";
+import { db, ensureSchemaPatches, schema } from "@yaos/database";
 import { getFollowLinks, getSiteSettings } from "@/lib/site";
 import { FollowCta } from "@/components/public/follow-cta";
 import { PublicFooter, PublicHeader } from "@/components/public/site-chrome";
@@ -14,6 +14,7 @@ import { NewsletterForm } from "@/components/public/newsletter-form";
 export const dynamic = "force-dynamic";
 
 async function getVideo(slug: string) {
+  await ensureSchemaPatches();
   const [v] = await db.select().from(schema.videos).where(and(eq(schema.videos.slug, slug), eq(schema.videos.hidden, false)));
   return v ?? null;
 }
@@ -68,7 +69,7 @@ export default async function VideoPage({ params }: { params: Promise<{ slug: st
         {video.prompt ? (
           <section className="panel overflow-hidden">
             <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-b border-border-subtle">
-              <span className="text-xs uppercase tracking-wide text-text-dim">Resource from this video</span>
+              <span className="text-sm font-medium">{video.resourceTitle || "Prompt from this video"}</span>
               <CopyButton text={video.prompt} />
             </div>
             <pre className="p-4 sm:p-5 whitespace-pre-wrap break-words font-mono text-[13px] leading-relaxed text-text">{video.prompt}</pre>
@@ -77,6 +78,12 @@ export default async function VideoPage({ params }: { params: Promise<{ slug: st
           <section className="panel p-5 text-sm text-text-dim">
             The prompt for this video is coming soon. Watch the video for now, and check back here.
           </section>
+        )}
+
+        {video.extraLink && (
+          <a href={video.extraLink} target="_blank" rel="noopener" className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3.5 py-2 text-sm hover:border-accent-cyan/40">
+            <ExternalLink size={15} /> Open the link from this video
+          </a>
         )}
 
         {video.keyword && video.prompt && (

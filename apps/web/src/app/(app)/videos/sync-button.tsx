@@ -21,7 +21,7 @@ export function SyncButton() {
         onClick={() => start(async () => setReport(await syncVideosNow()))}
         className="rounded-lg border border-border px-3.5 py-2 text-sm hover:border-accent-cyan/40 disabled:opacity-50"
       >
-        {pending ? "Syncing…" : "Sync now"}
+        {pending ? "Checking…" : "Check now"}
       </button>
       {report && (
         <p className="text-xs text-text-dim">

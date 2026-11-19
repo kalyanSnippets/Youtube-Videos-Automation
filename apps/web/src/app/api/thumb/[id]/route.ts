@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { db, schema } from "@yaos/database";
+import { db, ensureSchemaPatches, schema } from "@yaos/database";
 import { getConnection, instagramGraphBase, type InstagramMode } from "@yaos/comment-bot";
 
 export const dynamic = "force-dynamic";
@@ -56,6 +56,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   const placeholder = () =>
     new Response(PLACEHOLDER, { headers: { "content-type": "image/svg+xml", "cache-control": "public, max-age=600" } });
   if (!/^[0-9a-f-]{36}$/i.test(id)) return placeholder();
+  await ensureSchemaPatches();
 
   const [video] = await db.select().from(schema.videos).where(eq(schema.videos.id, id)).catch(() => []);
   if (!video || video.hidden) return placeholder();

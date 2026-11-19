@@ -192,3 +192,11 @@ Run [`docs/supabase-migration-2-formats-stats.sql`](supabase-migration-2-formats
 - **Retry all failed** / **Retry** / **Send reply** on the Comment Bot page now send immediately, one comment at a time, with a progress bar and the result for each.
 - **Resources → New resource** starts with "Fill in from a video": pick a YouTube video or Instagram Reel/post and the title, description, keyword, prompt and both links are filled in. The matching video on the other platform is found automatically.
 - Database: the app adds the two new columns it needs by itself. `docs/supabase-migration-3-templates.sql` does the same by hand and is safe to run even after that.
+
+### Simpler admin (latest)
+
+- Menu: **Channel** (Videos & prompts, Comment Bot, Subscribers), **Studio** (the video-production tools), **Settings**. Signing in lands on Videos & prompts.
+- **Videos & prompts**: one row per video. **Add prompt** opens an editor: import from a file or Google Doc (it fills the text box so you can check it), set the keyword and an optional prompt name and extra link, then **Save**. If the same content exists on the other platform (a Short and its Reel), tick "Also use this for…" to give both the same prompt. Old standalone prompts appear in a box at the top to move onto videos.
+- **Comment Bot** has tabs: **Activity** (what happened, with Retry / Send reply and a progress bar), **Test a reply**, **Reply messages** (wording, styles and the General comments choice), **Setup** (connections, keywords, checklist).
+- **Settings → Website**: site name, tagline, links, newsletter and the bot's private "About me" notes.
+- Replies are kept within Netlify's ~10 second limit: the AI is asked to answer without long "thinking", each AI call stops after 7 seconds, and at most 3 new comments are handled per minute. A reply that gets cut off is marked **Failed** after 3 minutes, with a Retry button.

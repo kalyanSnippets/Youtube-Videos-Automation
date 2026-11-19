@@ -131,8 +131,26 @@ export async function planReply(input: RespondInput): Promise<ReplyPlan> {
   const text = comment.text.trim();
   if (!text) return { action: "NONE", skipReason: "Empty comment" };
 
-  const match = matchKeyword(text, library.entries);
-  const wantsAnswer = match ? looksLikeQuestion(text, match.keyword) : true;
+  const found = matchKeyword(text, library.entries);
+  // Several videos can share a keyword (e.g. the Short and the Reel of the same content):
+  // prefer the one this comment is actually on.
+  const match = found && {
+    keyword: found.keyword,
+    entry:
+      library.entries.find((e) => e.keywords.includes(found.keyword) && comment.mediaId && e.mediaIds?.includes(comment.mediaId)) ??
+      found.entry,
+  };
+  const isQuestion = looksLikeQuestion(text, match?.keyword);
+  const wantsAnswer = match ? isQuestion : true;
+
+  // General comment (no keyword, not a question) with general replies switched off: no reply, no AI call.
+  if (!match && !isQuestion && templates.generalMode === "off") {
+    return { action: "NONE", skipReason: "General comments are switched off (Reply messages → General comments)." };
+  }
+  const randomGeneral = () => {
+    const lines = templates.generalReplies.length ? templates.generalReplies : DEFAULT_TEMPLATES.generalReplies;
+    return fillTemplate(lines[pickIndex(lines.length, input.pick)]!, { name, title: "" });
+  };
 
   let aiReply: string | undefined;
   let aiKeywordEntry: LibraryEntry | undefined;
@@ -140,6 +158,9 @@ export async function planReply(input: RespondInput): Promise<ReplyPlan> {
 
   if (wantsAnswer) {
     if (!llm) {
+      if (!match && !isQuestion && templates.generalMode === "fixed" && !/https?:\/\/|www\./i.test(text)) {
+        return { action: "GENERAL", publicReply: randomGeneral() };
+      }
       aiSkipReason = "No AI key configured (set GEMINI_API_KEY), so only keyword comments get replies.";
     } else {
       const raw = await llm.complete(buildSystemPrompt(comment.platform, library), buildUserPrompt(comment, input.media));
@@ -180,6 +201,8 @@ export async function planReply(input: RespondInput): Promise<ReplyPlan> {
     };
   }
 
-  if (aiReply) return { action: "AI_ANSWER", publicReply: aiReply };
+  // "Use my thank-you lines": the AI still filters out spam (it said "reply"), but the words are yours.
+  if (aiReply && !isQuestion && templates.generalMode === "fixed") return { action: "GENERAL", publicReply: randomGeneral() };
+  if (aiReply) return { action: isQuestion ? "AI_ANSWER" : "GENERAL", publicReply: aiReply };
   return { action: "NONE", skipReason: aiSkipReason ?? "Nothing to reply" };
 }

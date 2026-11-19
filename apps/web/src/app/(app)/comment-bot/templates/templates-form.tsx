@@ -34,10 +34,12 @@ export function TemplatesForm({ initial }: { initial: ReplyTemplates }) {
   const [state, action, pending] = useActionState<TemplatesFormState, FormData>(saveTemplates, {});
   const [t, setT] = useState<ReplyTemplates>(initial);
   const [igReplies, setIgReplies] = useState(initial.igPublicReplies.join("\n"));
+  const [generalLines, setGeneralLines] = useState(initial.generalReplies.join("\n"));
   const set = (patch: Partial<ReplyTemplates>) => setT((prev) => ({ ...prev, ...patch }));
   const load = (p: ReplyTemplates) => {
     setT(p);
     setIgReplies(p.igPublicReplies.join("\n"));
+    setGeneralLines(p.generalReplies.join("\n"));
   };
 
   const previews = useMemo(() => {
@@ -46,8 +48,14 @@ export function TemplatesForm({ initial }: { initial: ReplyTemplates }) {
       igPublic: replies.length ? fillTemplate(replies[0]!, SAMPLE) : "",
       igDm: renderDelivery(t.igDm, SAMPLE, 1000),
       yt: renderDelivery(t.youtubeKeywordReply, { ...SAMPLE, name: "@ravi" }, 9000),
+      general:
+        t.generalMode === "off"
+          ? "(no reply)"
+          : t.generalMode === "ai"
+            ? "(the AI writes a short thank-you about their comment, in your style)"
+            : fillTemplate(generalLines.split("\n").map((x) => x.trim()).find(Boolean) ?? "", { name: "ravi", title: "" }),
     };
-  }, [t, igReplies]);
+  }, [t, igReplies, generalLines]);
 
   return (
     <div className="space-y-6">
@@ -101,8 +109,31 @@ export function TemplatesForm({ initial }: { initial: ReplyTemplates }) {
             />
             <span className="block text-xs text-text-dim">Must include {"{prompt}"}. Links in YouTube replies are sometimes held for review.</span>
           </label>
+          <fieldset className="space-y-2">
+            <legend className="text-sm font-medium">General comments (no keyword, no question), e.g. “nice content!”</legend>
+            <input type="hidden" name="generalMode" value={t.generalMode} />
+            {(
+              [
+                ["ai", "AI writes a short thank-you", "Specific to what they said, in your style below."],
+                ["fixed", "Use my thank-you lines", "One of your lines below, picked at random. The AI still filters out spam."],
+                ["off", "Don't reply", "Only keywords and questions get replies."],
+              ] as const
+            ).map(([value, label, hint]) => (
+              <label key={value} className={`flex items-start gap-3 rounded-lg border p-3 cursor-pointer ${t.generalMode === value ? "border-accent-cyan/50 bg-accent-cyan/5" : "border-border"}`}>
+                <input type="radio" checked={t.generalMode === value} onChange={() => set({ generalMode: value })} className="mt-1" />
+                <span>
+                  <span className="block text-sm">{label}</span>
+                  <span className="block text-xs text-text-dim">{hint}</span>
+                </span>
+              </label>
+            ))}
+            {t.generalMode === "fixed" && (
+              <textarea name="generalReplies" value={generalLines} onChange={(e) => setGeneralLines(e.target.value)} rows={4} className={inputClass} placeholder="Thank you so much, {name}! 🙌" />
+            )}
+            {t.generalMode !== "fixed" && <input type="hidden" name="generalReplies" value={generalLines} />}
+          </fieldset>
           <label className="block space-y-1.5">
-            <span className="text-sm font-medium">AI answer style (for questions and other comments)</span>
+            <span className="text-sm font-medium">AI style (for answers to questions{t.generalMode === "ai" ? " and thank-yous" : ""})</span>
             <textarea name="aiStyle" value={t.aiStyle} onChange={(e) => set({ aiStyle: e.target.value })} rows={3} className={inputClass} />
             <span className="block text-xs text-text-dim">Describe the tone. Safety rules (no links, no invented facts, skip spam) always apply.</span>
           </label>
@@ -124,6 +155,8 @@ export function TemplatesForm({ initial }: { initial: ReplyTemplates }) {
           <Preview label="Instagram public reply" text={previews.igPublic} />
           <Preview label="Instagram DM" text={previews.igDm} />
           <Preview label="YouTube reply" text={previews.yt} />
+          <p className="text-xs text-text-dim pt-2">@ravi comments “nice content!”:</p>
+          <Preview label="Reply (Instagram and YouTube)" text={previews.general} />
         </aside>
       </form>
     </div>

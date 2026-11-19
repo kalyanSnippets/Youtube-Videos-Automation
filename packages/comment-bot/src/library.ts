@@ -18,6 +18,11 @@ export function videoPageUrl(slug: string, base = siteBaseUrl()): string | undef
 
 type VideoRow = typeof schema.videos.$inferSelect;
 
+/** "My video #shorts #ai" -> "My video" (hashtags read badly inside a DM). */
+export function cleanVideoTitle(title: string): string {
+  return title.replace(/(^|\s)#[\p{L}\p{N}_]+/gu, " ").replace(/\s{2,}/g, " ").trim() || title;
+}
+
 /** Videos that have both a keyword and a prompt become keyword entries. The bot links to the video's page on the site. */
 export function videosToEntries(rows: VideoRow[], base = siteBaseUrl()): LibraryEntry[] {
   return rows
@@ -25,10 +30,11 @@ export function videosToEntries(rows: VideoRow[], base = siteBaseUrl()): Library
     .map((v) => ({
       keyword: v.keyword!,
       keywords: [v.keyword!],
-      title: v.title,
+      title: v.resourceTitle?.trim() || cleanVideoTitle(v.title),
       link: v.watchUrl,
       message: v.prompt!,
       url: videoPageUrl(v.slug, base),
+      mediaIds: [v.externalId],
     }));
 }
 
@@ -82,20 +88,10 @@ export async function loadPromptLibrary(options: { force?: boolean } = {}): Prom
   ]);
   const base = siteBaseUrl();
   const resourceLib = toLibrary(rows, settings[0]?.about ?? "", base);
-  const seen = new Set(resourceLib.entries.flatMap((e) => e.keywords));
-  // A resource made from a video shares its keyword on purpose; only warn when they're unrelated.
-  const linkedToResource = new Set(rows.flatMap((r) => [r.videoUrl, r.instagramUrl].filter((u): u is string => Boolean(u))));
-  const extra = videosToEntries(videoRows, base).filter((e) => {
-    if (seen.has(e.keyword)) {
-      if (!e.link || !linkedToResource.has(e.link)) {
-        resourceLib.warnings.push(`Keyword ${e.keyword} is on a video and an unrelated resource; the resource wins.`);
-      }
-      return false;
-    }
-    seen.add(e.keyword);
-    return true;
-  });
-  const entries = [...resourceLib.entries, ...extra];
+  // Every video keeps its own entry, even when keywords repeat (the Short and the Reel of the same
+  // content): the bot picks the one the comment is on. Old standalone resources come after videos.
+  const extra = videosToEntries(videoRows, base);
+  const entries = [...extra, ...resourceLib.entries];
   const warnings = resourceLib.warnings.filter((w) => !w.startsWith("No published resources"));
   if (!entries.length) warnings.push("No keywords yet: upload a prompt to a video, or add a resource.");
   const library = { about: resourceLib.about, entries, warnings, templates: normaliseTemplates(settings[0]?.botTemplates) };

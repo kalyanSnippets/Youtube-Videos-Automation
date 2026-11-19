@@ -1,11 +1,11 @@
 "use server";
 
-import { and, eq, ne } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { db, ensureSchemaPatches, schema } from "@yaos/database";
 import { clearPromptLibraryCache, normaliseKeyword } from "@yaos/comment-bot";
 import { requireAdmin } from "@/lib/admin";
-import { fetchGoogleDoc, googleDocId, readUpload, tidy, takeKeywordLine, type ImportedPrompt } from "@/lib/prompt-import";
+import { fetchGoogleDoc, googleDocId, readUpload, takeKeywordLine, tidy } from "@/lib/prompt-import";
 import { runVideoSync, type SyncReport } from "@/lib/video-sync";
 
 export interface VideoFormState {
@@ -13,80 +13,135 @@ export interface VideoFormState {
   saved?: string;
 }
 
-function refresh(videoId?: string) {
+export interface ImportResult {
+  error?: string;
+  text?: string;
+  keyword?: string | null;
+  source?: string;
+  filename?: string | null;
+}
+
+function refresh() {
   clearPromptLibraryCache();
   revalidatePath("/videos");
   revalidatePath("/", "layout");
-  revalidatePath("/v", "layout");
-  if (videoId) revalidatePath(`/videos`);
 }
 
-/** Keyword must be unique across videos and resources, because the bot needs one answer per word. */
-async function keywordClash(keyword: string, videoId: string, watchUrl: string): Promise<string | null> {
-  const [video] = await db
-    .select({ title: schema.videos.title })
-    .from(schema.videos)
-    .where(and(eq(schema.videos.keyword, keyword), ne(schema.videos.id, videoId)))
-    .limit(1);
-  if (video) return `Keyword ${keyword} is already used by the video "${video.title}".`;
-  const resources = await db
-    .select({ title: schema.resources.title, keywords: schema.resources.keywords, videoUrl: schema.resources.videoUrl, instagramUrl: schema.resources.instagramUrl })
-    .from(schema.resources);
-  // Fine if the resource is about this very video (made with "Fill in from a video").
-  const resource = resources.find((r) => (r.keywords ?? []).includes(keyword) && r.videoUrl !== watchUrl && r.instagramUrl !== watchUrl);
-  if (resource) return `Keyword ${keyword} is already used by the resource "${resource.title}".`;
-  return null;
+function optionalUrl(value: string): string | null {
+  if (!value) return null;
+  const u = new URL(value); // throws on junk
+  if (u.protocol !== "https:" && u.protocol !== "http:") throw new Error("not http");
+  return u.toString();
 }
 
 /**
- * One form per video card: keyword, prompt (file, Google Doc link or pasted text), hidden flag.
- * Any prompt source converts to plain text and is stored on the video.
+ * Step 1 of adding a prompt: turn an uploaded file or a Google Doc link into text.
+ * Nothing is saved; the text goes into the editor so you can check it before saving.
  */
-export async function saveVideo(_prev: VideoFormState, form: FormData): Promise<VideoFormState> {
+export async function importPrompt(form: FormData): Promise<ImportResult> {
   await requireAdmin();
-  await ensureSchemaPatches();
-  const videoId = String(form.get("id") ?? "");
-  const [video] = await db.select().from(schema.videos).where(eq(schema.videos.id, videoId));
-  if (!video) return { error: "That video no longer exists. Refresh the page." };
-
   try {
-    let imported: ImportedPrompt | null = null;
     const file = form.get("file");
     const docLink = String(form.get("docLink") ?? "").trim();
-    const pasted = String(form.get("pasted") ?? "").trim();
     if (file instanceof File && file.size > 0) {
-      imported = await readUpload(file);
-    } else if (docLink) {
+      const r = await readUpload(file);
+      if (!r.text) return { error: "That file had no text in it." };
+      return { text: r.text, keyword: r.keyword, source: r.source, filename: r.filename };
+    }
+    if (docLink) {
       if (!googleDocId(docLink)) return { error: "That doesn't look like a Google Docs link." };
       const { keyword, text } = takeKeywordLine(tidy(await fetchGoogleDoc(docLink)));
-      imported = { text, source: "google-doc", filename: null, keyword };
-    } else if (pasted) {
-      const { keyword, text } = takeKeywordLine(tidy(pasted));
-      imported = { text, source: "text", filename: null, keyword };
+      if (!text) return { error: "That doc is empty." };
+      return { text, keyword, source: "google-doc", filename: null };
     }
-
-    const typedKeyword = normaliseKeyword(String(form.get("keyword") ?? ""));
-    const keyword = typedKeyword || imported?.keyword || video.keyword || null;
-    if (keyword) {
-      const clash = await keywordClash(keyword, video.id, video.watchUrl);
-      if (clash) return { error: clash };
-    }
-    const hidden = form.get("hidden") === "on";
-
-    const update: Partial<typeof schema.videos.$inferInsert> = { keyword, hidden, updatedAt: new Date() };
-    if (imported) {
-      if (!imported.text) return { error: "That file had no text in it." };
-      update.prompt = imported.text;
-      update.promptSource = imported.source;
-      update.promptFilename = imported.filename;
-    }
-    await db.update(schema.videos).set(update).where(eq(schema.videos.id, video.id));
-    refresh(video.id);
-    const what = imported ? `Prompt saved (${imported.text.length.toLocaleString()} characters).` : "Saved.";
-    return { saved: what };
+    return { error: "Choose a file or paste a Google Doc link first." };
   } catch (error) {
     return { error: (error as Error).message };
   }
+}
+
+/** Old standalone resources can't share a keyword with a video they're not about. */
+async function legacyResourceClash(keyword: string, watchUrls: string[]): Promise<string | null> {
+  const rows = await db
+    .select({ title: schema.resources.title, keywords: schema.resources.keywords, videoUrl: schema.resources.videoUrl, instagramUrl: schema.resources.instagramUrl, published: schema.resources.published })
+    .from(schema.resources);
+  const clash = rows.find(
+    (r) => r.published && (r.keywords ?? []).includes(keyword) && !watchUrls.includes(r.videoUrl ?? "") && !watchUrls.includes(r.instagramUrl ?? ""),
+  );
+  return clash ? `Keyword ${keyword} is still used by the old resource "${clash.title}". Move it into a video first (box at the top of this page), or pick another keyword.` : null;
+}
+
+/** Step 2: save the prompt (and optionally copy it to the same video on the other platform). */
+export async function saveVideo(_prev: VideoFormState, form: FormData): Promise<VideoFormState> {
+  await requireAdmin();
+  await ensureSchemaPatches();
+  const id = String(form.get("id") ?? "");
+  const [video] = await db.select().from(schema.videos).where(eq(schema.videos.id, id));
+  if (!video) return { error: "That video no longer exists. Refresh the page." };
+
+  try {
+    const prompt = tidy(String(form.get("prompt") ?? ""));
+    const keyword = normaliseKeyword(String(form.get("keyword") ?? "")) || null;
+    const resourceTitle = String(form.get("resourceTitle") ?? "").trim().slice(0, 200) || null;
+    let extraLink: string | null;
+    try {
+      extraLink = optionalUrl(String(form.get("extraLink") ?? "").trim());
+    } catch {
+      return { error: "The extra link must be a full address starting with https://" };
+    }
+    const hidden = form.get("hidden") === "on";
+    const twinId = String(form.get("twinId") ?? "");
+    const [twin] = twinId ? await db.select().from(schema.videos).where(eq(schema.videos.id, twinId)) : [];
+
+    if (keyword) {
+      const clash = await legacyResourceClash(keyword, [video.watchUrl, twin?.watchUrl ?? ""].filter(Boolean));
+      if (clash) return { error: clash };
+    }
+
+    const promptChanged = prompt !== (video.prompt ?? "");
+    const fields = {
+      keyword,
+      resourceTitle,
+      extraLink,
+      prompt: prompt || null,
+      promptSource: prompt ? (promptChanged ? String(form.get("promptSource") ?? "") || "text" : video.promptSource) : null,
+      promptFilename: prompt ? (promptChanged ? String(form.get("promptFilename") ?? "") || null : video.promptFilename) : null,
+      updatedAt: new Date(),
+    };
+    await db.update(schema.videos).set({ ...fields, hidden }).where(eq(schema.videos.id, video.id));
+    if (twin) await db.update(schema.videos).set(fields).where(eq(schema.videos.id, twin.id));
+    refresh();
+    const where = twin ? ` Also added to the ${twin.platform === "INSTAGRAM" ? "Instagram" : "YouTube"} version.` : "";
+    return { saved: prompt ? `Saved.${where}` : `Saved (no prompt yet, so it shows "Prompt coming soon").${where}` };
+  } catch (error) {
+    return { error: (error as Error).message };
+  }
+}
+
+/** Moves an old standalone resource onto a video (and its twin), then removes the old resource. */
+export async function moveResourceToVideo(form: FormData): Promise<void> {
+  await requireAdmin();
+  await ensureSchemaPatches();
+  const resourceId = String(form.get("resourceId") ?? "");
+  const videoIds = form.getAll("videoId").map(String).filter(Boolean);
+  const [resource] = await db.select().from(schema.resources).where(eq(schema.resources.id, resourceId));
+  if (!resource || !videoIds.length) return;
+  for (const videoId of videoIds) {
+    await db
+      .update(schema.videos)
+      .set({
+        prompt: resource.body,
+        promptSource: "text",
+        promptFilename: null,
+        keyword: resource.keywords?.[0] ?? null,
+        resourceTitle: resource.title,
+        extraLink: resource.link,
+        updatedAt: new Date(),
+      })
+      .where(eq(schema.videos.id, videoId));
+  }
+  await db.delete(schema.resources).where(eq(schema.resources.id, resourceId));
+  refresh();
 }
 
 export async function removeVideoPrompt(form: FormData): Promise<void> {
@@ -95,10 +150,10 @@ export async function removeVideoPrompt(form: FormData): Promise<void> {
   if (id) {
     await db
       .update(schema.videos)
-      .set({ prompt: null, promptSource: null, promptFilename: null, updatedAt: new Date() })
+      .set({ prompt: null, promptSource: null, promptFilename: null, keyword: null, updatedAt: new Date() })
       .where(eq(schema.videos.id, id));
   }
-  refresh(id);
+  refresh();
 }
 
 /** "Sync now" button on the Videos page. Same job the hourly schedule runs. */
