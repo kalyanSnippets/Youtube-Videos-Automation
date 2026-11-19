@@ -36,13 +36,25 @@ describe("planReply", () => {
     expect(llm.calls).toBe(0);
   });
 
-  it("YouTube keyword: the prompt goes in the public reply", async () => {
+  it("YouTube keyword: a short public reply with the link to the prompt's page", async () => {
     const plan = await planReply({ comment: yt("fable!"), library, llm: null });
     expect(plan.action).toBe("KEYWORD");
     expect(plan.privateReply).toBeUndefined();
-    expect(plan.publicReply).toContain("@ravi");
+    expect(plan.publicReply).toBe("Here you go @ravi 👇 The Fable prompts is ready to copy on my site:\nhttps://site.example/r/fable");
+    expect(plan.publicReply).not.toContain("Do the thing.");
+  });
+
+  it("YouTube keyword without a site address falls back to posting the prompt", async () => {
+    const noUrl = { ...library, entries: [{ ...library.entries[0]!, url: undefined }] };
+    const plan = await planReply({ comment: yt("FABLE"), library: noUrl, llm: null });
     expect(plan.publicReply).toContain("Do the thing.");
-    expect(plan.publicReply).toContain("https://site.example/r/fable");
+  });
+
+  it("Instagram keyword: the DM has the prompt and the link", async () => {
+    const plan = await planReply({ comment: ig("FABLE"), library, llm: null, pick: () => 0 });
+    expect(plan.privateReply).toContain("Do the thing.");
+    expect(plan.privateReply).toContain("https://site.example/r/fable");
+    expect(plan.publicReply).toBe("Sent! Check your DMs 📩");
   });
 
   it("keyword plus a question: answers and delivers", async () => {

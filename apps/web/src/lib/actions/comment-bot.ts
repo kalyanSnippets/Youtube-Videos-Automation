@@ -73,8 +73,11 @@ export async function saveTemplates(_prev: TemplatesFormState, form: FormData): 
       generalMode: String(form.get("generalMode") ?? "ai"),
       generalReplies: String(form.get("generalReplies") ?? "").split("\n"),
     });
-    if (!templates.igDm.includes("{prompt}") || !templates.youtubeKeywordReply.includes("{prompt}")) {
-      return { error: "The Instagram DM and the YouTube reply must both contain {prompt}, or viewers won't get the prompt." };
+    if (!templates.igDm.includes("{prompt}")) {
+      return { error: "The Instagram DM must contain {prompt}, or viewers won't get the prompt." };
+    }
+    if (!templates.youtubeKeywordReply.includes("{link}") && !templates.youtubeKeywordReply.includes("{prompt}")) {
+      return { error: "The YouTube reply must contain {link} (the prompt's page) or {prompt}, or viewers won't get the prompt." };
     }
     await ensureSchemaPatches();
     await db

@@ -15,7 +15,7 @@ export default async function ReplyTemplatesPage() {
         <div className="grid gap-3 md:grid-cols-3 text-sm">
           <div className="panel-raised p-3 space-y-1">
             <p className="font-medium">1. Keyword comments</p>
-            <p className="text-text-dim">“FABLE” on a video with that keyword. Instagram: the prompt goes by <b>DM</b> and a short public reply says it&apos;s sent. YouTube: the prompt is the public reply (YouTube has no DMs).</p>
+            <p className="text-text-dim">“FABLE” on a video with that keyword. Instagram: the prompt and its link go by <b>DM</b>, and a short public reply says it&apos;s sent. YouTube (no DMs): a short public reply with the <b>link to the prompt&apos;s page</b> on your site.</p>
           </div>
           <div className="panel-raised p-3 space-y-1">
             <p className="font-medium">2. Questions</p>

@@ -13,8 +13,8 @@ function describe(state: TestReplyState): string {
   switch (p.action) {
     case "KEYWORD":
       return state.platform === "INSTAGRAM"
-        ? `Keyword ${p.matchedKeyword}: sends the prompt by DM and posts a short public reply.`
-        : `Keyword ${p.matchedKeyword}: posts the prompt as a public reply (YouTube has no DMs).`;
+        ? `Keyword ${p.matchedKeyword}: DMs the prompt with its link, and posts a short public reply.`
+        : `Keyword ${p.matchedKeyword}: replies publicly with the link to the prompt's page on your site (YouTube has no DMs).`;
     case "KEYWORD_AND_ANSWER":
       return `Keyword ${p.matchedKeyword} plus a question: answers it and sends the prompt.`;
     case "AI_ANSWER":

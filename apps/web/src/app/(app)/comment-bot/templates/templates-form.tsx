@@ -99,7 +99,7 @@ export function TemplatesForm({ initial }: { initial: ReplyTemplates }) {
             <span className="block text-xs text-text-dim">Must include {"{prompt}"}. Instagram allows 1,000 characters; long prompts are cut and the reader is sent to {"{link}"}.</span>
           </label>
           <label className="block space-y-1.5">
-            <span className="text-sm font-medium">YouTube reply (YouTube has no DMs, so this is public)</span>
+            <span className="text-sm font-medium">YouTube reply (public: YouTube has no DMs)</span>
             <textarea
               name="youtubeKeywordReply"
               value={t.youtubeKeywordReply}
@@ -107,7 +107,9 @@ export function TemplatesForm({ initial }: { initial: ReplyTemplates }) {
               rows={7}
               className={`${inputClass} font-mono text-[13px]`}
             />
-            <span className="block text-xs text-text-dim">Must include {"{prompt}"}. Links in YouTube replies are sometimes held for review.</span>
+            <span className="block text-xs text-text-dim">
+              Include {"{link}"}: it sends viewers to the prompt&apos;s page on your site (with a Copy button). Use {"{prompt}"} instead to paste the whole prompt into the comment.
+            </span>
           </label>
           <fieldset className="space-y-2">
             <legend className="text-sm font-medium">General comments (no keyword, no question), e.g. “nice content!”</legend>

@@ -120,3 +120,24 @@ describe("when the AI is busy", () => {
     expect(plan.action).toBe("NONE");
   });
 });
+
+describe("saved YouTube replies from before", () => {
+  it("an old built-in reply that pasted the prompt is upgraded to the link version", () => {
+    const old = "Here you go {name} 👇 {title}\n\n{prompt}\n\n📄 Copy it here: {link}\n🔗 {video}";
+    expect(normaliseTemplates({ youtubeKeywordReply: old }).youtubeKeywordReply).toBe(DEFAULT_TEMPLATES.youtubeKeywordReply);
+  });
+  it("a custom reply is kept as written", () => {
+    expect(normaliseTemplates({ youtubeKeywordReply: "Grab it: {link}" }).youtubeKeywordReply).toBe("Grab it: {link}");
+  });
+});
+
+describe("every ready-made template", () => {
+  it("DMs the prompt with its link on Instagram, and links to the page on YouTube", () => {
+    for (const p of TEMPLATE_PRESETS) {
+      expect(p.templates.igDm, p.id).toContain("{prompt}");
+      expect(p.templates.igDm, p.id).toContain("{link}");
+      expect(p.templates.youtubeKeywordReply, p.id).toContain("{link}");
+      expect(p.templates.youtubeKeywordReply, p.id).not.toContain("{prompt}");
+    }
+  });
+});

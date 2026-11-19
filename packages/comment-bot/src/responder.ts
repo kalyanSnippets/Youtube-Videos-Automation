@@ -1,5 +1,5 @@
 import type { LLM } from "./llm";
-import { DEFAULT_TEMPLATES, fillTemplate, renderDelivery, type ReplyTemplates, type TemplateVars } from "./templates";
+import { DEFAULT_TEMPLATES, YOUTUBE_PROMPT_FALLBACK, fillTemplate, renderDelivery, type ReplyTemplates, type TemplateVars } from "./templates";
 import { looksLikeQuestion, matchKeyword } from "./matcher";
 import type { IncomingComment, LibraryEntry, MediaContext, Platform, PromptLibrary, ReplyPlan } from "./types";
 
@@ -35,7 +35,12 @@ export function buildInstagramDM(entry: LibraryEntry, name: string | undefined, 
 }
 
 export function buildYouTubeKeywordReply(entry: LibraryEntry, name: string | undefined, templates: ReplyTemplates = DEFAULT_TEMPLATES): string {
-  return renderDelivery(templates.youtubeKeywordReply, deliveryVars(entry, name), YOUTUBE_COMMENT_LIMIT);
+  const vars = deliveryVars(entry, name);
+  // The default YouTube reply points to the prompt's page on the site. Without a site address
+  // (or with a custom reply that has neither link nor prompt) post the prompt itself.
+  const template = templates.youtubeKeywordReply;
+  const usable = (template.includes("{link}") && vars.link) || template.includes("{prompt}");
+  return renderDelivery(usable ? template : YOUTUBE_PROMPT_FALLBACK, vars, YOUTUBE_COMMENT_LIMIT);
 }
 
 interface AIDecision {

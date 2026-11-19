@@ -17,7 +17,10 @@ export interface ReplyTemplates {
   igPublicReplies: string[];
   /** The Instagram DM with the prompt. */
   igDm: string;
-  /** The public YouTube reply for a keyword (YouTube has no DMs). */
+  /**
+   * The public YouTube reply for a keyword (YouTube has no DMs). By default a short note with {link},
+   * the prompt's page on the site. If the site address isn't known, the prompt itself is posted instead.
+   */
   youtubeKeywordReply: string;
   /** How the AI should sound when it answers questions. */
   aiStyle: string;
@@ -54,7 +57,7 @@ export const DEFAULT_TEMPLATES: ReplyTemplates = {
     "It's in your DMs ✅ Enjoy!",
   ],
   igDm: "Hey {name}! Here's the {title} you asked for 👇\n\n{prompt}\n\n📄 Copy it here: {link}\n🔗 {video}",
-  youtubeKeywordReply: "Here you go {name} 👇 {title}\n\n{prompt}\n\n📄 Copy it here: {link}\n🔗 {video}",
+  youtubeKeywordReply: "Here you go {name} 👇 The {title} is ready to copy on my site:\n{link}",
   aiStyle: "Warm, casual and helpful, like a friendly creator. 1-3 short sentences. At most one emoji.",
   generalMode: "ai",
   generalReplies: DEFAULT_TEMPLATES_GENERAL,
@@ -69,7 +72,7 @@ export const TEMPLATE_PRESETS: { id: string; label: string; description: string;
     templates: {
       igPublicReplies: ["Sent 📩", "Check your DMs ✅", "In your inbox, {name} 🙌"],
       igDm: "{title} 👇\n\n{prompt}\n\n{link}",
-      youtubeKeywordReply: "{title} 👇\n\n{prompt}\n\n{link}",
+      youtubeKeywordReply: "{title} 👉 {link}",
       aiStyle: "Very short and friendly. One sentence where possible. No emojis.",
       generalMode: "fixed",
       generalReplies: ["Thanks!", "Thank you, {name}!", "Glad you liked it!"],
@@ -82,7 +85,7 @@ export const TEMPLATE_PRESETS: { id: string; label: string; description: string;
     templates: {
       igPublicReplies: ["Sent you the {title} 📩 Tip: swap the [brackets] for your own details!", "Check your DMs, {name}. It's all there with tips 👍"],
       igDm: "Hi {name}! Here's the {title} 👇\n\n{prompt}\n\nHow to use it: copy it into ChatGPT, Claude or Gemini and replace anything in [brackets] with your own details.\n\n📄 Easy-copy version: {link}\n▶️ Rewatch the video: {video}",
-      youtubeKeywordReply: "Hi {name}! Here's the {title} 👇\n\n{prompt}\n\nTip: replace anything in [brackets] with your own details.\n📄 Easy-copy version: {link}",
+      youtubeKeywordReply: "Hi {name}! The {title} is here, with the full prompt to copy:\n{link}\nTip: replace anything in [brackets] with your own details.",
       aiStyle: "Patient and clear, like a teacher. Explain briefly in 2-3 sentences. Use simple words. At most one emoji.",
       generalMode: "ai",
       generalReplies: DEFAULT_TEMPLATES_GENERAL,
@@ -95,7 +98,7 @@ export const TEMPLATE_PRESETS: { id: string; label: string; description: string;
     templates: {
       igPublicReplies: ["🚀 Sent! Go check your DMs!", "Boom 💥 it's in your DMs, {name}!", "Done ✅🔥 Enjoy the {title}!"],
       igDm: "Yooo {name} 🔥 here's the {title}!\n\n{prompt}\n\n📄 Copy it here: {link}\n🎬 {video}",
-      youtubeKeywordReply: "🔥 {name}, here's the {title}!\n\n{prompt}\n\n📄 {link}",
+      youtubeKeywordReply: "🔥 {name}, grab the {title} here 👉 {link}",
       aiStyle: "Energetic and upbeat, 1-2 short sentences, 1-2 emojis.",
       generalMode: "fixed",
       generalReplies: ["🔥🔥 Thanks {name}!", "Let's gooo 🚀 Thanks for watching!", "You're awesome, {name} 🙌"],
@@ -104,6 +107,17 @@ export const TEMPLATE_PRESETS: { id: string; label: string; description: string;
 ];
 
 const MAX_TEMPLATE = 2000;
+
+/** Earlier built-in YouTube replies pasted the whole prompt; a saved copy of one is upgraded to the link version. */
+const LEGACY_YOUTUBE_REPLIES: Record<string, string> = {
+  ["Here you go {name} 👇 {title}\n\n{prompt}\n\n📄 Copy it here: {link}\n🔗 {video}"]: "Here you go {name} 👇 The {title} is ready to copy on my site:\n{link}",
+  ["{title} 👇\n\n{prompt}\n\n{link}"]: "{title} 👉 {link}",
+  ["Hi {name}! Here's the {title} 👇\n\n{prompt}\n\nTip: replace anything in [brackets] with your own details.\n📄 Easy-copy version: {link}"]: "Hi {name}! The {title} is here, with the full prompt to copy:\n{link}\nTip: replace anything in [brackets] with your own details.",
+  ["🔥 {name}, here's the {title}!\n\n{prompt}\n\n📄 {link}"]: "🔥 {name}, grab the {title} here 👉 {link}",
+};
+
+/** Used for YouTube when there's no site link to send (SITE_URL / URL not set). */
+export const YOUTUBE_PROMPT_FALLBACK = "Here you go {name} 👇 {title}\n\n{prompt}";
 
 function cleanString(v: unknown, fallback: string): string {
   return typeof v === "string" && v.trim() ? v.replace(/\r\n?/g, "\n").slice(0, MAX_TEMPLATE) : fallback;
@@ -120,7 +134,10 @@ export function normaliseTemplates(raw: unknown): ReplyTemplates {
   return {
     igPublicReplies: replies.length ? replies : DEFAULT_TEMPLATES.igPublicReplies,
     igDm: cleanString(r.igDm, DEFAULT_TEMPLATES.igDm),
-    youtubeKeywordReply: cleanString(r.youtubeKeywordReply, DEFAULT_TEMPLATES.youtubeKeywordReply),
+    youtubeKeywordReply: (() => {
+      const yt = cleanString(r.youtubeKeywordReply, DEFAULT_TEMPLATES.youtubeKeywordReply);
+      return LEGACY_YOUTUBE_REPLIES[yt] ?? yt;
+    })(),
     aiStyle: cleanString(r.aiStyle, DEFAULT_TEMPLATES.aiStyle).slice(0, 500),
     generalMode: mode,
     generalReplies: general.length ? general : DEFAULT_TEMPLATES.generalReplies,
