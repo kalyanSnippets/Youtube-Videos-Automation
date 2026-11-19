@@ -103,28 +103,27 @@ The bot now checks YouTube comments once a minute. Netlify's scheduled job only 
 1. **Settings → Account type and tools → Switch to professional account → Creator**. You don't need a Facebook Page.
 2. **Settings → Messages and story replies → Message controls → Connected tools →** turn on **Allow access to messages**.
 
-**On developers.facebook.com** (log in with Facebook and register as a developer if asked):
-1. **My Apps → Create app**. Name it `AI with Kalyan Bot`. For the use case, choose **Manage messaging & content on Instagram**,
-   then click through to **Create app**.
-2. Open **Instagram → API setup with Instagram login**. Copy the **Instagram app ID** and **Instagram app secret**.
-   Use the Instagram ones, not the Facebook App ID at the top.
-3. Pick any word as your webhook password, e.g. `kalyan-webhook-2026`.
-4. In Netlify, add `INSTAGRAM_APP_ID`, `INSTAGRAM_APP_SECRET` and `INSTAGRAM_WEBHOOK_VERIFY_TOKEN` (the word from step 3),
-   then **Trigger deploy** and wait for it to finish.
-5. Back in Meta, under **API setup with Instagram login**:
-   - **Configure webhooks**:
-     - Callback URL `https://YOUR-SITE/api/comment-bot/instagram/webhook`
-     - Verify token: your word from step 3
-     - Click **Verify and save**, then turn on the **comments** field.
-   - **Set up Instagram business login → Business login settings**: under OAuth redirect URIs, add
-     `https://YOUR-SITE/api/comment-bot/instagram/callback` and click **Save**.
-6. **App settings → Basic**:
-   - Privacy policy URL: `https://YOUR-SITE/privacy`
-   - User data deletion: `https://YOUR-SITE/privacy#data-deletion`
-   - Category: Education
-   - Click **Save changes**. Then switch **App Mode** at the top to **Live**.
-7. In your admin area, open **Comment Bot** and click **Connect Instagram**. Log in and click **Allow**.
-   You should see "Instagram connected ✅".
+**On developers.facebook.com** (log in with Facebook):
+
+Meta apps created since late 2026 use **"API setup with Unified login"**. The older "Instagram login" isn't offered for new apps.
+
+1. **My Apps → Create app**, name `AI with Kalyan Bot`, use case **Manage messaging & content on Instagram**.
+   - **Business portfolio:** connect one you're an admin of. Meta requires one for Unified login, and you can rename an existing portfolio rather than create a new one.
+2. **Use cases → Customize → API setup with Unified login → 1. Configure your app**:
+   - Click **Create new configuration**. Keep the access token as **System-user access token**, expiration **Never**, and choose your Instagram account as the asset. Tick the permissions `instagram_basic`, `instagram_manage_comments`, `instagram_manage_messages` and **`business_management`**.
+     - If `business_management` isn't offered there: add the **Facebook Login for Business** product, open **Configurations**, edit this configuration and add it. Without it, Meta logs you in but shares no Instagram account.
+   - **Redirect URL:** add `https://YOUR-SITE/api/comment-bot/instagram/callback` and click **Save**.
+   - Copy the **Configuration ID**. This is `META_LOGIN_CONFIG_ID`.
+3. **App settings → Basic**:
+   - Copy the **App ID** (`INSTAGRAM_APP_ID`) and the **App secret** (`INSTAGRAM_APP_SECRET`).
+   - Privacy policy URL: `https://YOUR-SITE/privacy`. User data deletion: `https://YOUR-SITE/privacy#data-deletion`. Category: Education. Click **Save changes**.
+4. Pick any word as your webhook password, e.g. `kalyan-webhook-2026`. This is `INSTAGRAM_WEBHOOK_VERIFY_TOKEN`.
+5. In Netlify, add `INSTAGRAM_APP_ID`, `INSTAGRAM_APP_SECRET`, `META_LOGIN_CONFIG_ID` and `INSTAGRAM_WEBHOOK_VERIFY_TOKEN`, then **Trigger deploy** and wait for **Published**.
+6. Back in Meta, open the **webhooks** step on the same Unified login page:
+   - Callback URL `https://YOUR-SITE/api/comment-bot/instagram/webhook`, and the verify token from step 4.
+   - Click **Verify and save**, then subscribe to the **comments** field.
+7. In your admin area, go to **Comment Bot → Connect Instagram**. Log in, choose your Instagram account and allow access. You should see "Instagram connected ✅". This connection doesn't expire.
+8. **Publish:** switch the app to **Live** (left menu **Publish**). In development mode, Meta only sends comments from people who have a role on the app.
 
 ## Part 8: Test everything, about 5 minutes
 
@@ -158,6 +157,6 @@ and `instagram_business_manage_messages`. Attach a short screen recording of the
 | `ADMIN_EMAILS` | yes | Part 2 |
 | `GEMINI_API_KEY` | for AI answers | Part 2 (or `ANTHROPIC_API_KEY` / `OPENAI_API_KEY`) |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | yes | Part 4 |
-| `INSTAGRAM_APP_ID`, `INSTAGRAM_APP_SECRET`, `INSTAGRAM_WEBHOOK_VERIFY_TOKEN` | for Instagram | Part 7 |
+| `INSTAGRAM_APP_ID`, `INSTAGRAM_APP_SECRET`, `META_LOGIN_CONFIG_ID`, `INSTAGRAM_WEBHOOK_VERIFY_TOKEN` | for Instagram | Part 7 |
 | `SITE_URL` | only with a custom domain | e.g. `https://aiwithkalyan.com` |
 | `COMMENT_BOT_PAUSED`, `COMMENT_BOT_DRY_RUN`, `YOUTUBE_BACKFILL_HOURS` | optional | see [`COMMENT-BOT.md`](COMMENT-BOT.md) |

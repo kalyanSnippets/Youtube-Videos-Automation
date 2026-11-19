@@ -4,6 +4,8 @@ import { processComment, type ProcessDeps, type ProcessOutcome } from "./process
 import { dbStore, getConnection, rowToComment, updateConnectionToken, type ConnectionRow } from "./store";
 import {
   getInstagramMediaContext,
+  instagramGraphBase,
+  type InstagramMode,
   refreshInstagramToken,
   replyToInstagramComment,
   sendInstagramPrivateReply,
@@ -86,12 +88,13 @@ export async function runYouTubePoll(options: { timeBudgetMs?: number; maxCommen
 
 function instagramDeps(conn: ConnectionRow, base: Omit<ProcessDeps, "senders">): ProcessDeps {
   const token = conn.accessToken!;
+  const graph = instagramGraphBase((conn.metadata as { mode?: InstagramMode } | null)?.mode);
   return {
     ...base,
-    getMedia: async (c) => (c.mediaId ? getInstagramMediaContext(token, c.mediaId) : undefined),
+    getMedia: async (c) => (c.mediaId ? getInstagramMediaContext(token, c.mediaId, graph) : undefined),
     senders: {
-      publicReply: async (c, text) => void (await replyToInstagramComment(token, c.commentId, text)),
-      privateReply: (c, text) => sendInstagramPrivateReply(token, conn.accountId, c.commentId, text),
+      publicReply: async (c, text) => void (await replyToInstagramComment(token, c.commentId, text, graph)),
+      privateReply: (c, text) => sendInstagramPrivateReply(token, conn.accountId, c.commentId, text, graph),
     },
   };
 }
@@ -128,6 +131,8 @@ export async function retryInstagramFailures(limit = 5) {
 /** Instagram long-lived tokens last 60 days; refresh once fewer than 10 remain. */
 export async function refreshInstagramTokenIfNeeded() {
   const conn = await getConnection("INSTAGRAM");
+  // Unified-login system-user tokens don't expire and can't be refreshed this way.
+  if ((conn?.metadata as { mode?: string } | null)?.mode === "unified") return { refreshed: false, note: "system-user token" };
   if (!conn?.accessToken || !conn.accessTokenExpiresAt) return { refreshed: false };
   const daysLeft = (conn.accessTokenExpiresAt.getTime() - Date.now()) / 86_400_000;
   if (daysLeft > 10) return { refreshed: false, daysLeft: Math.round(daysLeft) };

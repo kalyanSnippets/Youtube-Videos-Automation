@@ -1,6 +1,6 @@
 import { createHmac } from "node:crypto";
 import { describe, expect, it } from "vitest";
-import { parseInstagramWebhook, verifyMetaSignature } from "./instagram";
+import { FB_GRAPH, instagramGraphBase, parseInstagramWebhook, unifiedAuthUrl, verifyMetaSignature } from "./instagram";
 import { createOAuthState, verifyOAuthState } from "./oauth-state";
 
 describe("verifyMetaSignature", () => {
@@ -45,5 +45,19 @@ describe("OAuth state", () => {
     expect(verifyOAuthState(s, "INSTAGRAM", "k", now)).toBe(false);
     expect(verifyOAuthState(s, "YOUTUBE", "other", now)).toBe(false);
     expect(verifyOAuthState(s, "YOUTUBE", "k", now + 16 * 60 * 1000)).toBe(false);
+  });
+});
+
+describe("Unified login", () => {
+  it("uses graph.facebook.com for unified connections and graph.instagram.com otherwise", () => {
+    expect(instagramGraphBase("unified")).toBe(FB_GRAPH);
+    expect(FB_GRAPH).toMatch(/^https:\/\/graph\.facebook\.com\/v\d+\.0$/);
+    expect(instagramGraphBase(undefined)).toMatch(/^https:\/\/graph\.instagram\.com\//);
+  });
+  it("builds the Facebook Login for Business dialog URL with the configuration id", () => {
+    const url = new URL(unifiedAuthUrl({ appId: "123", configId: "cfg9", redirectUri: "https://s/cb", state: "st" }));
+    expect(url.hostname).toBe("www.facebook.com");
+    expect(url.pathname).toMatch(/\/dialog\/oauth$/);
+    expect(Object.fromEntries(url.searchParams)).toMatchObject({ client_id: "123", config_id: "cfg9", redirect_uri: "https://s/cb", state: "st", response_type: "code" });
   });
 });

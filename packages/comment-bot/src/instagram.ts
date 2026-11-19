@@ -9,6 +9,73 @@ import type { IncomingComment, MediaContext } from "./types";
  */
 export const IG_VERSION = process.env.INSTAGRAM_GRAPH_VERSION ?? "v24.0";
 const GRAPH = `https://graph.instagram.com/${IG_VERSION}`;
+
+/**
+ * Apps created since late 2026 can't use Instagram Login; Meta puts them on "Unified login":
+ * Facebook Login for Business with a configuration (config_id) that issues a never-expiring
+ * system-user token, and every call goes to graph.facebook.com. Same endpoints and webhook
+ * payloads, different host and login. A connection's metadata.mode says which one it uses.
+ */
+export const FB_VERSION = process.env.META_GRAPH_VERSION ?? "v26.0";
+export const FB_GRAPH = `https://graph.facebook.com/${FB_VERSION}`;
+export type InstagramMode = "unified" | "instagram-login";
+
+export function instagramGraphBase(mode: InstagramMode | undefined): string {
+  return mode === "unified" ? FB_GRAPH : GRAPH;
+}
+
+export function unifiedAuthUrl(p: { appId: string; configId: string; redirectUri: string; state: string }): string {
+  const q = new URLSearchParams({
+    client_id: p.appId,
+    config_id: p.configId,
+    redirect_uri: p.redirectUri,
+    response_type: "code",
+    override_default_response_type: "true",
+    state: p.state,
+  });
+  return `https://www.facebook.com/${FB_VERSION}/dialog/oauth?${q}`;
+}
+
+/** Code -> system-user token (Unified login). These tokens normally never expire. */
+export async function exchangeUnifiedCode(p: { code: string; appId: string; appSecret: string; redirectUri: string }) {
+  return readJson<{ access_token: string; expires_in?: number }>(
+    await fetch(
+      `${FB_GRAPH}/oauth/access_token?${new URLSearchParams({ client_id: p.appId, client_secret: p.appSecret, redirect_uri: p.redirectUri, code: p.code })}`,
+    ),
+    "code exchange",
+  );
+}
+
+/** The Instagram professional account(s) the system user was given. */
+export async function getUnifiedInstagramAccounts(accessToken: string): Promise<{ id: string; username: string }[]> {
+  const direct = await readJson<{ data?: { id: string; username?: string }[] }>(
+    await fetch(`${FB_GRAPH}/me/assigned_instagram_accounts?${new URLSearchParams({ fields: "id,username", access_token: accessToken })}`),
+    "account lookup",
+  ).catch(() => ({ data: [] as { id: string; username?: string }[] }));
+  if (direct.data?.length) return direct.data.map((a) => ({ id: String(a.id), username: a.username ?? a.id }));
+  // Fallback for accounts reached through a Facebook Page.
+  const pages = await readJson<{ data?: { instagram_business_account?: { id: string; username?: string } }[] }>(
+    await fetch(`${FB_GRAPH}/me/accounts?${new URLSearchParams({ fields: "instagram_business_account{id,username}", access_token: accessToken })}`),
+    "page lookup",
+  ).catch(() => ({ data: [] }));
+  return (pages.data ?? [])
+    .map((p) => p.instagram_business_account)
+    .filter((a): a is { id: string; username?: string } => Boolean(a?.id))
+    .map((a) => ({ id: String(a.id), username: a.username ?? a.id }));
+}
+
+/** Best effort: subscribe the account's comment events to this app. Returns an error message instead of throwing. */
+export async function subscribeUnifiedWebhooks(accessToken: string, igAccountId: string): Promise<string | null> {
+  try {
+    await readJson(
+      await fetch(`${FB_GRAPH}/${igAccountId}/subscribed_apps?${new URLSearchParams({ subscribed_fields: "comments", access_token: accessToken })}`, { method: "POST" }),
+      "webhook subscription",
+    );
+    return null;
+  } catch (error) {
+    return (error as Error).message;
+  }
+}
 export const INSTAGRAM_SCOPES = [
   "instagram_business_basic",
   "instagram_business_manage_comments",
@@ -84,10 +151,10 @@ export async function subscribeInstagramWebhooks(accessToken: string): Promise<v
   );
 }
 
-export async function getInstagramMediaContext(accessToken: string, mediaId: string): Promise<MediaContext> {
+export async function getInstagramMediaContext(accessToken: string, mediaId: string, base = GRAPH): Promise<MediaContext> {
   try {
     const json = await readJson<{ caption?: string; permalink?: string }>(
-      await fetch(`${GRAPH}/${mediaId}?${new URLSearchParams({ fields: "caption,permalink", access_token: accessToken })}`),
+      await fetch(`${base}/${mediaId}?${new URLSearchParams({ fields: "caption,permalink", access_token: accessToken })}`),
       "media lookup",
     );
     return { description: json.caption, url: json.permalink };
@@ -96,9 +163,9 @@ export async function getInstagramMediaContext(accessToken: string, mediaId: str
   }
 }
 
-export async function replyToInstagramComment(accessToken: string, commentId: string, message: string): Promise<string> {
+export async function replyToInstagramComment(accessToken: string, commentId: string, message: string, base = GRAPH): Promise<string> {
   const json = await readJson<{ id?: string }>(
-    await fetch(`${GRAPH}/${commentId}/replies`, {
+    await fetch(`${base}/${commentId}/replies`, {
       method: "POST",
       headers: { authorization: `Bearer ${accessToken}`, "content-type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({ message }),
@@ -108,9 +175,9 @@ export async function replyToInstagramComment(accessToken: string, commentId: st
   return json.id ?? "";
 }
 
-export async function sendInstagramPrivateReply(accessToken: string, igAccountId: string, commentId: string, text: string): Promise<void> {
+export async function sendInstagramPrivateReply(accessToken: string, igAccountId: string, commentId: string, text: string, base = GRAPH): Promise<void> {
   await readJson(
-    await fetch(`${GRAPH}/${igAccountId}/messages`, {
+    await fetch(`${base}/${igAccountId}/messages`, {
       method: "POST",
       headers: { authorization: `Bearer ${accessToken}`, "content-type": "application/json" },
       body: JSON.stringify({ recipient: { comment_id: commentId }, message: { text } }),

@@ -67,7 +67,11 @@ export default async function CommentBotPage() {
             <>
               <p className="font-medium">{ig.accountName}</p>
               <Badge variant={igDays !== null && igDays < 5 ? "warning" : "success"}>Connected</Badge>
-              {igDays !== null && <p className="text-xs text-text-dim">Token renews itself; {igDays} days left.</p>}
+              {(ig.metadata as { mode?: string } | null)?.mode === "unified" ? (
+                <p className="text-xs text-text-dim">Unified login: the connection doesn't expire.</p>
+              ) : (
+                igDays !== null && <p className="text-xs text-text-dim">Token renews itself; {igDays} days left.</p>
+              )}
             </>
           ) : (
             <Badge variant="warning">Not connected</Badge>
@@ -168,8 +172,9 @@ export default async function CommentBotPage() {
           <EnvRow name="GEMINI_API_KEY" hint="Free key from aistudio.google.com for AI answers (or ANTHROPIC_API_KEY / OPENAI_API_KEY)." />
           <EnvRow name="GOOGLE_CLIENT_ID" hint="Google Cloud OAuth client for YouTube." />
           <EnvRow name="GOOGLE_CLIENT_SECRET" hint="Google Cloud OAuth client secret." />
-          <EnvRow name="INSTAGRAM_APP_ID" hint="Meta app → Instagram → API setup with Instagram login." />
-          <EnvRow name="INSTAGRAM_APP_SECRET" hint="Same page as the app id. Also used to verify webhooks." />
+          <EnvRow name="INSTAGRAM_APP_ID" hint="Meta app → App settings → Basic → App ID." />
+          <EnvRow name="INSTAGRAM_APP_SECRET" hint="Meta app → App settings → Basic → App secret. Also used to verify webhooks." />
+          <EnvRow name="META_LOGIN_CONFIG_ID" hint="Meta app → Facebook Login for Business → Configurations → Configuration ID (Unified login)." />
           <EnvRow name="INSTAGRAM_WEBHOOK_VERIFY_TOKEN" hint="Any random word; paste the same value in Meta's webhook settings." />
         </ul>
       </section>
