@@ -11,3 +11,4 @@ export * from "./publish";
 export * from "./agents";
 export * from "./comment-bot";
 export * from "./site";
+export * from "./videos";

@@ -160,3 +160,18 @@ and `instagram_business_manage_messages`. Attach a short screen recording of the
 | `INSTAGRAM_APP_ID`, `INSTAGRAM_APP_SECRET`, `META_LOGIN_CONFIG_ID`, `INSTAGRAM_WEBHOOK_VERIFY_TOKEN` | for Instagram | Part 7 |
 | `SITE_URL` | only with a custom domain | e.g. `https://aiwithkalyan.com` |
 | `COMMENT_BOT_PAUSED`, `COMMENT_BOT_DRY_RUN`, `YOUTUBE_BACKFILL_HOURS` | optional | see [`COMMENT-BOT.md`](COMMENT-BOT.md) |
+
+---
+
+## Videos and prompts (added later)
+
+Every YouTube video and Instagram post becomes a card automatically: in the admin **Videos** page and on the public site.
+
+1. **Once:** in Supabase → **SQL Editor → New query**, paste the contents of [`docs/supabase-videos-migration.sql`](supabase-videos-migration.sql) and click **Run**. This adds the `videos` table.
+2. Open **Videos** in the admin area and click **Sync now**. After that, a scheduled job (`netlify/functions/videos-sync.mts`) refreshes the list every hour. Large channels fill in over a few hours.
+3. On each card:
+   - Type the **keyword** (e.g. `EDIT`).
+   - Add the prompt in one of these ways: upload a **.docx, .pdf, .txt or .md** file, paste a **Google Doc link** (shared as "Anyone with the link can view"), or paste the text.
+   - If the first line of the file is `KEYWORD: EDIT`, the keyword is filled in for you and that line is left out of the prompt.
+4. Cards without a prompt show "Prompt coming soon" publicly. Once a prompt is added, the card's page (`/v/<name>`) shows it with a Copy button and a link back to YouTube or Instagram, and the comment bot answers that keyword with it.
+5. Tick **Hide** on a card to keep it off the site and away from the bot.

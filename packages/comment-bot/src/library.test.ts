@@ -24,3 +24,29 @@ describe("toLibrary", () => {
     expect(lib.warnings.join(" ")).toMatch(/About me/);
   });
 });
+
+import { videosToEntries } from "./library";
+
+const video = (over: Record<string, unknown>) =>
+  ({
+    id: "v1", platform: "YOUTUBE", externalId: "abc", slug: "great-video-abc123", title: "Great video", description: null,
+    watchUrl: "https://youtu.be/abc", thumbnailUrl: null, publishedAt: new Date(), keyword: "EDIT", prompt: "Review my video",
+    promptSource: "docx", promptFilename: "edit.docx", hidden: false, createdAt: new Date(), updatedAt: new Date(), ...over,
+  }) as never;
+
+describe("videosToEntries", () => {
+  it("turns videos with a keyword and prompt into bot entries that link to the video page", () => {
+    const [entry] = videosToEntries([video({})], "https://site.example");
+    expect(entry).toEqual({
+      keyword: "EDIT",
+      keywords: ["EDIT"],
+      title: "Great video",
+      link: "https://youtu.be/abc",
+      message: "Review my video",
+      url: "https://site.example/v/great-video-abc123",
+    });
+  });
+  it("skips videos without a prompt, without a keyword, or that are hidden", () => {
+    expect(videosToEntries([video({ prompt: null }), video({ id: "2", keyword: null }), video({ id: "3", hidden: true })], "https://s")).toEqual([]);
+  });
+});

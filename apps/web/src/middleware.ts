@@ -8,10 +8,12 @@ import { SESSION_COOKIE, verifySessionToken } from "@/lib/session";
 const PUBLIC_EXACT = new Set(["/", "/privacy", "/login", "/robots.txt", "/sitemap.xml", "/favicon.ico", "/icon.svg"]);
 const PUBLIC_PREFIXES = [
   "/r/", // resource pages
+  "/v/", // video pages
   "/api/auth/", // sign-in flow
   "/api/newsletter", // public signup form
   "/api/comment-bot/instagram/webhook", // Meta (checks its own signature)
   "/api/comment-bot/run", // scheduler (checks APP_SECRET bearer)
+  "/api/videos/sync", // scheduler (checks APP_SECRET bearer)
   "/_next/",
 ];
 

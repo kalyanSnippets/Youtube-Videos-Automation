@@ -1,4 +1,4 @@
-import { asc, eq } from "drizzle-orm";
+import { and, asc, eq, isNotNull } from "drizzle-orm";
 import { db, schema } from "@yaos/database";
 import type { LibraryEntry, PromptLibrary } from "./types";
 
@@ -9,6 +9,26 @@ export function siteBaseUrl(): string | undefined {
 
 export function resourceUrl(slug: string, base = siteBaseUrl()): string | undefined {
   return base ? `${base}/r/${slug}` : undefined;
+}
+
+export function videoPageUrl(slug: string, base = siteBaseUrl()): string | undefined {
+  return base ? `${base}/v/${slug}` : undefined;
+}
+
+type VideoRow = typeof schema.videos.$inferSelect;
+
+/** Videos that have both a keyword and a prompt become keyword entries. The bot links to the video's page on the site. */
+export function videosToEntries(rows: VideoRow[], base = siteBaseUrl()): LibraryEntry[] {
+  return rows
+    .filter((v) => !v.hidden && v.keyword && v.prompt)
+    .map((v) => ({
+      keyword: v.keyword!,
+      keywords: [v.keyword!],
+      title: v.title,
+      link: v.watchUrl,
+      message: v.prompt!,
+      url: videoPageUrl(v.slug, base),
+    }));
 }
 
 type ResourceRow = typeof schema.resources.$inferSelect;
@@ -49,11 +69,30 @@ const CACHE_MS = 30 * 1000;
 /** Published resources + About notes, cached briefly so a burst of comments doesn't re-query. */
 export async function loadPromptLibrary(options: { force?: boolean } = {}): Promise<PromptLibrary> {
   if (!options.force && cache && Date.now() - cache.at < CACHE_MS) return cache.library;
-  const [rows, settings] = await Promise.all([
+  const [rows, settings, videoRows] = await Promise.all([
     db.select().from(schema.resources).where(eq(schema.resources.published, true)).orderBy(asc(schema.resources.sortOrder), asc(schema.resources.createdAt)),
     db.select().from(schema.siteSettings).where(eq(schema.siteSettings.id, 1)),
+    db
+      .select()
+      .from(schema.videos)
+      .where(and(eq(schema.videos.hidden, false), isNotNull(schema.videos.keyword), isNotNull(schema.videos.prompt)))
+      .catch(() => [] as VideoRow[]), // table not migrated yet: keep working with resources only
   ]);
-  const library = toLibrary(rows, settings[0]?.about ?? "");
+  const base = siteBaseUrl();
+  const resourceLib = toLibrary(rows, settings[0]?.about ?? "", base);
+  const seen = new Set(resourceLib.entries.flatMap((e) => e.keywords));
+  const extra = videosToEntries(videoRows, base).filter((e) => {
+    if (seen.has(e.keyword)) {
+      resourceLib.warnings.push(`Keyword ${e.keyword} is on a video and a resource; the resource wins.`);
+      return false;
+    }
+    seen.add(e.keyword);
+    return true;
+  });
+  const entries = [...resourceLib.entries, ...extra];
+  const warnings = resourceLib.warnings.filter((w) => !w.startsWith("No published resources"));
+  if (!entries.length) warnings.push("No keywords yet: upload a prompt to a video, or add a resource.");
+  const library = { about: resourceLib.about, entries, warnings };
   cache = { at: Date.now(), library };
   return library;
 }

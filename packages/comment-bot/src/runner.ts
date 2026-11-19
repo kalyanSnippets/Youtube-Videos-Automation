@@ -34,7 +34,7 @@ function tally(outcomes: ProcessOutcome[]): Record<string, number> {
 
 // ---------------------------------------------------------------- YouTube
 
-async function youtubeAccessToken(conn: ConnectionRow): Promise<string> {
+export async function youtubeAccessToken(conn: ConnectionRow): Promise<string> {
   const fresh = conn.accessToken && conn.accessTokenExpiresAt && conn.accessTokenExpiresAt.getTime() > Date.now() + 60_000;
   if (fresh) return conn.accessToken!;
   const clientId = process.env.GOOGLE_CLIENT_ID;
