@@ -35,7 +35,7 @@ export async function GET(request: Request) {
       accessToken: token.access_token,
       refreshToken: token.refresh_token,
       accessTokenExpiresAt: new Date(Date.now() + token.expires_in * 1000),
-      metadata: { scopes: token.scope ?? "" },
+      metadata: { scopes: token.scope ?? "", avatarUrl: channel.avatarUrl },
     });
     const analytics = (token.scope ?? "").includes("yt-analytics");
     return resultPage(

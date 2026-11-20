@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { currentAdminEmail } from "@/lib/admin";
+import { SiteLogo } from "@/components/site-logo";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Sign in" };
@@ -18,9 +19,9 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   return (
     <main className="min-h-screen grid place-items-center px-4">
       <div className="panel w-full max-w-sm p-8 space-y-5 text-center">
-        <div className="mx-auto h-10 w-10 rounded-xl bg-gradient-to-br from-accent-cyan to-accent-purple" />
+        <SiteLogo size={48} className="mx-auto rounded-xl" />
         <div>
-          <h1 className="text-lg font-semibold">Creator sign in</h1>
+          <h1 className="text-lg font-semibold">AI with Kalyan OS</h1>
           <p className="text-sm text-text-dim mt-1">This area is private. Viewers: the free resources are on the home page.</p>
         </div>
         {error && <p className="text-sm text-status-danger">{ERRORS[error] ?? "Sign-in failed."}</p>}

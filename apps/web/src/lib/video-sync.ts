@@ -326,12 +326,23 @@ async function syncStats(yt: ConnectionRow | null, ig: ConnectionRow | null): Pr
   if (yt) {
     try {
       const token = await youtubeAccessToken(yt);
-      const json = await ytGet<{ items?: { statistics?: { subscriberCount?: string; videoCount?: string; viewCount?: string; hiddenSubscriberCount?: boolean } }[] }>(
-        "channels",
-        { part: "statistics", id: yt.accountId },
-        token,
-      );
+      const json = await ytGet<{
+        items?: {
+          statistics?: { subscriberCount?: string; videoCount?: string; viewCount?: string; hiddenSubscriberCount?: boolean };
+          snippet?: { thumbnails?: Record<string, { url?: string }> };
+        }[];
+      }>("channels", { part: "statistics,snippet", id: yt.accountId }, token);
       const st = json.items?.[0]?.statistics;
+      // Channel profile picture: the site's default logo.
+      const thumbs = json.items?.[0]?.snippet?.thumbnails ?? {};
+      const avatarUrl = (thumbs.high ?? thumbs.medium ?? thumbs.default)?.url;
+      if (avatarUrl && (yt.metadata as { avatarUrl?: string } | null)?.avatarUrl !== avatarUrl) {
+        const fresh = await getConnection("YOUTUBE");
+        await db
+          .update(schema.socialConnections)
+          .set({ metadata: { ...((fresh?.metadata as object | null) ?? {}), avatarUrl } })
+          .where(eq(schema.socialConnections.platform, "YOUTUBE"));
+      }
       const row = { subscribers: st?.hiddenSubscriberCount ? null : num(st?.subscriberCount), videos: num(st?.videoCount), views: num(st?.viewCount) };
       await saveStats("YOUTUBE", row.subscribers, row.videos, row.views);
       report.youtube = row;

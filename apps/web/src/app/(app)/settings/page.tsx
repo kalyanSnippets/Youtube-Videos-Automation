@@ -5,6 +5,7 @@ import { getAllProviders } from "@yaos/ai-providers";
 import { updateChannelProfile } from "@/lib/actions/settings";
 import { Badge } from "@/components/ui/badge";
 import { SiteSettingsForm } from "@/components/admin/site-settings-form";
+import { LogoForm } from "@/components/admin/logo-form";
 import { getSiteSettings } from "@/lib/site";
 import { getConnection, hasAnalyticsScope } from "@yaos/comment-bot";
 import { analyticsState } from "@/lib/youtube-analytics";
@@ -58,6 +59,7 @@ export default async function SettingsPage() {
           <h2 className="text-sm font-semibold text-text-dim uppercase tracking-wide">Website</h2>
           <p className="text-xs text-text-dim mt-1">What viewers see on your public site, plus the private "About me" notes the comment bot uses to answer in your voice.</p>
         </div>
+        <LogoForm hasUpload={Boolean(site.logoData)} />
         <SiteSettingsForm settings={site} />
       </section>
 

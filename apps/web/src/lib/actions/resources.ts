@@ -113,3 +113,30 @@ export async function saveSiteSettings(_prev: FormState, form: FormData): Promis
   refresh();
   return { saved: true };
 }
+
+const LOGO_TYPES = ["image/png", "image/jpeg", "image/webp", "image/svg+xml", "image/gif"];
+const MAX_LOGO_BYTES = 1024 * 1024;
+
+/** Settings → Website: upload a logo (stored in the database as a small data: URL), or remove it. */
+export async function saveLogo(_prev: FormState, form: FormData): Promise<FormState> {
+  try {
+    await requireAdmin();
+    await ensureSchemaPatches();
+    let logoData: string | null = null;
+    if (form.get("remove") !== "1") {
+      const file = form.get("logo");
+      if (!(file instanceof File) || file.size === 0) return { error: "Choose an image first." };
+      if (!LOGO_TYPES.includes(file.type)) return { error: "Use a PNG, JPG, WebP, GIF or SVG image." };
+      if (file.size > MAX_LOGO_BYTES) return { error: "That image is over 1 MB. A square image around 512×512 is plenty." };
+      logoData = `data:${file.type};base64,${Buffer.from(await file.arrayBuffer()).toString("base64")}`;
+    }
+    await db
+      .insert(schema.siteSettings)
+      .values({ id: 1, logoData })
+      .onConflictDoUpdate({ target: schema.siteSettings.id, set: { logoData, updatedAt: new Date() } });
+    revalidatePath("/", "layout");
+    return { saved: true };
+  } catch (error) {
+    return { error: (error as Error).message };
+  }
+}

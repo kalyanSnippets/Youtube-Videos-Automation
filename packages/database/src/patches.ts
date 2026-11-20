@@ -31,8 +31,11 @@ const PATCHES = [
   `ALTER TABLE "videos" ADD COLUMN IF NOT EXISTS "stats_updated_at" timestamp with time zone`,
   `ALTER TABLE "videos" ADD COLUMN IF NOT EXISTS "page_views" integer DEFAULT 0 NOT NULL`,
   `CREATE UNIQUE INDEX IF NOT EXISTS "channel_daily_platform_day_idx" ON "channel_daily" USING btree ("platform","day")`,
+  // 0010: site logo
+  `ALTER TABLE "site_settings" ADD COLUMN IF NOT EXISTS "logo_data" text`,
 ];
 const MIGRATIONS = [
+  { hash: "595e0bb7af0fc1261cb0558e80bd6e17f0786621a6d3902a139f59e3d1024771", createdAt: 1795134560534 },
   { hash: "810a7078ba04471780ad6cdda2995e060aefe2f21d9171aab603a72a286f4837", createdAt: 1795133040078 },
   { hash: "51f3dea35b6e9a5853b7abca7885ae7122c0b8913fef087806107be12c7aa85b", createdAt: 1795057961922 },
   { hash: "e21c0cbd32b31e4c0afde5e80482000c47fa270c80f86aad7d7a17418ee7ea85", createdAt: 1795060954864 },

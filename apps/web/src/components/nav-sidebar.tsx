@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, FolderKanban, Lightbulb, Bot, Clapperboard, MessagesSquare, Settings, Mail, Film, BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SiteLogo } from "@/components/site-logo";
 
 /** Grouped so the everyday creator tools are on top and the video-production studio is separate. */
 export const NAV_GROUPS: { title: string; items: { href: string; label: string; icon: typeof Film }[] }[] = [
@@ -34,8 +35,8 @@ export function NavSidebar() {
   return (
     <aside className="hidden md:flex w-60 shrink-0 border-r border-border bg-bg-panel flex-col">
       <div className="h-16 flex items-center gap-2 px-5 border-b border-border">
-        <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-accent-cyan to-accent-purple" />
-        <span className="font-semibold text-sm">YouTube Agent OS</span>
+        <SiteLogo size={30} />
+        <span className="font-semibold text-sm">AI with Kalyan OS</span>
       </div>
       <nav className="flex-1 py-4 px-3 space-y-5 overflow-y-auto">
         {NAV_GROUPS.map((group, i) => (

@@ -71,6 +71,13 @@
       "when": 1795133040078,
       "tag": "0009_youtube_analytics",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1795134560534,
+      "tag": "0010_site_logo",
+      "breakpoints": true
     }
   ]
 }

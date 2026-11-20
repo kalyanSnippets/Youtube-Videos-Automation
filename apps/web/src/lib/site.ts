@@ -13,6 +13,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   instagramUrl: null,
   newsletterEnabled: true,
   botTemplates: null,
+  logoData: null,
   updatedAt: new Date(0),
 };
 

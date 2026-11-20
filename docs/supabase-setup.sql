@@ -1003,6 +1003,10 @@ ALTER TABLE "videos" ADD COLUMN IF NOT EXISTS "page_views" integer DEFAULT 0 NOT
 CREATE UNIQUE INDEX IF NOT EXISTS "channel_daily_platform_day_idx" ON "channel_daily" USING btree ("platform","day");
 INSERT INTO "drizzle"."__drizzle_migrations" (hash, created_at) VALUES ('810a7078ba04471780ad6cdda2995e060aefe2f21d9171aab603a72a286f4837', 1795133040078);
 
+-- 0010_site_logo
+ALTER TABLE "site_settings" ADD COLUMN IF NOT EXISTS "logo_data" text;
+INSERT INTO "drizzle"."__drizzle_migrations" (hash, created_at) VALUES ('595e0bb7af0fc1261cb0558e80bd6e17f0786621a6d3902a139f59e3d1024771', 1795134560534);
+
 -- Supabase exposes the public schema through its Data API. The app talks to Postgres directly
 -- (and bypasses row level security), so lock every table to the Data API.
 DO $$ DECLARE t record; BEGIN

@@ -7,6 +7,7 @@ import { MobileNav } from "@/components/mobile-nav";
 // lists, the owner user) — none of it is safe to prerender at build time, and forcing it here
 // (rather than per-page) also stops the build from needing DB access at all.
 export const dynamic = "force-dynamic";
+export const metadata = { title: { default: "AI with Kalyan OS", template: "%s · AI with Kalyan OS" } };
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Film, Mail, Menu, MessagesSquare, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NAV_GROUPS } from "./nav-sidebar";
+import { SiteLogo } from "@/components/site-logo";
 
 const TABS = [
   { href: "/videos", label: "Videos", icon: Film },
@@ -30,8 +31,8 @@ export function MobileNav() {
     <>
       <header className="md:hidden sticky top-0 z-30 h-14 flex items-center justify-between gap-3 border-b border-border bg-bg-panel/95 backdrop-blur px-4">
         <Link href="/videos" className="flex items-center gap-2">
-          <span className="h-7 w-7 rounded-lg bg-gradient-to-br from-accent-cyan to-accent-purple" />
-          <span className="font-semibold text-sm">AI with Kalyan</span>
+          <SiteLogo size={28} />
+          <span className="font-semibold text-sm">AI with Kalyan OS</span>
         </Link>
         <a href="/" target="_blank" className="rounded-lg border border-border px-3 py-1.5 text-xs text-text-dim">View site ↗</a>
       </header>

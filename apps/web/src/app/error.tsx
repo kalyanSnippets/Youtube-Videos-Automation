@@ -18,7 +18,8 @@ export default function GlobalError({ error, reset }: { error: Error & { digest?
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="w-full max-w-md text-center">
         <div className="inline-flex items-center gap-2 mb-3">
-          <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-accent-cyan to-accent-purple" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/api/logo" alt="" width={32} height={32} className="h-8 w-8 rounded-lg object-cover" />
           <span className="text-lg font-semibold">AI with Kalyan</span>
         </div>
         <div className="panel p-6 text-left space-y-3">

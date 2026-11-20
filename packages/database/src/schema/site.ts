@@ -37,6 +37,8 @@ export const siteSettings = pgTable("site_settings", {
   youtubeUrl: varchar("youtube_url", { length: 300 }),
   instagramUrl: varchar("instagram_url", { length: 300 }),
   newsletterEnabled: boolean("newsletter_enabled").notNull().default(true),
+  /** Uploaded logo as a data: URL (small image). Null = use the YouTube profile picture. */
+  logoData: text("logo_data"),
   /** Comment bot reply wording (see packages/comment-bot ReplyTemplates). Null = built-in defaults. */
   botTemplates: jsonb("bot_templates").$type<Record<string, unknown>>(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),

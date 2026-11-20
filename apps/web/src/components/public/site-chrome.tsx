@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getFollowLinks, type SiteSettings } from "@/lib/site";
 import { FollowCta } from "./follow-cta";
+import { SiteLogo } from "@/components/site-logo";
 
 function YouTubeIcon() {
   return (
@@ -42,7 +43,7 @@ export async function PublicHeader({ settings }: { settings: SiteSettings }) {
     <header className="border-b border-border-subtle">
       <div className="mx-auto max-w-5xl px-4 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-accent-cyan to-accent-purple" />
+          <SiteLogo size={32} />
           <span className="font-semibold">{settings.siteName}</span>
         </Link>
         <div className="flex items-center gap-2">

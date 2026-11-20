@@ -67,11 +67,16 @@ async function ytGet<T>(path: string, params: Record<string, string>, accessToke
   return json;
 }
 
-export async function getMyChannel(accessToken: string): Promise<{ id: string; title: string }> {
-  const json = await ytGet<{ items?: { id: string; snippet: { title: string } }[] }>("channels", { part: "snippet", mine: "true" }, accessToken);
+export async function getMyChannel(accessToken: string): Promise<{ id: string; title: string; avatarUrl: string | null }> {
+  const json = await ytGet<{ items?: { id: string; snippet: { title: string; thumbnails?: Record<string, { url?: string }> } }[] }>(
+    "channels",
+    { part: "snippet", mine: "true" },
+    accessToken,
+  );
   const channel = json.items?.[0];
   if (!channel) throw new Error("This Google account has no YouTube channel.");
-  return { id: channel.id, title: channel.snippet.title };
+  const t = channel.snippet.thumbnails ?? {};
+  return { id: channel.id, title: channel.snippet.title, avatarUrl: (t.high ?? t.medium ?? t.default)?.url ?? null };
 }
 
 interface ThreadItem {
