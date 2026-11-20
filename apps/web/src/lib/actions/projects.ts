@@ -2,11 +2,10 @@
 
 import { randomUUID } from "node:crypto";
 import { redirect } from "next/navigation";
-import { after } from "next/server";
+import { startAgentStep } from "@/lib/agent-jobs";
 import { revalidatePath } from "next/cache";
 import { eq } from "drizzle-orm";
 import { db, schema } from "@yaos/database";
-import { runIdeaResearch } from "@yaos/agents";
 import { recommendPresentationMode, type ContentType, type PresentationMode } from "@yaos/shared";
 import { getCurrentUser } from "@/lib/auth";
 
@@ -67,19 +66,8 @@ export async function createProject(formData: FormData) {
     summary: `Project created${seedIdea ? ` from seed idea "${seedIdea}"` : ""}.`,
   });
 
-  // Deferred: even a single-idea real Claude call can take a while, far past what any
-  // serverless function would tolerate blocking a request/redirect on. The user is sent
-  // straight to the ideas tab, which polls for results while this finishes in the background.
-  after(async () => {
-    try {
-      await runIdeaResearch({ db, projectId: project.id, topic: title });
-    } catch (err) {
-      console.error(`Background IDEA_RESEARCH failed for project ${project.id}:`, err);
-    }
-    revalidatePath("/dashboard");
-    revalidatePath("/projects");
-    revalidatePath(`/projects/${project.id}/ideas`);
-  });
+  // The AI step runs in the background; the ideas tab refreshes itself until it's done.
+  await startAgentStep(project.id, "ideas");
 
   revalidatePath("/dashboard");
   revalidatePath("/projects");

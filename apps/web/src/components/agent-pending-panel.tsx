@@ -20,9 +20,21 @@ export function AgentPendingPanel({ run, emptyLabel }: { run: AgentRun | null; e
       </div>
     );
   }
+  // A background run can be cut off (deploy, crash) and never write FAILED. Past these ages it is
+  // not coming back, so say so instead of spinning forever.
+  const age = Date.now() - run.createdAt.getTime();
+  const stuck = run.status === "QUEUED" ? age > 3 * 60_000 : age > 16 * 60_000;
+  if (stuck) {
+    return (
+      <div className="panel p-10 text-center text-sm space-y-2">
+        <p className="text-status-danger font-medium">This run stopped before it finished</p>
+        <p className="text-text-dim text-xs">Click the re-run button above to try again.</p>
+      </div>
+    );
+  }
   return (
     <div className="panel p-10 text-center text-text-dim text-sm space-y-2">
-      <p>Working on it - a real model call can take a couple of minutes.</p>
+      <p>{run.status === "QUEUED" ? "Starting…" : "Working on it - a real model call can take a couple of minutes."}</p>
       <AutoRefresh />
     </div>
   );

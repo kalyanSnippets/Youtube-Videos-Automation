@@ -1,10 +1,9 @@
 "use server";
 
-import { after } from "next/server";
+import { startAgentStep } from "@/lib/agent-jobs";
 import { revalidatePath } from "next/cache";
 import { eq, and, desc } from "drizzle-orm";
 import { db, schema } from "@yaos/database";
-import { runProductionDirector, runAssetPlanner, transitionStage } from "@yaos/agents";
 
 export async function runProductionDirectorAction(projectId: string) {
   const [project] = await db.select().from(schema.projects).where(eq(schema.projects.id, projectId));
@@ -17,34 +16,11 @@ export async function runProductionDirectorAction(projectId: string) {
     .limit(1);
   if (!approvedScript) throw new Error("No approved script found.");
 
-  after(async () => {
-    try {
-      await runProductionDirector({ db, projectId, scriptId: approvedScript.id, topic: project.seedIdea || project.title });
-      if (project.currentStage === "SCRIPT_APPROVED") {
-        await transitionStage(db, projectId, "PRODUCTION_PLAN_READY", "AGENT", "Production Director");
-      }
-    } catch (err) {
-      console.error(`Background PRODUCTION_DIRECTOR failed for project ${projectId}:`, err);
-    }
-    revalidatePath(`/projects/${projectId}`);
-    revalidatePath(`/projects/${projectId}/production`);
-  });
+  await startAgentStep(projectId, "production");
 }
 
 export async function runAssetPlannerAction(projectId: string) {
   const [project] = await db.select().from(schema.projects).where(eq(schema.projects.id, projectId));
   if (!project) throw new Error("Project not found");
-  after(async () => {
-    try {
-      await runAssetPlanner({ db, projectId, topic: project.seedIdea || project.title });
-      if (project.currentStage === "PRODUCTION_PLAN_READY") {
-        await transitionStage(db, projectId, "ASSETS_REQUESTED", "AGENT", "Asset Planner");
-      }
-    } catch (err) {
-      console.error(`Background ASSET_PLANNER failed for project ${projectId}:`, err);
-    }
-    revalidatePath(`/projects/${projectId}`);
-    revalidatePath(`/projects/${projectId}/shot-list`);
-    revalidatePath(`/projects/${projectId}/assets`);
-  });
+  await startAgentStep(projectId, "assets");
 }

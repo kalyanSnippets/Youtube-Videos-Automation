@@ -1,23 +1,15 @@
 "use server";
 
-import { after } from "next/server";
+import { startAgentStep } from "@/lib/agent-jobs";
 import { revalidatePath } from "next/cache";
 import { eq } from "drizzle-orm";
 import { db, schema } from "@yaos/database";
-import { runStoryWriter, approveScript } from "@yaos/agents";
+import { approveScript } from "@yaos/agents";
 
 export async function runStoryWriterAction(projectId: string) {
   const [project] = await db.select().from(schema.projects).where(eq(schema.projects.id, projectId));
   if (!project) throw new Error("Project not found");
-  after(async () => {
-    try {
-      await runStoryWriter({ db, projectId, topic: project.seedIdea || project.title });
-    } catch (err) {
-      console.error(`Background STORY_WRITER failed for project ${projectId}:`, err);
-    }
-    revalidatePath(`/projects/${projectId}`);
-    revalidatePath(`/projects/${projectId}/script`);
-  });
+  await startAgentStep(projectId, "script");
 }
 
 export async function approveScriptAction(formData: FormData) {
