@@ -1,4 +1,4 @@
-import { bigint, boolean, date, integer, pgTable, text, timestamp, uniqueIndex, uuid, varchar } from "drizzle-orm/pg-core";
+import { bigint, boolean, date, integer, pgTable, real, text, timestamp, uniqueIndex, uuid, varchar } from "drizzle-orm/pg-core";
 
 /**
  * One row per video on the creator's YouTube channel or Instagram account. Rows are created and
@@ -35,6 +35,16 @@ export const videos = pgTable(
     /** "google-doc" | "docx" | "pdf" | "text" */
     promptSource: varchar("prompt_source", { length: 40 }),
     promptFilename: varchar("prompt_filename", { length: 300 }),
+    /** YouTube Analytics, lifetime totals (refreshed every few hours). Null until the first analytics sync. */
+    views: integer("views"),
+    watchMinutes: integer("watch_minutes"),
+    avgViewPercent: real("avg_view_percent"),
+    subscribersGained: integer("subscribers_gained"),
+    likes: integer("likes"),
+    commentsCount: integer("comments_count"),
+    statsUpdatedAt: timestamp("stats_updated_at", { withTimezone: true }),
+    /** Visits to this video's page on the public site (/v/<slug>). */
+    pageViews: integer("page_views").notNull().default(0),
     /** Hidden videos are kept in admin but not shown publicly or used by the bot. */
     hidden: boolean("hidden").notNull().default(false),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -62,4 +72,20 @@ export const channelStats = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => ({ platformDay: uniqueIndex("channel_stats_platform_day_idx").on(t.platform, t.day) }),
+);
+
+/** Channel totals per day from YouTube Analytics (last 28+ days), for the Analytics page charts. */
+export const channelDaily = pgTable(
+  "channel_daily",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    platform: varchar("platform", { length: 20 }).notNull(),
+    day: date("day").notNull(),
+    views: integer("views"),
+    watchMinutes: integer("watch_minutes"),
+    subscribersGained: integer("subscribers_gained"),
+    subscribersLost: integer("subscribers_lost"),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({ platformDay: uniqueIndex("channel_daily_platform_day_idx").on(t.platform, t.day) }),
 );

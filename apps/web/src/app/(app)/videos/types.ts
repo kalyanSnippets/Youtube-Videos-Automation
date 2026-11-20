@@ -13,6 +13,8 @@ export interface VideoRowData {
   promptSource: string | null;
   promptFilename: string | null;
   extraLink: string | null;
+  /** YouTube Analytics lifetime totals (null until analytics are on) and site visits. */
+  stats: { views: number | null; avgViewPercent: number | null; subscribersGained: number | null; pageViews: number };
   /** Same content on the other platform, if found. */
   twin: { id: string; label: string; hasPrompt: boolean } | null;
 }

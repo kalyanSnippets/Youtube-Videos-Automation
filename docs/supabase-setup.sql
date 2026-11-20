@@ -980,6 +980,29 @@ ALTER TABLE "videos" ADD COLUMN IF NOT EXISTS "resource_title" varchar(200);--> 
 ALTER TABLE "videos" ADD COLUMN IF NOT EXISTS "extra_link" varchar(500);
 INSERT INTO "drizzle"."__drizzle_migrations" (hash, created_at) VALUES ('e21c0cbd32b31e4c0afde5e80482000c47fa270c80f86aad7d7a17418ee7ea85', 1795060954864);
 
+-- 0009_youtube_analytics
+CREATE TABLE IF NOT EXISTS "channel_daily" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"platform" varchar(20) NOT NULL,
+	"day" date NOT NULL,
+	"views" integer,
+	"watch_minutes" integer,
+	"subscribers_gained" integer,
+	"subscribers_lost" integer,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+ALTER TABLE "videos" ADD COLUMN IF NOT EXISTS "views" integer;--> statement-breakpoint
+ALTER TABLE "videos" ADD COLUMN IF NOT EXISTS "watch_minutes" integer;--> statement-breakpoint
+ALTER TABLE "videos" ADD COLUMN IF NOT EXISTS "avg_view_percent" real;--> statement-breakpoint
+ALTER TABLE "videos" ADD COLUMN IF NOT EXISTS "subscribers_gained" integer;--> statement-breakpoint
+ALTER TABLE "videos" ADD COLUMN IF NOT EXISTS "likes" integer;--> statement-breakpoint
+ALTER TABLE "videos" ADD COLUMN IF NOT EXISTS "comments_count" integer;--> statement-breakpoint
+ALTER TABLE "videos" ADD COLUMN IF NOT EXISTS "stats_updated_at" timestamp with time zone;--> statement-breakpoint
+ALTER TABLE "videos" ADD COLUMN IF NOT EXISTS "page_views" integer DEFAULT 0 NOT NULL;--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS "channel_daily_platform_day_idx" ON "channel_daily" USING btree ("platform","day");
+INSERT INTO "drizzle"."__drizzle_migrations" (hash, created_at) VALUES ('810a7078ba04471780ad6cdda2995e060aefe2f21d9171aab603a72a286f4837', 1795133040078);
+
 -- Supabase exposes the public schema through its Data API. The app talks to Postgres directly
 -- (and bypasses row level security), so lock every table to the Data API.
 DO $$ DECLARE t record; BEGIN

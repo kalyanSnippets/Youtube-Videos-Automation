@@ -6,6 +6,8 @@ import { updateChannelProfile } from "@/lib/actions/settings";
 import { Badge } from "@/components/ui/badge";
 import { SiteSettingsForm } from "@/components/admin/site-settings-form";
 import { getSiteSettings } from "@/lib/site";
+import { getConnection, hasAnalyticsScope } from "@yaos/comment-bot";
+import { analyticsState } from "@/lib/youtube-analytics";
 
 const INTEGRATION_LABELS: Record<string, string> = {
   OPENAI: "OpenAI",
@@ -28,13 +30,15 @@ export default async function SettingsPage() {
   const localWorkers = await db.select().from(schema.localWorkerNodes).where(eq(schema.localWorkerNodes.workspaceId, user.workspaceId));
   const providers = getAllProviders();
   const site = await getSiteSettings();
+  const ytConn = await getConnection("YOUTUBE").catch(() => null);
+  const analyticsOn = Boolean(ytConn && (hasAnalyticsScope(ytConn.metadata) || analyticsState(ytConn).lastAt));
 
   const integrationStatus: Record<string, "CONNECTED" | "NOT_CONNECTED" | "COMING_SOON"> = {
     OPENAI: providers.find((p) => p.id === "OPENAI")?.isAvailable() ? "CONNECTED" : "NOT_CONNECTED",
     ANTHROPIC: providers.find((p) => p.id === "ANTHROPIC")?.isAvailable() ? "CONNECTED" : "NOT_CONNECTED",
     WEB_RESEARCH: process.env.TAVILY_API_KEY ? "CONNECTED" : "NOT_CONNECTED",
     YOUTUBE_DATA: process.env.YOUTUBE_API_KEY ? "CONNECTED" : "NOT_CONNECTED",
-    YOUTUBE_ANALYTICS: "NOT_CONNECTED",
+    YOUTUBE_ANALYTICS: analyticsOn ? "CONNECTED" : "NOT_CONNECTED",
     FILE_STORAGE: "NOT_CONNECTED",
     LOCAL_WORKER: localWorkers.some((w) => w.isOnline) ? "CONNECTED" : "NOT_CONNECTED",
     WHISPER: "COMING_SOON",

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, FolderKanban, Lightbulb, Bot, Clapperboard, MessagesSquare, Settings, Mail, Film } from "lucide-react";
+import { LayoutDashboard, FolderKanban, Lightbulb, Bot, Clapperboard, MessagesSquare, Settings, Mail, Film, BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /** Grouped so the everyday creator tools are on top and the video-production studio is separate. */
@@ -12,6 +12,7 @@ export const NAV_GROUPS: { title: string; items: { href: string; label: string; 
     items: [
       { href: "/videos", label: "Videos & prompts", icon: Film },
       { href: "/comment-bot", label: "Comment Bot", icon: MessagesSquare },
+      { href: "/analytics", label: "Analytics", icon: BarChart3 },
       { href: "/subscribers", label: "Subscribers", icon: Mail },
     ],
   },

@@ -5,6 +5,8 @@ import { useMemo, useState } from "react";
 import { kindLabel, type VideoRowData } from "./types";
 import { VideoEditor } from "./video-editor";
 
+const compact = new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 });
+
 type Filter = "all" | "needs" | "ready" | "yt-long" | "yt-short" | "ig-reel" | "ig-post" | "hidden";
 
 const FILTERS: { id: Filter; label: string; test: (v: VideoRowData) => boolean }[] = [
@@ -80,6 +82,18 @@ export function VideoList({ videos }: { videos: VideoRowData[] }) {
                   {v.publishedAt && <span>· {new Date(v.publishedAt).toLocaleDateString()}</span>}
                   <Status v={v} />
                 </div>
+                {(v.stats.views !== null || v.stats.pageViews > 0) && (
+                  <p className="mt-1 text-xs text-text-faint tabular-nums">
+                    {[
+                      v.stats.views !== null && `${compact.format(v.stats.views)} views`,
+                      v.stats.avgViewPercent !== null && `${Math.round(v.stats.avgViewPercent)}% watched`,
+                      v.stats.subscribersGained ? `+${compact.format(v.stats.subscribersGained)} subs` : null,
+                      v.stats.pageViews > 0 && `${compact.format(v.stats.pageViews)} site visits`,
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")}
+                  </p>
+                )}
               </div>
               <div className="flex shrink-0 items-center gap-2">
                 <a href={v.watchUrl} target="_blank" rel="noopener" className="hidden sm:inline text-xs text-text-dim hover:text-text">Watch ↗</a>

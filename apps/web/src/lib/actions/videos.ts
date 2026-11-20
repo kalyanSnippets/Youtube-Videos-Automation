@@ -168,7 +168,7 @@ export async function removeVideoPrompt(form: FormData): Promise<void> {
 /** "Sync now" button on the Videos page. Same job the hourly schedule runs. */
 export async function syncVideosNow(): Promise<SyncReport> {
   await requireAdmin();
-  const report = await runVideoSync();
+  const report = await runVideoSync({ forceAnalytics: true });
   refresh();
   return report;
 }

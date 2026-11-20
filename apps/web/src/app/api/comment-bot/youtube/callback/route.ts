@@ -35,8 +35,16 @@ export async function GET(request: Request) {
       accessToken: token.access_token,
       refreshToken: token.refresh_token,
       accessTokenExpiresAt: new Date(Date.now() + token.expires_in * 1000),
+      metadata: { scopes: token.scope ?? "" },
     });
-    return resultPage("YouTube connected ✅", `The bot will now reply to comments on ${channel.title}. New comments are picked up within about a minute.`, true);
+    const analytics = (token.scope ?? "").includes("yt-analytics");
+    return resultPage(
+      "YouTube connected ✅",
+      `The bot will now reply to comments on ${channel.title}. New comments are picked up within about a minute.${
+        analytics ? " Analytics are on: numbers appear on the Analytics page within a few minutes." : " Analytics access wasn't granted; tick it on Google's screen next time to see your numbers."
+      }`,
+      true,
+    );
   } catch (error) {
     return resultPage("YouTube was not connected", (error as Error).message, false);
   }

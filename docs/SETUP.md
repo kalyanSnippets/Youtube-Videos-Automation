@@ -200,3 +200,11 @@ Run [`docs/supabase-migration-2-formats-stats.sql`](supabase-migration-2-formats
 - **Comment Bot** has tabs: **Activity** (what happened, with Retry / Send reply and a progress bar), **Test a reply**, **Reply messages** (wording, styles and the General comments choice), **Setup** (connections, keywords, checklist).
 - **Settings → Website**: site name, tagline, links, newsletter and the bot's private "About me" notes.
 - Replies are kept within Netlify's ~10 second limit: the AI is asked to answer without long "thinking", each AI call stops after 7 seconds, and at most 3 new comments are handled per minute. A reply that gets cut off is marked **Failed** after 3 minutes, with a Retry button.
+
+### YouTube Analytics
+
+1. Google Cloud (project AI with Kalyan) → **APIs & Services → Library** → "YouTube Analytics API" → **Enable**.
+2. **Google Auth Platform → Data access → Add or remove scopes** → tick `.../auth/yt-analytics.readonly` → Update → Save.
+3. In the admin area open **Analytics** and click **Reconnect YouTube**; allow "View YouTube Analytics reports".
+
+The Analytics page then shows the last 28 days (views, watch time, subscribers gained/lost, with daily charts), lifetime totals per video (views, watch time, average % watched, subscribers gained, likes, comments) and visits to each video's prompt page on the site. Numbers refresh every 6 hours with the hourly video check (or **Refresh now**); YouTube's analytics lag a day or two behind Studio. Settings → Integrations shows YouTube Analytics as connected once the permission is granted.

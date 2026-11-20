@@ -8,6 +8,7 @@ import {
   type InstagramMode,
 } from "@yaos/comment-bot";
 import { slugify } from "@/lib/site";
+import { syncYouTubeAnalytics, type AnalyticsResult } from "@/lib/youtube-analytics";
 
 /**
  * Pulls every video from the connected YouTube channel and Instagram account into the `videos`
@@ -356,12 +357,13 @@ async function syncStats(yt: ConnectionRow | null, ig: ConnectionRow | null): Pr
 
 export interface SyncReport {
   stats?: StatsReport;
+  analytics?: AnalyticsResult;
   youtube?: { created: number; updated: number; more: boolean } | { skipped: string } | { error: string };
   instagram?: { created: number; updated: number; more: boolean } | { skipped: string } | { error: string };
 }
 
 /** Runs both platforms. A failure on one never stops the other. */
-export async function runVideoSync(): Promise<SyncReport> {
+export async function runVideoSync(options: { forceAnalytics?: boolean } = {}): Promise<SyncReport> {
   await ensureSchemaPatches();
   const report: SyncReport = {};
   const yt = await getConnection("YOUTUBE");
@@ -375,5 +377,7 @@ export async function runVideoSync(): Promise<SyncReport> {
     return { error: e.message };
   }) : { skipped: "not connected" };
   report.stats = await syncStats(yt, ig);
+  // After the video list is fresh, so per-video numbers land on rows that exist.
+  report.analytics = await syncYouTubeAnalytics({ force: options.forceAnalytics });
   return report;
 }

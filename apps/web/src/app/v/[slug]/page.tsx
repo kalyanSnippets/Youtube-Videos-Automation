@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { db, ensureSchemaPatches, schema } from "@yaos/database";
 import { getFollowLinks, getSiteSettings } from "@/lib/site";
@@ -28,6 +28,8 @@ export default async function VideoPage({ params }: { params: Promise<{ slug: st
   const { slug } = await params;
   const [video, settings] = await Promise.all([getVideo(slug), getSiteSettings()]);
   if (!video) notFound();
+  // Best-effort visit counter (shown on the Analytics page); never blocks the page.
+  db.update(schema.videos).set({ pageViews: sql`${schema.videos.pageViews} + 1` }).where(eq(schema.videos.id, video.id)).catch(() => undefined);
   const watchLabel = video.platform === "YOUTUBE" ? "Watch on YouTube" : "View on Instagram";
   const date = video.publishedAt ? new Date(video.publishedAt).toLocaleDateString() : null;
 

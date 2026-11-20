@@ -6,7 +6,15 @@ import type { IncomingComment, MediaContext } from "./types";
  * (50 units). The default 10,000 units/day covers about 1,440 polls + ~170 replies.
  */
 const API = "https://www.googleapis.com/youtube/v3";
-export const YOUTUBE_SCOPES = ["https://www.googleapis.com/auth/youtube.force-ssl"];
+export const YOUTUBE_ANALYTICS_SCOPE = "https://www.googleapis.com/auth/yt-analytics.readonly";
+/** Comments (read + reply) and read-only analytics for the Analytics page. */
+export const YOUTUBE_SCOPES = ["https://www.googleapis.com/auth/youtube.force-ssl", YOUTUBE_ANALYTICS_SCOPE];
+
+/** True when this YouTube connection was granted analytics access (stored from the token's scope list). */
+export function hasAnalyticsScope(metadata: unknown): boolean {
+  const scopes = (metadata as { scopes?: string } | null)?.scopes ?? "";
+  return scopes.includes("yt-analytics");
+}
 
 export function youtubeAuthUrl(params: { clientId: string; redirectUri: string; state: string }): string {
   const q = new URLSearchParams({
@@ -25,6 +33,8 @@ export function youtubeAuthUrl(params: { clientId: string; redirectUri: string; 
 
 interface TokenResponse {
   access_token: string;
+  /** Space-separated scopes Google actually granted. */
+  scope?: string;
   expires_in: number;
   refresh_token?: string;
 }
