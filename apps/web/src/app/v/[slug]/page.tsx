@@ -10,6 +10,25 @@ import { FollowCta } from "@/components/public/follow-cta";
 import { PublicFooter, PublicHeader } from "@/components/public/site-chrome";
 import { CopyButton } from "@/components/public/copy-button";
 import { NewsletterForm } from "@/components/public/newsletter-form";
+import { videoDetailParts, videoKind } from "@/lib/video-details";
+
+/** The full description, with links made clickable. */
+function Description({ text }: { text: string }) {
+  const parts = text.trim().split(/(https?:\/\/[^\s]+)/g);
+  return (
+    <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-text-dim">
+      {parts.map((part, i) =>
+        /^https?:\/\//.test(part) ? (
+          <a key={i} href={part} target="_blank" rel="noopener nofollow" className="text-accent-cyan hover:underline">
+            {part}
+          </a>
+        ) : (
+          part
+        ),
+      )}
+    </p>
+  );
+}
 
 export const dynamic = "force-dynamic";
 
@@ -31,7 +50,7 @@ export default async function VideoPage({ params }: { params: Promise<{ slug: st
   // Best-effort visit counter (shown on the Analytics page); never blocks the page.
   db.update(schema.videos).set({ pageViews: sql`${schema.videos.pageViews} + 1` }).where(eq(schema.videos.id, video.id)).catch(() => undefined);
   const watchLabel = video.platform === "YOUTUBE" ? "Watch on YouTube" : "View on Instagram";
-  const date = video.publishedAt ? new Date(video.publishedAt).toLocaleDateString() : null;
+  const details = videoDetailParts(video);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -51,10 +70,8 @@ export default async function VideoPage({ params }: { params: Promise<{ slug: st
 
         <div className="space-y-2">
           <div className="flex flex-wrap items-center gap-2 text-xs text-text-dim">
-            <span className="badge border bg-bg-raised text-text-dim border-border">
-              {video.platform === "YOUTUBE" ? (video.format === "SHORT" ? "YouTube Short" : "YouTube") : video.format === "REEL" ? "Instagram Reel" : "Instagram post"}
-            </span>
-            {date && <span>{date}</span>}
+            <span className="badge border bg-bg-raised text-text-dim border-border">{videoKind(video)}</span>
+            {details.length > 0 && <span className="tabular-nums">{details.join(" · ")}</span>}
           </div>
           <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">{video.title}</h1>
         </div>
@@ -68,17 +85,13 @@ export default async function VideoPage({ params }: { params: Promise<{ slug: st
           <ExternalLink size={15} /> {watchLabel}
         </a>
 
-        {video.prompt ? (
+        {video.prompt && (
           <section className="panel overflow-hidden">
             <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-b border-border-subtle">
               <span className="text-sm font-medium">{video.resourceTitle || "Prompt from this video"}</span>
               <CopyButton text={video.prompt} />
             </div>
             <pre className="p-4 sm:p-5 whitespace-pre-wrap break-words font-mono text-[13px] leading-relaxed text-text">{video.prompt}</pre>
-          </section>
-        ) : (
-          <section className="panel p-5 text-sm text-text-dim">
-            The prompt for this video is coming soon. Watch the video for now, and check back here.
           </section>
         )}
 
@@ -92,6 +105,13 @@ export default async function VideoPage({ params }: { params: Promise<{ slug: st
           <p className="text-sm text-text-dim">
             Tip: comment <span className="text-accent-cyan font-medium">{video.keyword}</span> on the {video.platform === "YOUTUBE" ? "video" : "post"} and I&apos;ll send this to you.
           </p>
+        )}
+
+        {video.description?.trim() && (
+          <section className="panel p-5 space-y-2">
+            <h2 className="text-sm font-semibold">About this {video.platform === "YOUTUBE" ? "video" : "post"}</h2>
+            <Description text={video.description} />
+          </section>
         )}
 
         <section className="panel p-5 space-y-3">

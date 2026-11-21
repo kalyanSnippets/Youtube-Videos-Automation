@@ -1,5 +1,10 @@
 import { listConnections, recentComments, replyStats, resolveLLM, type CommentRow } from "@yaos/comment-bot";
+import Image from "next/image";
+import { inArray } from "drizzle-orm";
+import { db, schema } from "@yaos/database";
 import { formatRelativeTime } from "@/lib/utils";
+import { videoDetailParts, videoKind } from "@/lib/video-details";
+import { cleanTitle } from "@/lib/video-match";
 import { BotHeader } from "./bot-header";
 import { RowSend, SendProgress, type PendingComment } from "./send-progress";
 
@@ -42,6 +47,36 @@ function whatHappened(c: CommentRow): string | null {
   }
 }
 
+type VideoRow = typeof schema.videos.$inferSelect;
+
+/** The videos these comments were left on, keyed "PLATFORM:external id". */
+async function videosFor(comments: CommentRow[]): Promise<Map<string, VideoRow>> {
+  const ids = [...new Set(comments.map((c) => c.mediaId).filter((id): id is string => Boolean(id)))];
+  if (!ids.length) return new Map();
+  const rows = await db.select().from(schema.videos).where(inArray(schema.videos.externalId, ids)).catch(() => [] as VideoRow[]);
+  return new Map(rows.map((v) => [`${v.platform}:${v.externalId}`, v]));
+}
+
+function VideoBadge({ v }: { v: VideoRow }) {
+  const portrait = v.format === "SHORT" || v.format === "REEL";
+  const details = [videoKind(v), ...videoDetailParts(v)];
+  return (
+    <a href={v.watchUrl} target="_blank" rel="noopener" className="group mb-2 flex items-center gap-2.5 rounded-lg bg-bg-raised/60 p-1.5 pr-3 hover:bg-bg-raised">
+      <span className={`relative shrink-0 overflow-hidden rounded bg-bg-raised ${portrait ? "h-12 w-7" : "h-10 w-16"}`}>
+        <Image src={`/api/thumb/${v.id}`} alt="" fill sizes="56px" className="object-cover" unoptimized />
+      </span>
+      <span className="min-w-0">
+        <span className="block truncate text-xs font-medium text-text group-hover:text-accent-cyan">{cleanTitle(v.title) || v.title}</span>
+        <span className="block truncate text-[11px] text-text-dim tabular-nums">{details.join(" · ")}</span>
+        <span className="block truncate text-[11px]">
+          <span className={v.botEnabled ? "text-status-success" : "text-text-faint"}>Bot {v.botEnabled ? "on" : "off"}</span>
+          {v.keyword && <span className="text-text-dim"> · keyword <span className="text-accent-cyan">{v.keyword}</span></span>}
+        </span>
+      </span>
+    </a>
+  );
+}
+
 function toPending(c: CommentRow): PendingComment {
   return { id: c.id, platform: c.platform, author: c.authorName, text: c.commentText, status: isStuck(c) ? "FAILED" : c.status };
 }
@@ -52,6 +87,7 @@ export default async function CommentBotActivityPage() {
     recentComments(60).catch(() => [] as CommentRow[]),
     replyStats().catch(() => ({}) as Record<string, number>),
   ]);
+  const videos = await videosFor(comments);
   const llm = resolveLLM();
   const yt = connections.find((c) => c.platform === "YOUTUBE");
   const ig = connections.find((c) => c.platform === "INSTAGRAM");
@@ -84,9 +120,11 @@ export default async function CommentBotActivityPage() {
           const pill = statusPill(c);
           const what = whatHappened(c);
           const canSend = c.status === "FAILED" || c.status === "SKIPPED" || c.status === "DRY_RUN" || isStuck(c);
+          const video = c.mediaId ? videos.get(`${c.platform}:${c.mediaId}`) : undefined;
           return (
             <div key={c.id} className="p-4 grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
               <div className="min-w-0">
+                {video && <VideoBadge v={video} />}
                 <p className="text-xs text-text-dim">
                   {c.platform === "YOUTUBE" ? "YouTube" : "Instagram"} · {c.authorName ?? "viewer"} · {formatRelativeTime(c.createdAt)}
                 </p>

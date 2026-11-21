@@ -7,6 +7,7 @@ import { PublicFooter, PublicHeader } from "@/components/public/site-chrome";
 import { ChannelBrowser } from "@/components/public/channel-browser";
 import type { GridItem } from "@/components/public/resource-grid";
 import { NewsletterForm } from "@/components/public/newsletter-form";
+import { descriptionSummary, videoDetailParts } from "@/lib/video-details";
 
 export const dynamic = "force-dynamic";
 
@@ -21,12 +22,13 @@ function toItem(v: VideoRow): GridItem {
   return {
     href: `/v/${v.slug}`,
     title: v.title,
-    summary: v.description ? v.description.split("\n").find((l) => l.trim())?.slice(0, 160) ?? null : null,
+    summary: descriptionSummary(v.description),
     keywords: v.keyword && v.prompt ? [v.keyword] : [],
     thumbnail: `/api/thumb/${v.id}`,
-    badge: v.prompt ? "Prompt ready" : "Prompt coming soon",
-    badgeTone: v.prompt ? "cyan" : "dim",
-    meta: v.publishedAt ? new Date(v.publishedAt).toLocaleDateString() : undefined,
+    // Only videos with a prompt get a label; the rest just show their details.
+    badge: v.prompt ? "Free prompt" : undefined,
+    badgeTone: "cyan",
+    meta: videoDetailParts(v).join(" · ") || undefined,
   };
 }
 

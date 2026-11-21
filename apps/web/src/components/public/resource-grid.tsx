@@ -9,7 +9,7 @@ export interface GridItem {
   summary: string | null;
   keywords: string[];
   thumbnail?: string | null;
-  /** Small label, e.g. "Prompt ready" or "Prompt coming soon". */
+  /** Small label, e.g. "Free prompt". */
   badge?: string;
   badgeTone?: "cyan" | "purple" | "dim";
   /** Extra text shown next to the badge and included in search, e.g. the date. */
@@ -48,12 +48,14 @@ export function CardGrid({ items, shape = "video" }: { items: GridItem[]; shape?
             </div>
           )}
           <div className={`${compact ? "p-3 gap-2" : "p-5 gap-3"} flex flex-col flex-1`}>
-            <div className="flex flex-wrap items-center gap-2">
-              {r.badge && <span className={`badge border ${TONE[r.badgeTone ?? "dim"]}`}>{r.badge}</span>}
-              {r.meta && <span className="text-xs text-text-faint">{r.meta}</span>}
-            </div>
+            {(r.badge || r.meta) && (
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                {r.badge && <span className={`badge border ${TONE[r.badgeTone ?? "dim"]}`}>{r.badge}</span>}
+                {r.meta && <span className="text-xs text-text-faint tabular-nums">{r.meta}</span>}
+              </div>
+            )}
             <h2 className={`font-semibold leading-snug ${compact ? "text-sm line-clamp-3" : ""}`}>{r.title}</h2>
-            {r.summary && !compact && <p className="text-sm text-text-dim line-clamp-3">{r.summary}</p>}
+            {r.summary && <p className={`text-text-dim ${compact ? "text-xs line-clamp-2" : "text-sm line-clamp-3"}`}>{r.summary}</p>}
             {r.keywords.length > 0 && (
               <div className="mt-auto flex flex-wrap gap-1.5 pt-1">
                 {r.keywords.slice(0, 3).map((k) => (
