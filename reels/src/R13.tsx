@@ -128,7 +128,7 @@ const SalukiPanel: React.FC = () => {
 /* 21.3 the 3D compression beat (pre-rendered with Remotion + Three.js) */
 const CompressPanel: React.FC = () => (
   <>
-    <OffthreadVideo src={staticFile("b/r13_compress.mp4")} muted startFrom={34} style={{ position: "absolute", inset: 0, width: 1080, height: 960 }} />
+    <OffthreadVideo src={staticFile("b/r13_compress.mp4")} muted startFrom={50} style={{ position: "absolute", inset: 0, width: 1080, height: 960 }} />
     <PopIn delay={2} style={{ position: "absolute", left: 0, right: 0, top: 120, display: "flex", justifyContent: "center" }}><Chip bg={K.green} size={44}>✓ compress an existing model</Chip></PopIn>
   </>
 );
