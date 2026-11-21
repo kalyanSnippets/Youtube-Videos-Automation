@@ -17,6 +17,8 @@ import { Reel10, R10_FRAMES } from "./R10";
 import { Reel11, R11_FRAMES } from "./R11";
 import { Intro3D, INTRO_FRAMES } from "./Intro3D";
 import { Reel12, R12_FRAMES } from "./R12";
+import { Compress3D, COMPRESS_FRAMES } from "./Compress3D";
+import { Reel13, R13_FRAMES } from "./R13";
 import { Cover } from "./Cover";
 import { Cover2 } from "./Cover2";
 import { Cover3 } from "./Cover3";
@@ -40,6 +42,8 @@ export const RemotionRoot: React.FC = () => (
     <Composition id="Reel11-FiveTools" component={Reel11} durationInFrames={R11_FRAMES} {...common} />
     <Composition id="Intro3D" component={Intro3D} durationInFrames={INTRO_FRAMES} fps={30} width={1600} height={1000} />
     <Composition id="Reel12-DrawingToGame" component={Reel12} durationInFrames={R12_FRAMES} {...common} />
+    <Composition id="Compress3D" component={Compress3D} durationInFrames={COMPRESS_FRAMES} fps={30} width={1080} height={960} />
+    <Composition id="Reel13-ShrinkAIModel" component={Reel13} durationInFrames={R13_FRAMES} {...common} />
     <Composition id="Cover1" component={Cover} durationInFrames={1} {...common} defaultProps={{ top: "img/cf_top1.png", topPos: "60% 40%", topZoom: 1.25, face: "img/cf_face1.png", faceY: 380, tag: "REA + CLAUDE CODE", line1: "I let AI rebuild", line2: "a real app", accent: "#CC785C" }} />
     <Composition id="Cover2" component={Cover} durationInFrames={1} {...common} defaultProps={{ top: "img/cf_top2.png", face: "img/cf_face2.png", faceY: 380, tag: "GOOGLE GENIE 4", line1: "Type a prompt.", line2: "Walk inside it.", accent: "#3B82F6" }} />
     <Composition id="Cover3" component={Cover} durationInFrames={1} {...common} defaultProps={{ top: "img/cf_top3.png", topPos: "95% 35%", topZoom: 1.15, face: "img/cf_face3.png", faceY: 330, tag: "GEMMA 4 IN ORBIT", line1: "Google put AI", line2: "in SPACE 🛰", accent: "#F2B84B" }} />
