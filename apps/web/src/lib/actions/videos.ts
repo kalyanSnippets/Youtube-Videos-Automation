@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { db, ensureSchemaPatches, schema } from "@yaos/database";
 import { clearPromptLibraryCache, splitKeywords } from "@yaos/comment-bot";
 import { requireAdmin } from "@/lib/admin";
-import { fetchGoogleDoc, googleDocId, readUpload, takeKeywordLine, tidy } from "@/lib/prompt-import";
+import { fetchGoogleDoc, googleDocId, readAttachment, readUpload, takeKeywordLine, tidy } from "@/lib/prompt-import";
 import { runVideoSync, type SyncReport } from "@/lib/video-sync";
 
 export interface VideoFormState {
@@ -100,6 +100,18 @@ export async function saveVideo(_prev: VideoFormState, form: FormData): Promise<
       if (clash) return { error: clash };
     }
 
+    // The uploaded document itself, kept so viewers download the file instead of getting pasted text.
+    const upload = form.get("attachment");
+    let attachment: Awaited<ReturnType<typeof readAttachment>> | null = null;
+    if (upload instanceof File && upload.size > 0) {
+      try {
+        attachment = await readAttachment(upload);
+      } catch (error) {
+        return { error: (error as Error).message };
+      }
+    }
+    const removeAttachment = form.get("removeAttachment") === "on";
+
     const promptChanged = prompt !== (video.prompt ?? "");
     const fields = {
       keyword,
@@ -112,8 +124,13 @@ export async function saveVideo(_prev: VideoFormState, form: FormData): Promise<
     };
     await db.update(schema.videos).set({ ...fields, hidden }).where(eq(schema.videos.id, video.id));
     if (twin) await db.update(schema.videos).set(fields).where(eq(schema.videos.id, twin.id));
+    for (const target of twin ? [video.id, twin.id] : [video.id]) {
+      if (attachment) await setAttachment(target, attachment);
+      else if (removeAttachment) await setAttachment(target, null);
+    }
     refresh();
     const where = twin ? ` Also added to the ${twin.platform === "INSTAGRAM" ? "Instagram" : "YouTube"} version.` : "";
+    if (attachment) return { saved: `Saved. Viewers now get ${attachment.name} as a download.${where}` };
     if (prompt) return { saved: `Saved.${where}` };
     return {
       saved: keyword
@@ -125,6 +142,20 @@ export async function saveVideo(_prev: VideoFormState, form: FormData): Promise<
     const message = (error as Error).message;
     return { error: /not signed in/i.test(message) ? "You've been signed out. Reload the page and sign in again." : `Couldn't save: ${message}` };
   }
+}
+
+/** Store (or with null, remove) the document a video sends as a download. */
+async function setAttachment(videoId: string, file: { name: string; type: string; size: number; base64: string } | null): Promise<void> {
+  if (!file) {
+    await db.delete(schema.videoAttachments).where(eq(schema.videoAttachments.videoId, videoId));
+    await db.update(schema.videos).set({ attachmentName: null, attachmentType: null, attachmentSize: null }).where(eq(schema.videos.id, videoId));
+    return;
+  }
+  await db
+    .insert(schema.videoAttachments)
+    .values({ videoId, data: file.base64, updatedAt: new Date() })
+    .onConflictDoUpdate({ target: schema.videoAttachments.videoId, set: { data: file.base64, updatedAt: new Date() } });
+  await db.update(schema.videos).set({ attachmentName: file.name, attachmentType: file.type, attachmentSize: file.size }).where(eq(schema.videos.id, videoId));
 }
 
 /** Moves an old standalone resource onto a video (and its twin), then removes the old resource. */
@@ -161,6 +192,7 @@ export async function removeVideoPrompt(form: FormData): Promise<void> {
       .update(schema.videos)
       .set({ prompt: null, promptSource: null, promptFilename: null, keyword: null, updatedAt: new Date() })
       .where(eq(schema.videos.id, id));
+    await setAttachment(id, null);
   }
   refresh();
 }

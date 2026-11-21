@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { and, eq, sql } from "drizzle-orm";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { ArrowLeft, Download, ExternalLink, FileText } from "lucide-react";
 import { db, ensureSchemaPatches, schema } from "@yaos/database";
 import { getFollowLinks, getSiteSettings } from "@/lib/site";
 import { FollowCta } from "@/components/public/follow-cta";
@@ -11,6 +11,10 @@ import { PublicFooter, PublicHeader } from "@/components/public/site-chrome";
 import { CopyButton } from "@/components/public/copy-button";
 import { NewsletterForm } from "@/components/public/newsletter-form";
 import { videoDetailParts, videoKind } from "@/lib/video-details";
+
+function fileSize(bytes: number): string {
+  return bytes < 1024 * 1024 ? `${Math.max(1, Math.round(bytes / 1024))} KB` : `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+}
 
 /** The full description, with links made clickable. */
 function Description({ text }: { text: string }) {
@@ -85,7 +89,34 @@ export default async function VideoPage({ params }: { params: Promise<{ slug: st
           <ExternalLink size={15} /> {watchLabel}
         </a>
 
-        {video.prompt && (
+        {video.attachmentName && (
+          <section className="panel p-4 sm:p-5 flex flex-wrap items-center gap-4 border-accent-cyan/30">
+            <FileText size={28} className="shrink-0 text-accent-cyan" />
+            <div className="min-w-0 flex-1">
+              <p className="font-medium break-words">{video.resourceTitle || video.attachmentName}</p>
+              <p className="text-xs text-text-dim break-words">
+                {video.attachmentName}
+                {video.attachmentSize ? ` · ${fileSize(video.attachmentSize)}` : ""}
+              </p>
+            </div>
+            <a
+              href={`/v/${video.slug}/file`}
+              className="inline-flex items-center gap-2 rounded-lg bg-accent-cyan text-bg font-medium text-sm px-4 py-2.5 hover:brightness-110"
+            >
+              <Download size={15} /> Download
+            </a>
+          </section>
+        )}
+
+        {video.prompt && video.attachmentName && (
+          <details className="panel overflow-hidden group">
+            <summary className="cursor-pointer px-4 py-3 text-sm text-text-dim hover:text-text">Show the text version</summary>
+            <div className="flex justify-end px-4 pb-2"><CopyButton text={video.prompt} /></div>
+            <pre className="px-4 pb-5 sm:px-5 whitespace-pre-wrap break-words font-mono text-[13px] leading-relaxed text-text">{video.prompt}</pre>
+          </details>
+        )}
+
+        {video.prompt && !video.attachmentName && (
           <section className="panel overflow-hidden">
             <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-b border-border-subtle">
               <span className="text-sm font-medium">{video.resourceTitle || "Prompt from this video"}</span>

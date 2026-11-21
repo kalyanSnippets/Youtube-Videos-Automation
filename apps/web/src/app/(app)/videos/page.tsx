@@ -59,6 +59,7 @@ export default async function VideosPage() {
       prompt: v.prompt,
       promptSource: v.promptSource,
       promptFilename: v.promptFilename,
+      attachment: v.attachmentName ? { name: v.attachmentName, size: v.attachmentSize } : null,
       extraLink: v.extraLink,
       stats: { views: v.views, avgViewPercent: v.avgViewPercent, subscribersGained: v.subscribersGained, pageViews: v.pageViews ?? 0 },
       twin: twin ? { id: twin.id, label: `${kindLabel(twin)} “${(cleanTitle(twin.title) || twin.title).slice(0, 60)}”`, hasPrompt: Boolean(twin.prompt) } : null,

@@ -1017,6 +1017,23 @@ DO $$ BEGIN
 END $$;
 INSERT INTO "drizzle"."__drizzle_migrations" (hash, created_at) VALUES ('26288163fe3d474693ec16dca26ce105a59025a09674602ace5c6a9131d9774a', 1795280043342);
 
+-- 0012_video_attachments
+CREATE TABLE IF NOT EXISTS "video_attachments" (
+	"video_id" uuid PRIMARY KEY NOT NULL,
+	"data" text NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+ALTER TABLE "videos" ADD COLUMN IF NOT EXISTS "attachment_name" varchar(300);--> statement-breakpoint
+ALTER TABLE "videos" ADD COLUMN IF NOT EXISTS "attachment_type" varchar(150);--> statement-breakpoint
+ALTER TABLE "videos" ADD COLUMN IF NOT EXISTS "attachment_size" integer;--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "video_attachments" ADD CONSTRAINT "video_attachments_video_id_videos_id_fk" FOREIGN KEY ("video_id") REFERENCES "public"."videos"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+INSERT INTO "drizzle"."__drizzle_migrations" (hash, created_at) VALUES ('f9b08cd7a8044a022e8ca1546d79bdfc67c06a63477206c46b351e7ff57b1a82', 1795287698555);
+
 -- Supabase exposes the public schema through its Data API. The app talks to Postgres directly
 -- (and bypasses row level security), so lock every table to the Data API.
 DO $$ DECLARE t record; BEGIN

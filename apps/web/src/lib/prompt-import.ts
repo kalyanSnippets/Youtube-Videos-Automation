@@ -77,3 +77,21 @@ export async function readUpload(file: File): Promise<ImportedPrompt> {
   const { keyword, text } = takeKeywordLine(tidy(raw));
   return { text, source, filename: name, keyword };
 }
+
+const FILE_TYPES: Record<string, string> = {
+  docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  pdf: "application/pdf",
+  txt: "text/plain; charset=utf-8",
+  md: "text/markdown; charset=utf-8",
+};
+
+/** Checks an uploaded document before it's kept as the video's download. */
+export async function readAttachment(file: File): Promise<{ name: string; type: string; size: number; base64: string }> {
+  if (file.size > MAX_UPLOAD_BYTES) throw new Error("That file is over 5 MB. Export a smaller file and try again.");
+  const name = (file.name || "prompt").replace(/[\\/\r\n"]/g, "_").slice(0, 300);
+  const ext = name.toLowerCase().split(".").pop() ?? "";
+  const type = FILE_TYPES[ext];
+  if (!type) throw new Error("Upload a Word (.docx), PDF, text (.txt) or Markdown (.md) file.");
+  const base64 = Buffer.from(await file.arrayBuffer()).toString("base64");
+  return { name, type, size: file.size, base64 };
+}

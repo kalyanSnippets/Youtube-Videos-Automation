@@ -14,6 +14,8 @@ export interface LibraryEntry {
   url?: string;
   /** Video/post ids this entry belongs to. When two entries share a keyword, a comment on one of these wins. */
   mediaIds?: string[];
+  /** An uploaded document sent as a download link instead of the prompt text. */
+  file?: { name: string; url: string };
   /** Keyword is set but the prompt isn't added yet: reply with the page link and "coming soon". */
   comingSoon?: boolean;
 }

@@ -35,6 +35,13 @@ export const videos = pgTable(
     /** "google-doc" | "docx" | "pdf" | "text" */
     promptSource: varchar("prompt_source", { length: 40 }),
     promptFilename: varchar("prompt_filename", { length: 300 }),
+    /**
+     * The original uploaded document (Word, PDF, ...), sent to viewers as a download instead of
+     * pasted text. The bytes live in video_attachments so listing videos stays light.
+     */
+    attachmentName: varchar("attachment_name", { length: 300 }),
+    attachmentType: varchar("attachment_type", { length: 150 }),
+    attachmentSize: integer("attachment_size"),
     /** YouTube Analytics, lifetime totals (refreshed every few hours). Null until the first analytics sync. */
     views: integer("views"),
     watchMinutes: integer("watch_minutes"),
@@ -91,3 +98,12 @@ export const channelDaily = pgTable(
   },
   (t) => ({ platformDay: uniqueIndex("channel_daily_platform_day_idx").on(t.platform, t.day) }),
 );
+
+/** The bytes of a video's uploaded document (base64), one row per video. */
+export const videoAttachments = pgTable("video_attachments", {
+  videoId: uuid("video_id")
+    .primaryKey()
+    .references(() => videos.id, { onDelete: "cascade" }),
+  data: text("data").notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});

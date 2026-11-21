@@ -15,18 +15,28 @@ export function VideoEditor({ video, onDone }: { video: VideoRowData; onDone: ()
   const [importMsg, setImportMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [docLink, setDocLink] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
+  // An uploaded document is kept as-is and sent to viewers as a download; its text only fills the box below.
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [removeFile, setRemoveFile] = useState(false);
+  const attachedName = pendingFile?.name ?? (removeFile ? null : video.attachment?.name ?? null);
 
   function runImport(fd: FormData) {
     startImport(async () => {
       const r = await importPrompt(fd);
       if (r.error || !r.text) {
+        if (fd.get("file")) setPendingFile(null);
         setImportMsg({ ok: false, text: r.error ?? "Nothing to import." });
         return;
       }
       setPrompt(r.text);
       if (r.keyword && !keyword) setKeyword(r.keyword);
       setSource({ source: r.source ?? "text", filename: r.filename ?? null });
-      setImportMsg({ ok: true, text: `Imported ${r.text.length.toLocaleString()} characters${r.filename ? ` from ${r.filename}` : ""}. Check it below, then Save.` });
+      setImportMsg({
+        ok: true,
+        text: r.filename
+          ? `${r.filename} is ready. Click Save: viewers will get this file as a download.`
+          : `Imported ${r.text.length.toLocaleString()} characters. Check it below, then Save.`,
+      });
     });
   }
 
@@ -47,6 +57,8 @@ export function VideoEditor({ video, onDone }: { video: VideoRowData; onDone: ()
             if (!f) return;
             const fd = new FormData();
             fd.set("file", f);
+            setPendingFile(f);
+            setRemoveFile(false);
             runImport(fd);
             e.target.value = "";
           }}
@@ -70,13 +82,42 @@ export function VideoEditor({ video, onDone }: { video: VideoRowData; onDone: ()
       {importing && <p className="text-xs text-accent-cyan">Reading…</p>}
       {importMsg && <p className={`text-xs ${importMsg.ok ? "text-status-success" : "text-status-danger"}`}>{importMsg.text}</p>}
 
-      <form action={action} className="space-y-4">
+      {attachedName && (
+        <div className="flex flex-wrap items-center gap-3 rounded-lg border border-accent-cyan/30 bg-accent-cyan/5 px-3 py-2.5 text-sm">
+          <span className="min-w-0 flex-1">
+            📎 <span className="font-medium">{attachedName}</span>
+            <span className="block text-xs text-text-dim">
+              Sent as a file: the bot DMs a download link, and the website shows a Download button.
+              {pendingFile ? " Click Save to keep it." : ""}
+            </span>
+          </span>
+          <button
+            type="button"
+            onClick={() => {
+              if (pendingFile) setPendingFile(null);
+              else setRemoveFile(true);
+            }}
+            className="text-xs text-status-danger hover:underline"
+          >
+            Remove file
+          </button>
+        </div>
+      )}
+
+      <form
+        action={(fd) => {
+          if (pendingFile) fd.set("attachment", pendingFile);
+          if (removeFile) fd.set("removeAttachment", "on");
+          return action(fd);
+        }}
+        className="space-y-4"
+      >
         <input type="hidden" name="id" value={video.id} />
         <input type="hidden" name="promptSource" value={source?.source ?? ""} />
         <input type="hidden" name="promptFilename" value={source?.filename ?? ""} />
 
         <label className="block space-y-1">
-          <span className="text-xs font-medium">Prompt text</span>
+          <span className="text-xs font-medium">{attachedName ? "Text version (shown on the page under the download)" : "Prompt text"}</span>
           <textarea
             name="prompt"
             value={prompt}
@@ -85,7 +126,11 @@ export function VideoEditor({ video, onDone }: { video: VideoRowData; onDone: ()
             placeholder="Paste or type the prompt, or import it from a file / Google Doc above."
             className={`${inputClass} font-mono text-[13px]`}
           />
-          <span className="block text-[11px] text-text-faint">This is what viewers copy on your site and what the bot sends. Leave empty to show "Prompt coming soon".</span>
+          <span className="block text-[11px] text-text-faint">
+            {attachedName
+              ? "Viewers can still read and copy this on your site. The bot sends the file, not this text."
+              : "This is what viewers copy on your site and what the bot sends. Upload a file above to send a document instead."}
+          </span>
         </label>
 
         <div className="grid gap-4 sm:grid-cols-[180px_1fr]">

@@ -29,7 +29,9 @@ function clip(text: string, max: number): string {
 let currentSite: string | undefined;
 
 function deliveryVars(entry: LibraryEntry, name: string | undefined): TemplateVars {
-  return { name, title: entry.title, keyword: entry.keyword, prompt: entry.message, link: entry.url, video: entry.link, site: currentSite };
+  // An uploaded document goes out as a download link in place of the pasted text.
+  const prompt = entry.file ? `📎 ${entry.file.name}\n⬇️ Download: ${entry.file.url}` : entry.message;
+  return { name, title: entry.title, keyword: entry.keyword, prompt, link: entry.url, video: entry.link, site: currentSite };
 }
 
 export function buildInstagramDM(entry: LibraryEntry, name: string | undefined, templates: ReplyTemplates = DEFAULT_TEMPLATES): string {

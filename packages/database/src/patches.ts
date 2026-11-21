@@ -41,8 +41,30 @@ const PATCHES = [
     UPDATE "videos" SET "bot_enabled" = true WHERE "keyword" IS NOT NULL AND btrim("keyword") <> '';
   END IF;
 END $$;`,
+  // 0012: uploaded documents sent as downloads
+  `CREATE TABLE IF NOT EXISTS "video_attachments" (
+	"video_id" uuid PRIMARY KEY NOT NULL,
+	"data" text NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+)`,
+  `ALTER TABLE "videos" ADD COLUMN IF NOT EXISTS "attachment_name" varchar(300)`,
+  `ALTER TABLE "videos" ADD COLUMN IF NOT EXISTS "attachment_type" varchar(150)`,
+  `ALTER TABLE "videos" ADD COLUMN IF NOT EXISTS "attachment_size" integer`,
+  `DO $$ BEGIN
+ ALTER TABLE "video_attachments" ADD CONSTRAINT "video_attachments_video_id_videos_id_fk" FOREIGN KEY ("video_id") REFERENCES "public"."videos"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$`,
+  // Tables added by these patches after the first setup: keep them closed to Supabase's Data API
+  // like the rest (the app connects as the table owner, which RLS doesn't restrict).
+  `DO $$ DECLARE t record; BEGIN
+    FOR t IN SELECT tablename FROM pg_tables WHERE schemaname = 'public' AND NOT rowsecurity LOOP
+      EXECUTE format('ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY', t.tablename);
+    END LOOP;
+  END $$`,
 ];
 const MIGRATIONS = [
+  { hash: "f9b08cd7a8044a022e8ca1546d79bdfc67c06a63477206c46b351e7ff57b1a82", createdAt: 1795287698555 },
   { hash: "26288163fe3d474693ec16dca26ce105a59025a09674602ace5c6a9131d9774a", createdAt: 1795280043342 },
   { hash: "595e0bb7af0fc1261cb0558e80bd6e17f0786621a6d3902a139f59e3d1024771", createdAt: 1795134560534 },
   { hash: "810a7078ba04471780ad6cdda2995e060aefe2f21d9171aab603a72a286f4837", createdAt: 1795133040078 },

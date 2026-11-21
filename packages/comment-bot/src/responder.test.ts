@@ -124,4 +124,20 @@ describe("safety helpers", () => {
     expect(dm).toContain("https://site.example/r/big");
     expect(dm).toContain("…");
   });
+  it("sends an uploaded document as a download link, not the pasted text", () => {
+    const dm = buildInstagramDM(
+      {
+        keyword: "GAME",
+        keywords: ["GAME"],
+        title: "Game prompt",
+        message: "SECRET PROMPT TEXT",
+        url: "https://site.example/v/game",
+        file: { name: "Game prompt.docx", url: "https://site.example/v/game/file" },
+      },
+      "kavya",
+    );
+    expect(dm).toContain("Game prompt.docx");
+    expect(dm).toContain("https://site.example/v/game/file");
+    expect(dm).not.toContain("SECRET PROMPT TEXT");
+  });
 });

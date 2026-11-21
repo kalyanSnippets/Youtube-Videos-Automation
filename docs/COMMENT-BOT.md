@@ -17,6 +17,12 @@ arrive with the switch off. Comments on a video that's off are logged as "No rep
 "Bot is off for this video"; turn the switch on and click **Send** on the Comment Bot page to answer them.
 When the switch was added, videos that already had a keyword were switched on once so nothing stopped.
 
+**Uploaded documents are sent as files.** When you upload a Word, PDF, text or Markdown file for a
+video, the original file is kept. The Instagram DM carries a direct download link
+(`/v/<slug>/file`) instead of the pasted text, and the video's page shows a Download button. Instagram
+and YouTube don't let a bot attach a file to a comment reply or a private reply, so a link is the
+only way to deliver it. Prompts imported from a Google Doc link or typed in are still sent as text.
+
 Every comment and every reply is logged on the **Comment Bot** page of the admin area (`/comment-bot`, sign-in required).
 
 ## How it works

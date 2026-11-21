@@ -14,6 +14,8 @@ export interface VideoRowData {
   prompt: string | null;
   promptSource: string | null;
   promptFilename: string | null;
+  /** The uploaded document viewers download, if any. */
+  attachment: { name: string; size: number | null } | null;
   extraLink: string | null;
   /** YouTube Analytics lifetime totals (null until analytics are on) and site visits. */
   stats: { views: number | null; avgViewPercent: number | null; subscribersGained: number | null; pageViews: number };

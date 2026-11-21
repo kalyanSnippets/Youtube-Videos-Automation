@@ -85,6 +85,13 @@
       "when": 1795280043342,
       "tag": "0011_video_bot_switch",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1795287698555,
+      "tag": "0012_video_attachments",
+      "breakpoints": true
     }
   ]
 }

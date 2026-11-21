@@ -13,6 +13,10 @@ export function resourceUrl(slug: string, base = siteBaseUrl()): string | undefi
   return base ? `${base}/r/${slug}` : undefined;
 }
 
+export function videoFileUrl(slug: string, base = siteBaseUrl()): string | undefined {
+  return base ? `${base}/v/${slug}/file` : undefined;
+}
+
 export function videoPageUrl(slug: string, base = siteBaseUrl()): string | undefined {
   return base ? `${base}/v/${slug}` : undefined;
 }
@@ -37,8 +41,14 @@ export function videosToEntries(rows: VideoRow[], base = siteBaseUrl()): Library
       message: v.prompt ?? "",
       url: videoPageUrl(v.slug, base),
       mediaIds: [v.externalId],
-      ...(v.prompt ? {} : { comingSoon: true }),
+      ...(fileOf(v, base) ? { file: fileOf(v, base) } : {}),
+      ...(v.prompt || v.attachmentName ? {} : { comingSoon: true }),
     }));
+}
+
+function fileOf(v: VideoRow, base: string | undefined): { name: string; url: string } | undefined {
+  const url = v.attachmentName ? videoFileUrl(v.slug, base) : undefined;
+  return url ? { name: v.attachmentName!, url } : undefined;
 }
 
 type ResourceRow = typeof schema.resources.$inferSelect;
