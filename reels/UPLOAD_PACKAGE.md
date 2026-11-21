@@ -747,3 +747,72 @@ Send me your game when it's done 😄
 1. **Poll:** "When you were a kid, did you want to make games?" with options 🎮 Yes! / 😅 No
 2. **Quiz:** "How many lines of code did I write?" with options 0 ✅ / 100 / 1,000 / 10,000
 3. **Before/after:** your paper drawing next to the game, with the reel shared below it and "Comment GAME on the reel for my prompt".
+
+---
+
+# Reel 13: Shrink a 54 GB AI model for a normal laptop (Saluki 27B)
+
+| Video | Cover | Length | Comment ask |
+|---|---|---|---|
+| `13_Saluki_Shrink-AI-Model.mp4` | `13_cover.jpg` | 53s | your RAM (8 / 16 / 32 GB) + Windows or Mac |
+
+1080×1920, 30 fps, H.264, about −16 LUFS. Music and 3D were made in code, so nothing needs licensing. On-screen facts come from the Saluki Hugging Face model card (checked 21 Nov 2026); the benchmark numbers are Underdog's own and are labelled "vendor". Leave the AI label **off**: there is no AI-generated footage.
+
+## Instagram
+**Caption**
+```
+What if you could run a 54 GB AI model… on a normal laptop? 🤯
+
+The problem: you find an amazing open-source AI model, download it… and your laptop runs out of RAM 😩
+
+Saluki 27B by Underdog compresses an existing model (Qwen3.8-27B) instead of training a new one:
+📦 ~54 GB ➜ one 7.89 GB file
+🧰 runs on standard llama.cpp
+📊 Underdog reports it keeps most of the performance
+
+⚠️ The catch: compression can affect accuracy, and you still need enough memory.
+Before downloading ANY local AI model, check:
+✅ file size
+✅ RAM requirements
+✅ benchmarks
+
+💬 How much RAM does your laptop have: 8, 16 or 32 GB? And Windows or Mac?
+I'll use your answers to build a local AI setup guide 🛠️
+
+➕ Follow @aiwithkalyan, let's make AI accessible without expensive hardware
+
+#localai #llm #opensourceai #ai #artificialintelligence #qwen #llamacpp #aitools #machinelearning #techreels #laptop #gguf #aimodel #runailocally #privacy
+```
+**Topics:** Artificial intelligence · Technology · Computers
+**Alt text:** Kalyan explains Saluki 27B, which compresses a 54 GB AI model into a 7.89 GB file, with 3D animations of a laptop, RAM sticks and a shrinking model.
+**Pinned comment:** Drop your RAM + OS 👇 (e.g. "16 GB · Windows"). Most-voted setup gets the first guide!
+
+## YouTube Shorts
+**Title:** Run a 54 GB AI Model on a Normal Laptop? 🤯 (Saluki 27B) #shorts
+**Description**
+```
+What if you could shrink a massive AI model and run it on a normal laptop?
+
+Saluki 27B from Underdog compresses an existing model (Qwen3.8-27B) instead of training a new one: about 54 GB down to a single 7.89 GB GGUF file that runs on standard llama.cpp.
+
+The catch: compression can affect accuracy, and you still need enough memory. Before downloading any local AI model, check its file size, RAM requirements and benchmarks.
+
+💬 How much RAM does your laptop have (8, 16 or 32 GB), and do you use Windows or Mac? I'll use your answers to plan a local AI setup guide.
+
+Source: Saluki model card on Hugging Face (ConwayResearch/Underdog-Saluki-27B-1.0). Benchmark figures are vendor-reported.
+
+Subscribe to AI with Kalyan and let's make AI more accessible without expensive hardware.
+
+#localai #llm #shorts
+```
+**Tags**
+```
+saluki 27b, underdog ai, run ai locally, local llm, run llm on laptop, compressed ai model, quantization, 2-bit quantization, gguf, llama.cpp, qwen3.8, qwen 27b, open source ai, ai on laptop, how much ram for ai, local ai setup, AI with Kalyan
+```
+**Keywords to target:** run ai on laptop, local llm, saluki 27b, compressed ai model, how much ram for local ai
+**Settings:** Not made for kids · Altered or synthetic content: No · Category: Science & Technology
+
+## Instagram Stories (optional)
+1. **Poll:** "How much RAM does your laptop have?" with options 8 GB / 16 GB / 32 GB+ (use the poll's extra-options slider)
+2. **Quiz:** "Saluki shrinks a 54 GB model to…" with options 7.89 GB ✅ / 20 GB / 40 GB
+3. **Reel share** with "Comment your RAM + OS on the reel 👇"
