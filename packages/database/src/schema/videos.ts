@@ -47,6 +47,8 @@ export const videos = pgTable(
     pageViews: integer("page_views").notNull().default(0),
     /** Hidden videos are kept in admin but not shown publicly or used by the bot. */
     hidden: boolean("hidden").notNull().default(false),
+    /** The comment bot replies on this video only while this is on. New videos start off. */
+    botEnabled: boolean("bot_enabled").notNull().default(false),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },

@@ -172,3 +172,17 @@ export async function syncVideosNow(): Promise<SyncReport> {
   refresh();
   return report;
 }
+
+/** The per-video comment bot switch. The bot replies on a video only while this is on. */
+export async function setVideoBot(videoId: string, on: boolean): Promise<{ error?: string }> {
+  try {
+    await requireAdmin();
+    await ensureSchemaPatches();
+    await db.update(schema.videos).set({ botEnabled: on, updatedAt: new Date() }).where(eq(schema.videos.id, videoId));
+    refresh();
+    return {};
+  } catch (error) {
+    console.error("[videos] bot switch failed", error);
+    return { error: "Couldn't change the switch. Try again." };
+  }
+}

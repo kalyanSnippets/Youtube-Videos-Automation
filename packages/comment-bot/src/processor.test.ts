@@ -50,6 +50,21 @@ function setup(opts: { failDM?: number; failPublic?: number; dryRun?: boolean } 
 }
 
 describe("processComment", () => {
+  it("sends nothing on a video whose bot switch is off", async () => {
+    const { store, sent, deps } = setup();
+    deps.library = { ...library, enabledMediaIds: new Set(["other-video"]) };
+    expect(await processComment(deps, comment)).toBe("SKIPPED");
+    expect(sent).toEqual([]);
+    expect(store.rows.get("c1")?.skipReason).toMatch(/Bot is off/);
+  });
+
+  it("replies once the video's switch is on", async () => {
+    const { sent, deps } = setup();
+    deps.library = { ...library, enabledMediaIds: new Set(["m1"]) };
+    expect(await processComment(deps, comment)).toBe("REPLIED");
+    expect(sent).toEqual(["DM:true", "PUBLIC"]);
+  });
+
   it("sends DM then public reply, once", async () => {
     const { store, sent, deps } = setup();
     expect(await processComment(deps, comment)).toBe("REPLIED");

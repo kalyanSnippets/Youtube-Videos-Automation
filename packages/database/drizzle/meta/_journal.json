@@ -78,6 +78,13 @@
       "when": 1795134560534,
       "tag": "0010_site_logo",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1795280043342,
+      "tag": "0011_video_bot_switch",
+      "breakpoints": true
     }
   ]
 }

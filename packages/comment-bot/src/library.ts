@@ -80,7 +80,7 @@ const CACHE_MS = 30 * 1000;
 export async function loadPromptLibrary(options: { force?: boolean } = {}): Promise<PromptLibrary> {
   if (!options.force && cache && Date.now() - cache.at < CACHE_MS) return cache.library;
   await ensureSchemaPatches();
-  const [rows, settings, videoRows] = await Promise.all([
+  const [rows, settings, videoRows, enabledRows] = await Promise.all([
     db.select().from(schema.resources).where(eq(schema.resources.published, true)).orderBy(asc(schema.resources.sortOrder), asc(schema.resources.createdAt)),
     db.select().from(schema.siteSettings).where(eq(schema.siteSettings.id, 1)),
     db
@@ -88,6 +88,11 @@ export async function loadPromptLibrary(options: { force?: boolean } = {}): Prom
       .from(schema.videos)
       .where(and(eq(schema.videos.hidden, false), isNotNull(schema.videos.keyword)))
       .catch(() => [] as VideoRow[]), // table not migrated yet: keep working with resources only
+    db
+      .select({ id: schema.videos.externalId })
+      .from(schema.videos)
+      .where(and(eq(schema.videos.botEnabled, true), eq(schema.videos.hidden, false)))
+      .catch(() => null), // column missing: don't block every reply
   ]);
   const base = siteBaseUrl();
   const resourceLib = toLibrary(rows, settings[0]?.about ?? "", base);
@@ -97,7 +102,14 @@ export async function loadPromptLibrary(options: { force?: boolean } = {}): Prom
   const entries = [...extra, ...resourceLib.entries];
   const warnings = resourceLib.warnings.filter((w) => !w.startsWith("No published resources"));
   if (!entries.length) warnings.push("No keywords yet: upload a prompt to a video, or add a resource.");
-  const library = { about: resourceLib.about, entries, warnings, templates: normaliseTemplates(settings[0]?.botTemplates), siteUrl: base };
+  const library: PromptLibrary = {
+    about: resourceLib.about,
+    entries,
+    warnings,
+    templates: normaliseTemplates(settings[0]?.botTemplates),
+    siteUrl: base,
+    enabledMediaIds: enabledRows ? new Set(enabledRows.map((r) => r.id)) : undefined,
+  };
   cache = { at: Date.now(), library };
   return library;
 }

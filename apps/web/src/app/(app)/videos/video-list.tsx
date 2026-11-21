@@ -3,14 +3,16 @@
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import { kindLabel, type VideoRowData } from "./types";
+import { BotSwitch } from "./bot-switch";
 import { VideoEditor } from "./video-editor";
 
 const compact = new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 });
 
-type Filter = "all" | "needs" | "ready" | "yt-long" | "yt-short" | "ig-reel" | "ig-post" | "hidden";
+type Filter = "all" | "bot-on" | "needs" | "ready" | "yt-long" | "yt-short" | "ig-reel" | "ig-post" | "hidden";
 
 const FILTERS: { id: Filter; label: string; test: (v: VideoRowData) => boolean }[] = [
   { id: "all", label: "All", test: (v) => !v.hidden },
+  { id: "bot-on", label: "Bot on", test: (v) => !v.hidden && v.botEnabled },
   { id: "needs", label: "Needs a prompt", test: (v) => !v.hidden && !v.prompt },
   { id: "ready", label: "Prompt ready", test: (v) => !v.hidden && Boolean(v.prompt) },
   { id: "yt-long", label: "YouTube videos", test: (v) => !v.hidden && v.platform === "YOUTUBE" && v.format !== "SHORT" },
@@ -95,7 +97,8 @@ export function VideoList({ videos }: { videos: VideoRowData[] }) {
                   </p>
                 )}
               </div>
-              <div className="flex shrink-0 items-center gap-2">
+              <div className="flex shrink-0 flex-col-reverse items-end gap-1 sm:flex-row sm:items-center sm:gap-2">
+                {!v.hidden && <BotSwitch key={`${v.id}-${v.botEnabled}`} videoId={v.id} initial={v.botEnabled} />}
                 <a href={v.watchUrl} target="_blank" rel="noopener" className="hidden sm:inline text-xs text-text-dim hover:text-text">Watch ↗</a>
                 <a href={`/v/${v.slug}`} target="_blank" className="hidden sm:inline text-xs text-text-dim hover:text-text">Page ↗</a>
                 <button

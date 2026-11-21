@@ -12,6 +12,11 @@ with no one watching.
 | Spam, self-promo, hate, gibberish, or a bare "thanks" in a thread | Skipped | Skipped |
 | Your own comments, or threads you already replied to by hand | Skipped | Skipped |
 
+**The bot only replies on videos whose Bot switch is on** (Videos page, one switch per video). New videos
+arrive with the switch off. Comments on a video that's off are logged as "No reply" with the reason
+"Bot is off for this video"; turn the switch on and click **Send** on the Comment Bot page to answer them.
+When the switch was added, videos that already had a keyword were switched on once so nothing stopped.
+
 Every comment and every reply is logged on the **Comment Bot** page of the admin area (`/comment-bot`, sign-in required).
 
 ## How it works

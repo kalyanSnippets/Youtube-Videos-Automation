@@ -28,6 +28,11 @@ export interface PromptLibrary {
   templates?: import("./templates").ReplyTemplates;
   /** Home page of the public site, for {site} in messages. */
   siteUrl?: string;
+  /**
+   * Video / post ids whose bot switch is on. When set, comments on anything else get no reply.
+   * Left out (tests, old setups) means every video is on.
+   */
+  enabledMediaIds?: Set<string>;
 }
 
 /** A comment normalised across platforms. */

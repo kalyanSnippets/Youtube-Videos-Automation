@@ -53,6 +53,7 @@ export default async function VideosPage() {
       publishedAt: v.publishedAt ? v.publishedAt.toISOString() : null,
       slug: v.slug,
       hidden: v.hidden,
+      botEnabled: v.botEnabled,
       keyword: v.keyword,
       resourceTitle: v.resourceTitle,
       prompt: v.prompt,
@@ -76,8 +77,8 @@ export default async function VideosPage() {
         <div className="flex-1 min-w-[240px]">
           <h1 className="text-xl font-semibold mb-1">Videos & prompts</h1>
           <p className="text-sm text-text-dim">
-            Every new YouTube video and Instagram post appears here by itself. Add a prompt and a keyword to a video, and it shows on your website and the
-            comment bot sends it to anyone who comments the keyword.
+            Every new YouTube video and Instagram post appears here by itself. Add a prompt and a keyword to a video, and it shows on your website.
+            The comment bot only replies on videos whose <span className="text-text">Bot</span> switch is on. New videos start with it off.
           </p>
         </div>
         <a href="/" target="_blank" className="hidden sm:inline-block rounded-lg border border-border px-3.5 py-2 text-sm text-text-dim hover:text-text">View website ↗</a>

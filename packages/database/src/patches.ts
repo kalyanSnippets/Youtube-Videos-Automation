@@ -33,8 +33,17 @@ const PATCHES = [
   `CREATE UNIQUE INDEX IF NOT EXISTS "channel_daily_platform_day_idx" ON "channel_daily" USING btree ("platform","day")`,
   // 0010: site logo
   `ALTER TABLE "site_settings" ADD COLUMN IF NOT EXISTS "logo_data" text`,
+  // 0011: per-video comment bot switch (existing keyword videos are switched on once)
+  `DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'videos' AND column_name = 'bot_enabled') THEN
+    ALTER TABLE "videos" ADD COLUMN "bot_enabled" boolean DEFAULT false NOT NULL;
+    -- Once, when the switch is added: videos that already had a keyword keep replying.
+    UPDATE "videos" SET "bot_enabled" = true WHERE "keyword" IS NOT NULL AND btrim("keyword") <> '';
+  END IF;
+END $$;`,
 ];
 const MIGRATIONS = [
+  { hash: "26288163fe3d474693ec16dca26ce105a59025a09674602ace5c6a9131d9774a", createdAt: 1795280043342 },
   { hash: "595e0bb7af0fc1261cb0558e80bd6e17f0786621a6d3902a139f59e3d1024771", createdAt: 1795134560534 },
   { hash: "810a7078ba04471780ad6cdda2995e060aefe2f21d9171aab603a72a286f4837", createdAt: 1795133040078 },
   { hash: "51f3dea35b6e9a5853b7abca7885ae7122c0b8913fef087806107be12c7aa85b", createdAt: 1795057961922 },

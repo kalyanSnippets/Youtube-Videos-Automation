@@ -36,6 +36,16 @@ export async function processComment(deps: ProcessDeps, comment: IncomingComment
   if (!row) return "ALREADY_HANDLED";
   const { platform, commentId } = comment;
   try {
+    const enabled = deps.library.enabledMediaIds;
+    if (enabled && !(comment.mediaId && enabled.has(comment.mediaId))) {
+      await deps.store.update(platform, commentId, {
+        status: "SKIPPED",
+        action: "NONE",
+        skipReason: "Bot is off for this video. Turn it on in Videos, then click Send.",
+        error: null,
+      });
+      return "SKIPPED";
+    }
     const media = deps.getMedia ? await deps.getMedia(comment).catch(() => undefined) : undefined;
     const plan = await planReply({ comment, library: deps.library, media, llm: deps.llm });
 

@@ -7,6 +7,8 @@ export interface VideoRowData {
   publishedAt: string | null;
   slug: string;
   hidden: boolean;
+  /** Comment bot switch for this video. */
+  botEnabled: boolean;
   keyword: string | null;
   resourceTitle: string | null;
   prompt: string | null;

@@ -1007,6 +1007,16 @@ INSERT INTO "drizzle"."__drizzle_migrations" (hash, created_at) VALUES ('810a707
 ALTER TABLE "site_settings" ADD COLUMN IF NOT EXISTS "logo_data" text;
 INSERT INTO "drizzle"."__drizzle_migrations" (hash, created_at) VALUES ('595e0bb7af0fc1261cb0558e80bd6e17f0786621a6d3902a139f59e3d1024771', 1795134560534);
 
+-- 0011_video_bot_switch
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'videos' AND column_name = 'bot_enabled') THEN
+    ALTER TABLE "videos" ADD COLUMN "bot_enabled" boolean DEFAULT false NOT NULL;
+    -- Once, when the switch is added: videos that already had a keyword keep replying.
+    UPDATE "videos" SET "bot_enabled" = true WHERE "keyword" IS NOT NULL AND btrim("keyword") <> '';
+  END IF;
+END $$;
+INSERT INTO "drizzle"."__drizzle_migrations" (hash, created_at) VALUES ('26288163fe3d474693ec16dca26ce105a59025a09674602ace5c6a9131d9774a', 1795280043342);
+
 -- Supabase exposes the public schema through its Data API. The app talks to Postgres directly
 -- (and bypasses row level security), so lock every table to the Data API.
 DO $$ DECLARE t record; BEGIN
