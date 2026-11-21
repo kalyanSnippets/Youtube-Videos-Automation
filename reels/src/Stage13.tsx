@@ -181,17 +181,17 @@ const Poll: React.FC = () => {
   const tiles: [THREE.Texture, number, number][] = [[win, 44.54, -2.1], [mac, 45.06, 2.1]];
   return (
     <>
-      <Cam pos={[Math.sin(fr / 110) * 1.4, 2.2, 12.5]} look={[0, 1.6, 0]} />
+      <Cam pos={[Math.sin(fr / 110) * 1.2, 2.4, 12.5]} look={[0, 1.3, 0]} />
       <ambientLight intensity={0.35} /><pointLight position={[-5, 6, 6]} intensity={160} color="#a78bfa" /><pointLight position={[5, 2, 6]} intensity={140} color="#22d3ee" />
       <Floor color="#22d3ee" />
       {sticks.map(([l, at, x]) => {
         const p = ramp(fr, T(at) - 0.15, T(at) + 0.45, Easing.out(Easing.back(1.4)));
-        return <RamStick key={l} label={l} position={[x, -1.5 + p * 3.3 + Math.sin(fr / 18 + x) * 0.08, 0]} rotation={[0.1, (1 - p) * 2.5 + Math.sin(fr / 30 + x) * 0.25, 0]} scale={0.95} />;
+        return <RamStick key={l} label={l} position={[x * 0.85, -1.4 + p * 3.8 + Math.sin(fr / 18 + x) * 0.08, -0.6]} rotation={[0.1, (1 - p) * 2.5 + Math.sin(fr / 30 + x) * 0.25, 0]} scale={0.82} />;
       })}
       {tiles.map(([tx, at, x], i) => {
         const p = ramp(fr, T(at) - 0.2, T(at) + 0.35, Easing.out(Easing.back(1.6)));
         return (
-          <group key={i} position={[x, 0.6, 1.6]} scale={p} rotation={[0, Math.sin(fr / 26 + i) * 0.2, 0]}>
+          <group key={i} position={[x, 0.85, 1.8]} scale={p} rotation={[0, Math.sin(fr / 26 + i) * 0.2, 0]}>
             <mesh><boxGeometry args={[3.2, 1.25, 0.18]} /><meshPhysicalMaterial color={i ? "#e5e7eb" : "#2563eb"} metalness={0.2} roughness={0.3} clearcoat={1} /></mesh>
             <mesh position={[0, 0, 0.1]}><planeGeometry args={[3.0, 1.17]} /><meshBasicMaterial map={tx} toneMapped={false} /></mesh>
           </group>
