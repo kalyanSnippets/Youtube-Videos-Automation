@@ -5,7 +5,7 @@ import face from "../public/r/r15f_face.json";
 import { f, FPS, INTER, MONO, Music, PopIn, ReelData, Sfx, chunkWords, activeChunk } from "./lib";
 import { K, ease, clamp, Screen3D, FaceTrack } from "./split";
 
-/* Reel 15: GitHub Goldmine #1, Immich (self-hosted photo library with AI search).
+/* Reel 15: GitHub Goldmine, Immich (self-hosted photo library with AI search).
    Style A (approved): relatable problem -> real POV phone demo -> HUD callouts, snap zooms, yellow-highlight captions,
    steady beat with subtle UI clicks, comment CTA. Demo footage is the official public Immich demo (demo.immich.app),
    recorded in a phone-sized browser: real timeline scrolling, a real "beach with red umbrella" context search, the real People page.
@@ -306,8 +306,7 @@ const Badge: React.FC = () => {
   const k = interpolate(frame, [2, 12], [0, 1], { ...clamp, easing: Easing.out(Easing.back(1.6)) });
   return (
     <div style={{ position: "absolute", left: 40, top: 140, transform: `scale(${k})`, transformOrigin: "0 50%", display: "flex", alignItems: "center", gap: 0, boxShadow: "0 14px 34px rgba(0,0,0,0.35)" }}>
-      <div style={{ background: "#111", color: Y, fontFamily: MONO, fontWeight: 800, fontSize: 36, padding: "12px 18px" }}>⛏ GITHUB GOLDMINE</div>
-      <div style={{ background: Y, color: "#111", fontFamily: MONO, fontWeight: 900, fontSize: 36, padding: "12px 18px" }}>EP 1</div>
+      <div style={{ background: "#111", color: Y, fontFamily: MONO, fontWeight: 800, fontSize: 36, padding: "12px 18px", border: `3px solid ${Y}` }}>⛏ GITHUB GOLDMINE</div>
     </div>
   );
 };
@@ -319,7 +318,7 @@ const NextEp: React.FC = () => {
       <PopIn delay={2} style={{ position: "absolute", left: 0, right: 0, top: 90, display: "flex", justifyContent: "center" }}>
         <div style={{ display: "flex" }}>
           <div style={{ background: "#111", color: Y, fontFamily: MONO, fontWeight: 800, fontSize: 40, padding: "12px 20px", border: `3px solid ${Y}` }}>⛏ GITHUB GOLDMINE</div>
-          <div style={{ background: Y, color: "#111", fontFamily: MONO, fontWeight: 900, fontSize: 40, padding: "12px 20px" }}>NEXT · EP 2</div>
+          <div style={{ background: Y, color: "#111", fontFamily: MONO, fontWeight: 900, fontSize: 40, padding: "12px 20px" }}>NEXT UP</div>
         </div>
       </PopIn>
       <PopIn delay={10} from="up" style={{ position: "absolute", left: 90, right: 90, top: 270 }}>
@@ -331,7 +330,7 @@ const NextEp: React.FC = () => {
           </div>
         </div>
       </PopIn>
-      <div style={{ position: "absolute", left: 0, right: 0, top: 760, textAlign: "center", fontFamily: MONO, fontWeight: 800, fontSize: 34, color: "rgba(255,255,255,0.8)", opacity: Math.floor(frame / 12) % 2 ? 1 : 0.4 }}>🔒 UNLOCKS NEXT EPISODE</div>
+      <div style={{ position: "absolute", left: 0, right: 0, top: 760, textAlign: "center", fontFamily: MONO, fontWeight: 800, fontSize: 34, color: "rgba(255,255,255,0.8)", opacity: Math.floor(frame / 12) % 2 ? 1 : 0.4 }}>🔒 COMING NEXT</div>
     </>
   );
 };
@@ -345,14 +344,13 @@ const Outro: React.FC = () => {
       <div style={{ textAlign: "center", opacity: fadeOut, transform: `scale(${0.94 + 0.06 * k})` }}>
         <div style={{ display: "inline-flex", boxShadow: "0 14px 34px rgba(0,0,0,0.35)" }}>
           <div style={{ background: "#111", color: Y, fontFamily: MONO, fontWeight: 800, fontSize: 48, padding: "14px 22px", border: `3px solid ${Y}` }}>⛏ GITHUB GOLDMINE</div>
-          <div style={{ background: Y, color: "#111", fontFamily: MONO, fontWeight: 900, fontSize: 48, padding: "14px 22px" }}>EP 1</div>
         </div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 22, marginTop: 60 }}>
           <Img src={staticFile("img/immich_logo.png")} style={{ width: 130, height: 130 }} />
           <div style={{ fontFamily: INTER, fontWeight: 900, fontSize: 130, color: "#fff", letterSpacing: -4 }}>Immich</div>
         </div>
         <div style={{ marginTop: 70, display: "inline-block", background: "#fff", color: "#111", fontFamily: INTER, fontWeight: 900, fontSize: 52, padding: "18px 34px", borderRadius: 999 }}>💬 Comment <span style={{ color: "#0a7cff" }}>PHOTO</span> for the link</div>
-        <div style={{ marginTop: 30, fontFamily: INTER, fontWeight: 800, fontSize: 42, color: "rgba(255,255,255,0.85)" }}>Follow AI with Kalyan · EP 2 next</div>
+        <div style={{ marginTop: 30, fontFamily: INTER, fontWeight: 800, fontSize: 42, color: "rgba(255,255,255,0.85)" }}>Follow AI with Kalyan</div>
       </div>
     </AbsoluteFill>
   );

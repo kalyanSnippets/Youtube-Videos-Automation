@@ -5,7 +5,7 @@ import face from "../public/r/r16_face.json";
 import { f, FPS, INTER, MONO, Music, PopIn, ReelData, Sfx, chunkWords, activeChunk, Typewriter } from "./lib";
 import { ease, clamp, Screen3D, FaceTrack } from "./split";
 
-/* Reel 16: GitHub Goldmine EP 3, Paperclip AI (open-source app to run AI agents like a company).
+/* Reel 16: GitHub Goldmine, Paperclip AI (open-source app to run AI agents like a company).
    Style: mix of A (animated AI-agent org chart, zooms into each department, checkmarks, light pings) and
    B (split screen: graphics on top, face below, series badge, real GitHub stat cards, boxed captions, follow CTA).
    Real footage: github.com/paperclipai/paperclip recorded 2026-11-25 (117k stars, 19.4k forks, MIT licence) and the
@@ -120,7 +120,6 @@ const Badge: React.FC = () => {
   return (
     <div style={{ position: "absolute", left: 40, top: 40, transform: `scale(${k})`, transformOrigin: "0 50%", display: "flex", boxShadow: "0 14px 34px rgba(0,0,0,0.45)", zIndex: 5 }}>
       <div style={{ background: "#111", color: Y, fontFamily: MONO, fontWeight: 800, fontSize: 34, padding: "10px 16px", border: `3px solid ${Y}` }}>⛏ GITHUB GOLDMINE</div>
-      <div style={{ background: Y, color: "#111", fontFamily: MONO, fontWeight: 900, fontSize: 34, padding: "10px 16px" }}>EP 3</div>
     </div>
   );
 };
@@ -345,7 +344,6 @@ const Outro: React.FC = () => {
       <div style={{ textAlign: "center", opacity: fadeOut, transform: `scale(${0.94 + 0.06 * k})` }}>
         <div style={{ display: "inline-flex", boxShadow: "0 14px 34px rgba(0,0,0,0.35)" }}>
           <div style={{ background: "#111", color: Y, fontFamily: MONO, fontWeight: 800, fontSize: 48, padding: "14px 22px", border: `3px solid ${Y}` }}>⛏ GITHUB GOLDMINE</div>
-          <div style={{ background: Y, color: "#111", fontFamily: MONO, fontWeight: 900, fontSize: 48, padding: "14px 22px" }}>EP 3</div>
         </div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 26, marginTop: 60 }}>
           <ClipMark size={130} />

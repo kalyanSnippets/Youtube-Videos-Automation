@@ -819,11 +819,11 @@ saluki 27b, underdog ai, run ai locally, local llm, run llm on laptop, compresse
 
 ---
 
-# Reel 15: Immich, GitHub Goldmine #1 (approved 2026-11-25)
+# Reel 15: Immich, GitHub Goldmine (approved 2026-11-25)
 
 | Video | Cover | Length | Comment keyword |
 |---|---|---|---|
-| `15_Immich_GitHub-Goldmine-1.mp4` | `15_cover.jpg` | 73s | PHOTO |
+| `15_Immich_GitHub-Goldmine.mp4` | `15_cover.jpg` | 73s | PHOTO |
 
 1080×1920, 30 fps, H.264, about −16 LUFS. Music was made in code. Demo footage is the official public Immich demo (demo.immich.app); the concept shots use those demo photos plus licensed Pexels/Mixkit stock. Leave the AI label **off**.
 
@@ -838,7 +838,7 @@ You remember exactly what's in it, but not when you took it. So you scroll… an
 
 What if you could just type "beach photo with red umbrella" and your photo library understood you? 🤯
 
-That's Immich ⛏ GitHub Goldmine #1
+That's Immich ⛏ GitHub Goldmine
 📷 a photo & video library you host yourself, like your own Google Photos
 🔍 AI search: find photos by describing them
 🧑 face recognition
@@ -849,7 +849,7 @@ That's Immich ⛏ GitHub Goldmine #1
 💬 Comment PHOTO and I'll send you the GitHub link + setup checklist
 👇 And tell me: what's that one photo you've spent ages trying to find?
 
-➕ Follow @aiwithkalyan. EP 2 is a GitHub project that answers questions about your own documents 📄
+➕ Follow @aiwithkalyan. Next up: a GitHub project that answers questions about your own documents 📄
 
 #immich #selfhosted #opensource #github #googlephotos #googlephotosalternative #homelab #aitools #ai #privacy #photography #techreels #githubgoldmine #homeserver #docker
 ```
@@ -872,7 +872,7 @@ The catch: you run it yourself, so you need storage, some setup and proper backu
 🔗 GitHub: https://github.com/immich-app/immich
 📋 Setup checklist: https://docs.google.com/document/d/1y7B2b_3Ye8kD8zQ6ss9wX4BUfCOUw2Z7PKwVG1VOJcU/view
 
-GitHub Goldmine #1. Next: a GitHub project that lets you ask questions about your own documents.
+GitHub Goldmine. Next: a GitHub project that lets you ask questions about your own documents.
 Subscribe to AI with Kalyan!
 
 #immich #selfhosted #shorts
