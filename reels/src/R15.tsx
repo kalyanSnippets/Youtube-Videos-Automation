@@ -72,19 +72,112 @@ const Split: React.FC<{ offset: number; children: React.ReactNode }> = ({ offset
 const L = (abs: number, a: number) => f(abs) - f(a);
 
 /* ---- beats (each clip shows what is being said) ---- */
-const Thousands: React.FC<{ offset: number }> = ({ offset }) => (
-  <Pov src="b/r15_calm.mp4" offset={offset}>
-    <Hud at={L(2.5, 1.7)} y={250} color={Y}>📸 THOUSANDS OF PHOTOS</Hud>
-  </Pov>
+/* ---- concept beats (replace plain gallery scrolling) ---- */
+const TILES = Array.from({ length: 26 }, (_, i) => `img/r15t/t${String(i).padStart(2, "0")}.jpg`);
+const Stage: React.FC<{ children: React.ReactNode; tint?: string }> = ({ children, tint = "#1d3b6b" }) => (
+  <AbsoluteFill style={{ background: `radial-gradient(ellipse at 50% 38%, ${tint}, #070b14 70%)`, overflow: "hidden" }}>{children}</AbsoluteFill>
 );
-const BackInTime: React.FC<{ offset: number }> = ({ offset }) => {
+const PhoneShell: React.FC<{ x: number; y: number; w: number; children?: React.ReactNode; tilt?: number }> = ({ x, y, w, children, tilt = 0 }) => (
+  <div style={{ position: "absolute", left: x, top: y, width: w, height: w * 2.05, borderRadius: w * 0.14, background: "#0d1117", border: `${w * 0.035}px solid #2b3240`, boxShadow: "0 40px 90px rgba(0,0,0,0.6), inset 0 0 0 2px rgba(255,255,255,0.08)", overflow: "hidden", transform: `perspective(1400px) rotateY(${tilt}deg) rotateX(6deg)` }}>
+    <div style={{ position: "absolute", left: "35%", right: "35%", top: w * 0.04, height: w * 0.06, borderRadius: 99, background: "#000", zIndex: 3 }} />
+    {children}
+  </div>
+);
+/* 1.6s "thousands of photos on our phones": photos pour out of the phone into a growing pile, counter races up */
+const Overload: React.FC = () => {
   const frame = useCurrentFrame();
-  const a = 5.4;
+  const n = Math.round(interpolate(frame, [6, 100], [0, 12483], { ...clamp, easing: Easing.out(Easing.cubic) }));
   return (
-    <Pov src="b/r15_back.mp4" startFrom={f(1.1)} offset={offset}>
-      <Hud at={L(5.5, a)} y={250}>⏪ THAT ONE PICTURE…</Hud>
-      {frame >= L(7.5, a) && <Hud at={L(7.5, a)} y={370} color={Y} size={52}>📅 2–3 YEARS AGO</Hud>}
-    </Pov>
+    <Stage>
+      {Array.from({ length: 34 }).map((_, i) => {
+        const t0 = 6 + i * 2.6, p = interpolate(frame, [t0, t0 + 22], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) });
+        if (frame < t0) return null;
+        const ang = ((i * 137) % 360) * (Math.PI / 180), r = 260 + (i % 5) * 70;
+        const x = 540 + Math.cos(ang) * r * p - 110, y = 1080 - p * (300 + (i % 7) * 42) + Math.sin(ang) * r * 0.3 * p;
+        return <Img key={i} src={staticFile(TILES[i % TILES.length])} style={{ position: "absolute", left: x, top: y, width: 220, height: 220, objectFit: "cover", borderRadius: 16, border: "5px solid #fff", boxShadow: "0 14px 30px rgba(0,0,0,0.5)", transform: `rotate(${((i * 53) % 40) - 20}deg) scale(${0.5 + 0.5 * p})`, opacity: Math.min(1, p * 2) }} />;
+      })}
+      <PhoneShell x={390} y={1060} w={300}>
+        <div style={{ position: "absolute", inset: 0, display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 3, padding: "44px 6px 6px" }}>
+          {TILES.slice(0, 18).map((t, i) => <Img key={i} src={staticFile(t)} style={{ width: "100%", aspectRatio: "1", objectFit: "cover" }} />)}
+        </div>
+      </PhoneShell>
+      <div style={{ position: "absolute", left: 0, right: 0, top: 170, textAlign: "center", zIndex: 99 }}>
+        <div style={{ fontFamily: INTER, fontWeight: 900, fontSize: 150, color: "#fff", letterSpacing: -5, textShadow: "0 10px 40px rgba(0,0,0,0.6)" }}>{n.toLocaleString("en-US")}</div>
+        <div style={{ fontFamily: MONO, fontWeight: 800, fontSize: 44, color: Y, letterSpacing: 4 }}>📸 PHOTOS ON YOUR PHONE</div>
+      </div>
+    </Stage>
+  );
+};
+/* 5.4s "that one picture you took two, three years ago": calendar flips back to 2023, one glowing card hidden in a deep stack */
+const YearsBack: React.FC = () => {
+  const frame = useCurrentFrame();
+  const years = ["2025", "2024", "2023"];
+  const yi = Math.min(2, Math.floor(interpolate(frame, [8, 62], [0, 2.99], clamp)));
+  const flip = (frame - 8) % 18;
+  const rx = frame >= 8 && frame < 62 ? interpolate(flip, [0, 9, 18], [0, -90, 0], clamp) : 0;
+  return (
+    <Stage tint="#2a1d5a">
+      <div style={{ position: "absolute", left: 90, top: 330, width: 420, perspective: 1200 }}>
+        <div style={{ background: "#fff", borderRadius: 26, overflow: "hidden", boxShadow: "0 30px 70px rgba(0,0,0,0.55)", transform: `rotateX(${rx}deg)`, transformOrigin: "50% 0%" }}>
+          <div style={{ background: "#FF3B30", color: "#fff", fontFamily: INTER, fontWeight: 900, fontSize: 48, textAlign: "center", padding: "18px 0" }}>📅 YEAR</div>
+          <div style={{ fontFamily: INTER, fontWeight: 900, fontSize: 170, color: "#111", textAlign: "center", padding: "26px 0 36px", letterSpacing: -6 }}>{years[yi]}</div>
+        </div>
+      </div>
+      <div style={{ position: "absolute", left: 560, top: 300, width: 420, height: 900, perspective: 1300 }}>
+        {Array.from({ length: 12 }).map((_, i) => {
+          const glow = i === 9;
+          const lift = glow ? interpolate(frame, [64, 80], [0, 1], { ...clamp, easing: ease }) : 0;
+          return <Img key={i} src={staticFile(TILES[(i * 3) % TILES.length])} style={{ position: "absolute", left: 30 + i * 6 - lift * 40, top: 40 + i * 52 - lift * 120, width: 340, height: 250, objectFit: "cover", borderRadius: 18, border: glow ? `8px solid ${Y}` : "6px solid #fff", boxShadow: glow ? `0 0 ${40 + Math.sin(frame / 5) * 15}px ${Y}` : "0 12px 26px rgba(0,0,0,0.45)", transform: `rotateX(28deg) rotateZ(${((i * 41) % 10) - 5}deg) scale(${1 + lift * 0.15})`, zIndex: glow ? 50 : i }} />;
+        })}
+      </div>
+      <Hud at={10} y={150} color={Y} size={44}>⏪ THAT ONE PICTURE…</Hud>
+      {frame >= 62 && <Hud at={62} y={1280} color="#34D399" size={50} center>📅 2–3 YEARS AGO</Hud>}
+    </Stage>
+  );
+};
+/* 10.05s "no idea when you took it": calendar pages tear off and fly, with a big question mark */
+const NoIdea: React.FC = () => {
+  const frame = useCurrentFrame();
+  const months = ["JAN", "MAR", "MAY", "JUL", "AUG", "OCT", "DEC"];
+  return (
+    <Stage tint="#5a1d2a">
+      {months.map((m, i) => {
+        const t0 = i * 9, p = interpolate(frame, [t0 + 6, t0 + 24], [0, 1], { ...clamp, easing: Easing.in(Easing.quad) });
+        return (
+          <div key={m} style={{ position: "absolute", left: 290, top: 520, width: 500, background: "#fff", borderRadius: 22, boxShadow: "0 24px 50px rgba(0,0,0,0.5)", transform: `translate(${p * (i % 2 ? 700 : -700)}px, ${-p * 500 + p * p * 900}px) rotate(${p * (i % 2 ? 70 : -70)}deg)`, opacity: frame < t0 ? 0 : 1, zIndex: 20 - i }}>
+            <div style={{ background: "#FF3B30", color: "#fff", fontFamily: INTER, fontWeight: 900, fontSize: 44, textAlign: "center", padding: "12px 0", borderRadius: "22px 22px 0 0" }}>{m}</div>
+            <div style={{ fontFamily: INTER, fontWeight: 900, fontSize: 160, color: "#111", textAlign: "center", padding: "10px 0 24px" }}>{(i * 7) % 28 + 1}</div>
+          </div>
+        );
+      })}
+      <div style={{ position: "absolute", left: 0, right: 0, top: 1060, textAlign: "center", fontSize: 220, transform: `rotate(${Math.sin(frame / 6) * 8}deg)` }}>❓</div>
+      <Hud at={4} y={250} color="#FF5A5A" size={48} center>⏱ WHEN DID I TAKE IT?</Hud>
+    </Stage>
+  );
+};
+/* 12.35s "scrolling and scrolling": 1.5s of real fast scroll, then the tired-thumb joke */
+const Scrolling: React.FC<{ offset: number }> = ({ offset }) => {
+  const frame = useCurrentFrame();
+  const joke = 46;
+  if (frame < joke) return <Pov src="b/r15_scroll.mp4" startFrom={15} rate={1.6} offset={offset}><Hud at={2} y={250} color="#FF5A5A" size={48}>SCROLLING… 😩</Hud></Pov>;
+  const f2 = frame - joke;
+  const n = Math.round(interpolate(f2, [0, 90], [847, 4812], clamp));
+  const swipe = (f2 % 12) / 12;
+  return (
+    <Stage tint="#3b2a12">
+      <PhoneShell x={300} y={360} w={480}>
+        <div style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 3, padding: 6, transform: `translateY(${-((f2 * 38) % 600)}px)`, filter: "blur(3px)" }}>
+            {Array.from({ length: 45 }).map((_, i) => <Img key={i} src={staticFile(TILES[i % TILES.length])} style={{ width: "100%", aspectRatio: "1", objectFit: "cover" }} />)}
+          </div>
+        </div>
+      </PhoneShell>
+      <div style={{ position: "absolute", left: 470, top: 900 - swipe * 360, fontSize: 200, opacity: 1 - swipe * 0.4, transform: "rotate(-10deg)" }}>👆</div>
+      <div style={{ position: "absolute", left: 0, right: 0, top: 190, textAlign: "center" }}>
+        <div style={{ fontFamily: MONO, fontWeight: 800, fontSize: 46, color: "#fff" }}>SCROLL #{n.toLocaleString("en-US")}</div>
+      </div>
+      <Hud at={20} y={1400} color="#FF5A5A" size={50} center>STILL NOT FOUND 😩</Hud>
+    </Stage>
   );
 };
 const Memory: React.FC = () => {
@@ -99,29 +192,6 @@ const Memory: React.FC = () => {
       </div>
       <Hud at={6} y={300} color="#34D399" size={44}>🧠 YOU REMEMBER: BEACH · RED UMBRELLA</Hud>
     </AbsoluteFill>
-  );
-};
-const NoIdea: React.FC<{ offset: number }> = ({ offset }) => {
-  const frame = useCurrentFrame();
-  const dates = ["MAR 2023", "AUG 2022", "JUL 2023", "DEC 2022", "MAY 2023", "OCT 2022"];
-  return (
-    <Pov src="b/r15_back.mp4" startFrom={f(0.2)} offset={offset} blur={3}>
-      <div style={{ position: "absolute", left: 0, right: 0, top: 640, textAlign: "center" }}>
-        <div style={{ fontFamily: MONO, fontWeight: 800, fontSize: 120, color: "#fff", textShadow: "0 10px 40px rgba(0,0,0,0.8)" }}>{dates[Math.floor(frame / 6) % dates.length]}</div>
-        <div style={{ fontSize: 160, marginTop: 10 }}>❓</div>
-      </div>
-      <Hud at={4} y={250} color="#FF5A5A" size={48}>⏱ WHEN DID I TAKE IT?</Hud>
-    </Pov>
-  );
-};
-const Scrolling: React.FC<{ offset: number }> = ({ offset }) => {
-  const frame = useCurrentFrame();
-  const n = Math.floor(interpolate(frame, [0, 130], [12, 148], clamp));
-  return (
-    <Pov src="b/r15_scroll.mp4" startFrom={15} rate={1.3} offset={offset}>
-      <Hud at={2} y={250} color="#FF5A5A" size={48}>SCROLLING… 😩</Hud>
-      <Hud at={10} y={370}>SCROLL #{n}</Hud>
-    </Pov>
   );
 };
 const Search: React.FC<{ offset: number }> = ({ offset }) => {
@@ -150,14 +220,36 @@ const GitHubP: React.FC = () => {
     </>
   );
 };
-const SelfHost: React.FC<{ offset: number }> = ({ offset }) => {
+/* 29.05s "a photo and video library you can host yourself, like your own Google Photos": where your photos live */
+const SelfHost: React.FC = () => {
+  const frame = useCurrentFrame();
   const a = 29.05;
+  const flow = (frame * 6) % 60;
+  const serverIn = L(31.4, a), gIn = L(33.4, a);
+  const Box: React.FC<{ x: number; y: number; title: string; sub: string; icon: string; c: string; dim?: boolean; at: number }> = ({ x, y, title, sub, icon, c, dim, at }) => {
+    const k = interpolate(frame - at, [0, 10], [0, 1], { ...clamp, easing: Easing.out(Easing.back(1.4)) });
+    return (
+      <div style={{ position: "absolute", left: x, top: y, width: 420, opacity: frame < at ? 0 : (dim ? 0.55 : 1) * Math.min(1, k * 1.5), transform: `scale(${0.7 + 0.3 * k})`, background: "rgba(255,255,255,0.07)", border: `4px solid ${c}`, borderRadius: 30, padding: "28px 24px", textAlign: "center", boxShadow: dim ? "none" : `0 0 50px ${c}55` }}>
+        <div style={{ fontSize: 120 }}>{icon}</div>
+        <div style={{ fontFamily: INTER, fontWeight: 900, fontSize: 48, color: "#fff" }}>{title}</div>
+        <div style={{ fontFamily: INTER, fontWeight: 700, fontSize: 32, color: "rgba(255,255,255,0.75)", marginTop: 6 }}>{sub}</div>
+      </div>
+    );
+  };
   return (
-    <Pov src="b/r15_calm.mp4" startFrom={f(3)} offset={offset}>
-      <Hud at={L(29.9, a)} y={250} color={Y}>📷 PHOTO + VIDEO LIBRARY</Hud>
-      <Hud at={L(31.5, a)} y={370}>🏠 HOSTED ON YOUR OWN SERVER</Hud>
-      <Hud at={L(33.4, a)} y={490} color="#34D399">≈ YOUR OWN GOOGLE PHOTOS</Hud>
-    </Pov>
+    <Stage tint="#123a3a">
+      <PhoneShell x={400} y={240} w={280}>
+        <div style={{ position: "absolute", inset: 0, display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 2, padding: "36px 4px 4px" }}>
+          {TILES.slice(4, 22).map((t, i) => <Img key={i} src={staticFile(t)} style={{ width: "100%", aspectRatio: "1", objectFit: "cover" }} />)}
+        </div>
+      </PhoneShell>
+      <Hud at={L(29.9, a)} y={120} color={Y} center>📷 PHOTO + VIDEO LIBRARY</Hud>
+      {frame >= serverIn && <div style={{ position: "absolute", left: 330, top: 860, width: 10, height: 170, background: `repeating-linear-gradient(180deg, #34D399 0 18px, transparent 18px 30px)`, backgroundPositionY: flow }} />}
+      {frame >= gIn && <div style={{ position: "absolute", left: 740, top: 860, width: 10, height: 170, background: `repeating-linear-gradient(180deg, rgba(255,255,255,0.4) 0 18px, transparent 18px 30px)`, backgroundPositionY: flow }} />}
+      <Box x={110} y={1040} title="Immich" sub="your own server 🏠" icon="🖥️" c="#34D399" at={serverIn} />
+      <Box x={550} y={1040} title="Google Photos" sub="their servers ☁️" icon="☁️" c="#9aa4b2" dim at={gIn} />
+      {frame >= gIn + 12 && <Hud at={gIn + 12} y={1540} color="#34D399" size={44} center>≈ YOUR OWN GOOGLE PHOTOS</Hud>}
+    </Stage>
   );
 };
 const SearchDesc: React.FC<{ offset: number }> = ({ offset }) => (
@@ -269,14 +361,14 @@ const Outro: React.FC = () => {
 type Seg = { a: number; b: number; pov?: (o: number) => React.ReactNode; split?: React.FC; over?: React.FC };
 const SEGS: Seg[] = [
   { a: 0, b: 1.62, over: Badge },
-  { a: 1.62, b: 5.4, pov: (o) => <Thousands offset={o} /> },
-  { a: 5.4, b: 8.15, pov: (o) => <BackInTime offset={o} /> },
+  { a: 1.62, b: 5.4, over: Overload },
+  { a: 5.4, b: 8.15, over: YearsBack },
   { a: 8.15, b: 10.05, over: Memory },
-  { a: 10.05, b: 12.35, pov: (o) => <NoIdea offset={o} /> },
+  { a: 10.05, b: 12.35, over: NoIdea },
   { a: 12.35, b: 17.0, pov: (o) => <Scrolling offset={o} /> },
   { a: 18.6, b: 24.55, pov: (o) => <Search offset={o} /> },
   { a: 24.6, b: 29.0, split: GitHubP },
-  { a: 29.05, b: 34.7, pov: (o) => <SelfHost offset={o} /> },
+  { a: 29.05, b: 34.7, over: SelfHost },
   { a: 35.0, b: 37.9, over: AiSearchTag },
   { a: 37.95, b: 39.85, pov: (o) => <SearchDesc offset={o} /> },
   { a: 39.85, b: 41.9, pov: (o) => <Faces offset={o} /> },
@@ -297,7 +389,8 @@ const Captions: React.FC = () => {
   if ((t >= 56.6 && t < 61.0) || t >= 69.75) return null; // the comment box shows the keyword; outro has no speech
   const c = activeChunk(chunks, t);
   if (!c) return null;
-  const top = isSplit(t) ? 908 : isPov(t) ? 1490 : 1440;
+  const concept = [[1.62, 8.15], [10.05, 17.0], [29.05, 34.7]].some(([x, y]) => t >= x && t < y);
+  const top = isSplit(t) ? 908 : concept ? 1740 : isPov(t) ? 1490 : 1440;
   return (
     <div style={{ position: "absolute", top, left: 30, right: 30, display: "flex", justifyContent: "center", flexWrap: "wrap", gap: "0 18px" }}>
       {c.words.map((w, i) => {
