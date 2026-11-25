@@ -903,3 +903,91 @@ What's the photo you've been hunting for? 👀
 1. **Quiz:** "How do you find an old photo?" with options Scroll forever 😩 / Search the date / Ask AI ✅
 2. **Slider:** "How many photos are on your phone?" 📸
 3. **Reel share:** "Comment PHOTO on the reel for my setup checklist 👇"
+
+---
+
+# Reel 16: Paperclip AI, GitHub Goldmine (approved 2026-11-25)
+
+| Video | Cover | Length | Comment keyword |
+|---|---|---|---|
+| `reel16_paperclip.mp4` | `16_cover.jpg` | 59s | COMPANY |
+
+1080×1920, 30 fps, H.264, about −16 LUFS. Music was made in code. Real footage: github.com/paperclipai/paperclip (recorded 2026-11-25: 117k stars, MIT) and the product demo video from its README. The org-chart graphics were built in Remotion. Leave the AI label **off**.
+
+**Guide doc for COMPANY (public, view-only):** https://docs.google.com/document/d/1BoulTukIhwCPAPeiZnNeJmBH0aeBkLcBbt-_AeIj5uw/view
+
+## Instagram
+**Caption**
+```
+The next billion-dollar company might have just ONE human employee 🤯
+
+Starting a software company normally means a CEO, developers, designers and marketers before you've even launched anything.
+
+Paperclip AI ⛏ GitHub Goldmine
+🤖 organise AI agents like a real company: a CEO agent, a developer agent, a marketing agent
+🎯 give them one goal and they break it into tasks and coordinate the work
+📊 monitor progress from one dashboard
+💰 set budgets and control spending
+🔓 open source (MIT) and self-hosted, 117k+ ⭐ on GitHub
+
+⚠️ But don't confuse AI agents with real employees. You still need to review their work.
+
+💡 Start small: just 2 agents, a researcher and a writer.
+
+💬 Comment COMPANY and I'll send you the project link + a beginner-friendly setup plan
+👇 What's the first job you'd give your AI team?
+
+➕ Follow @aiwithkalyan. I'm breaking down how one person can use AI to do the work of a whole team.
+
+#paperclipai #aiagents #opensource #github #githubgoldmine #aitools #ai #automation #solopreneur #onepersonbusiness #agenticai #multiagent #productivity #techreels #startup
+```
+**Topics:** Technology · Artificial intelligence · Entrepreneurship
+**Alt text:** Kalyan explains Paperclip AI, an open-source app that organises AI agents like a company: an animated org chart of CEO, developer and marketing agents, a goal split into tasks, the real Paperclip dashboard and its GitHub page with 117k stars.
+**Pinned comment:** Comment COMPANY for the project link + beginner setup plan 👇 What would your first AI agent do?
+
+## YouTube Shorts
+**Title:** This Open-Source App Runs AI Agents Like a Company (Paperclip AI) #shorts
+**Description**
+```
+Could the next billion-dollar company have just one human employee? Paperclip AI is an open-source, self-hosted app that organises AI agents like a company: a CEO agent, developer agent and marketing agent working toward one goal.
+
+🎯 Give agents a goal and they split it into tasks
+📊 Monitor progress from one dashboard
+💰 Budgets and spending limits
+🔓 MIT licence, self-hosted
+
+The catch: AI agents aren't real employees. You still need to review their work. Start with just 2 agents: a researcher and a writer.
+
+🔗 GitHub: https://github.com/paperclipai/paperclip
+📋 Beginner setup plan: https://docs.google.com/document/d/1BoulTukIhwCPAPeiZnNeJmBH0aeBkLcBbt-_AeIj5uw/view
+
+GitHub Goldmine on AI with Kalyan. Subscribe for more!
+
+#paperclipai #aiagents #shorts
+```
+**Tags**
+```
+paperclip ai, paperclip ai agents, ai agents, ai agent company, multi agent system, open source ai agents, ai org chart, ai ceo agent, one person company, zero human company, run a business with ai, ai automation, self hosted ai, github projects, github goldmine, AI with Kalyan
+```
+**Keywords to target:** paperclip ai, ai agents company, one person billion dollar company, open source ai agents, multi agent orchestration
+**Settings:** Not made for kids · Altered or synthetic content: No · Category: Science & Technology
+
+## Comment reply ("COMPANY")
+**Public reply:**
+```
+Sent you the link + setup plan in DM 📩 (check message requests!)
+```
+**DM:**
+```
+Hey! 🤖 Thanks for commenting COMPANY 🙌
+Here's the Paperclip AI project link + a beginner-friendly setup plan (what you need, install steps and a simple 2-agent starter: researcher + writer):
+https://docs.google.com/document/d/1BoulTukIhwCPAPeiZnNeJmBH0aeBkLcBbt-_AeIj5uw/view
+
+Tip: set a small budget first and always review what the agents produce 😉
+What's the first job you'd give your AI team? 👀
+```
+
+## Instagram Stories (optional)
+1. **Poll:** "Would you run a company with AI agents?" Yes, let's go 🤖 / No way 🙅
+2. **Question box:** "What's the first job you'd give an AI agent?"
+3. **Reel share:** "Comment COMPANY on the reel for the setup plan 👇"
