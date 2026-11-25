@@ -816,3 +816,90 @@ saluki 27b, underdog ai, run ai locally, local llm, run llm on laptop, compresse
 1. **Poll:** "How much RAM does your laptop have?" with options 8 GB / 16 GB / 32 GB+ (use the poll's extra-options slider)
 2. **Quiz:** "Saluki shrinks a 54 GB model to…" with options 7.89 GB ✅ / 20 GB / 40 GB
 3. **Reel share** with "Comment your RAM + OS on the reel 👇"
+
+---
+
+# Reel 15: Immich, GitHub Goldmine #1 (approved 2026-11-25)
+
+| Video | Cover | Length | Comment keyword |
+|---|---|---|---|
+| `15_Immich_GitHub-Goldmine-1.mp4` | `15_cover.jpg` | 73s | PHOTO |
+
+1080×1920, 30 fps, H.264, about −16 LUFS. Music was made in code. Demo footage is the official public Immich demo (demo.immich.app); the concept shots use those demo photos plus licensed Pexels/Mixkit stock. Leave the AI label **off**.
+
+**Guide doc for PHOTO (public, view-only):** https://docs.google.com/document/d/1y7B2b_3Ye8kD8zQ6ss9wX4BUfCOUw2Z7PKwVG1VOJcU/view
+
+## Instagram
+**Caption**
+```
+Thousands of photos on your phone… and you still can't find THAT one picture from 2–3 years ago? 😩
+
+You remember exactly what's in it, but not when you took it. So you scroll… and scroll… and scroll.
+
+What if you could just type "beach photo with red umbrella" and your photo library understood you? 🤯
+
+That's Immich ⛏ GitHub Goldmine #1
+📷 a photo & video library you host yourself, like your own Google Photos
+🔍 AI search: find photos by describing them
+🧑 face recognition
+❌ no more remembering dates or file names
+
+⚠️ The catch: you run it yourself, so you need storage, some setup and proper backups. It's not "install and forget".
+
+💬 Comment PHOTO and I'll send you the GitHub link + setup checklist
+👇 And tell me: what's that one photo you've spent ages trying to find?
+
+➕ Follow @aiwithkalyan. EP 2 is a GitHub project that answers questions about your own documents 📄
+
+#immich #selfhosted #opensource #github #googlephotos #googlephotosalternative #homelab #aitools #ai #privacy #photography #techreels #githubgoldmine #homeserver #docker
+```
+**Topics:** Technology · Artificial intelligence · Photography
+**Alt text:** Kalyan shows Immich, a self-hosted photo app: an AI search for "beach with red umbrella" finds the right photos, plus face recognition and the Immich GitHub page.
+**Pinned comment:** Comment PHOTO for the GitHub link + setup checklist 👇 What photo are YOU hunting for?
+
+## YouTube Shorts
+**Title:** Find Any Photo by Describing It: Your Own Google Photos (Immich) #shorts
+**Description**
+```
+Thousands of photos, but you can't find that one picture from years ago? Immich is an open-source photo and video library you host yourself, like your own Google Photos.
+
+✨ AI search: type a description like "beach with red umbrella"
+🧑 Face recognition
+📱 Phone backup apps
+
+The catch: you run it yourself, so you need storage, some setup and proper backups.
+
+🔗 GitHub: https://github.com/immich-app/immich
+📋 Setup checklist: https://docs.google.com/document/d/1y7B2b_3Ye8kD8zQ6ss9wX4BUfCOUw2Z7PKwVG1VOJcU/view
+
+GitHub Goldmine #1. Next: a GitHub project that lets you ask questions about your own documents.
+Subscribe to AI with Kalyan!
+
+#immich #selfhosted #shorts
+```
+**Tags**
+```
+immich, immich setup, self hosted photos, google photos alternative, self hosted google photos, open source photo app, ai photo search, search photos by description, face recognition photos, homelab, home server, docker, github projects, github goldmine, privacy photos, AI with Kalyan
+```
+**Keywords to target:** google photos alternative, immich, self hosted photo library, ai photo search, find photos by description
+**Settings:** Not made for kids · Altered or synthetic content: No · Category: Science & Technology
+
+## Comment reply ("PHOTO")
+**Public reply:**
+```
+Sent you the link + setup checklist in DM 📩 (check message requests!)
+```
+**DM:**
+```
+Hey! 📸 Thanks for commenting PHOTO 🙌
+Here's everything for Immich (GitHub link, requirements and a step-by-step setup checklist):
+https://docs.google.com/document/d/1y7B2b_3Ye8kD8zQ6ss9wX4BUfCOUw2Z7PKwVG1VOJcU/view
+
+Tip: try the live demo first at demo.immich.app ("Login as demo user") 😉
+What's the photo you've been hunting for? 👀
+```
+
+## Instagram Stories (optional)
+1. **Quiz:** "How do you find an old photo?" with options Scroll forever 😩 / Search the date / Ask AI ✅
+2. **Slider:** "How many photos are on your phone?" 📸
+3. **Reel share:** "Comment PHOTO on the reel for my setup checklist 👇"
