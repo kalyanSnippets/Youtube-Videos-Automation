@@ -991,3 +991,159 @@ What's the first job you'd give your AI team? 👀
 1. **Poll:** "Would you run a company with AI agents?" Yes, let's go 🤖 / No way 🙅
 2. **Question box:** "What's the first job you'd give an AI agent?"
 3. **Reel share:** "Comment COMPANY on the reel for the setup plan 👇"
+
+---
+
+# Website versions (aiwithkalyan.com) for Reels 15 and 16 (2026-11-26)
+
+aiwithkalyan.com makes a page for each YouTube upload at `aiwithkalyan.com/v/<title-slug>-<id>` and shows the YouTube description on it. So the setup steps go **in the YouTube description**, and the DM links to that page. Neither reel had a page yet on 2026-11-26: post on YouTube first, copy the new page link from the homepage, and put it where it says `[PAGE LINK]`.
+
+## Reel 16: Paperclip AI (keyword COMPANY)
+
+**Instagram caption**
+```
+The next billion-dollar company might have just ONE human employee 🤯
+
+Starting a software company normally means a CEO, developers, designers and marketers before you've even launched anything.
+
+Paperclip AI ⛏ GitHub Goldmine
+🤖 organise AI agents like a real company: CEO agent, developer agent, marketing agent
+🎯 give them one goal and they break it into tasks and coordinate the work
+📊 monitor progress from one dashboard
+💰 set budgets and control spending
+🔓 open source (MIT) and self-hosted, 117k+ ⭐ on GitHub
+
+⚠️ AI agents aren't real employees. You still need to review their work.
+💡 Start small: just 2 agents, a researcher and a writer.
+
+💬 Comment COMPANY and I'll DM you the project link + beginner setup plan
+🔗 All my free resources: aiwithkalyan.com
+
+➕ Follow @ai_with_kalyan. I'm breaking down how one person can use AI to do the work of a whole team.
+
+#paperclipai #aiagents #opensource #github #githubgoldmine #aitools #ai #automation #solopreneur #onepersonbusiness #agenticai #multiagent #productivity #techreels #startup
+```
+**Pinned comment (Instagram):** Comment COMPANY for the project link + beginner setup plan 👇 Everything is also free on aiwithkalyan.com
+
+**YouTube title:** This Open-Source App Runs AI Agents Like a Company (Paperclip AI) #shorts
+
+**YouTube description** (this text becomes the website page)
+```
+Could the next billion-dollar company have just one human employee? Paperclip AI is an open-source, self-hosted app that organises AI agents like a company: a CEO agent, a developer agent and a marketing agent working toward one goal.
+
+🔗 Project: https://github.com/paperclipai/paperclip (MIT licence, 117k+ stars)
+
+✅ What it does
+• Give agents roles, an org chart and one goal; they split it into tasks
+• Monitor progress from one dashboard
+• Company, agent and project budgets with alerts and automatic pauses
+
+🛠 Beginner setup plan
+1. Install Node.js 24.11 or newer (nodejs.org)
+2. In a terminal run: npx paperclipai@latest onboard --yes
+3. Open the dashboard it starts (the README says http://localhost:3100)
+4. Connect one AI provider (Anthropic, OpenAI or OpenRouter) and set a SMALL budget first
+5. Start with 2 agents: a Researcher (finds facts) and a Writer (turns them into a draft)
+6. Review everything they produce before you use it
+
+⚠️ AI agents are not real employees. They make mistakes, and the AI model you connect usually costs money per use. Check the README for the latest commands.
+
+Source: github.com/paperclipai/paperclip README (checked 25 Nov 2026).
+More free resources: https://aiwithkalyan.com
+Subscribe to AI with Kalyan: how one person can use AI to do the work of a team.
+
+#paperclipai #aiagents #shorts
+```
+**Tags:** paperclip ai, paperclip ai agents, ai agents, ai agent company, multi agent system, open source ai agents, ai org chart, ai ceo agent, one person company, run a business with ai, ai automation, self hosted ai, github projects, github goldmine, AI with Kalyan
+
+**Comment reply (public):** `Sent it to your DMs 📩 (check message requests!) Everything's also on aiwithkalyan.com`
+
+**DM**
+```
+Hey! Thanks for commenting COMPANY 🙌🤖
+
+Here's the Paperclip AI project link + a beginner-friendly setup plan (what you need, install steps and a simple 2-agent starter: researcher + writer):
+👉 [PAGE LINK]
+
+GitHub: https://github.com/paperclipai/paperclip
+
+Tip: set a small budget first and always review what the agents produce 😉
+More free resources from my videos: aiwithkalyan.com
+What's the first job you'd give your AI team? 👀
+```
+
+## Reel 15: Immich (keyword PHOTO)
+
+**Instagram caption**
+```
+Thousands of photos on your phone… and you still can't find THAT one picture from 2–3 years ago? 😩
+
+You remember exactly what's in it, but not when you took it. So you scroll… and scroll… and scroll.
+
+What if you could just type "beach photo with red umbrella" and your photo library understood you? 🤯
+
+That's Immich ⛏ GitHub Goldmine
+📷 a photo & video library you host yourself, like your own Google Photos
+🔍 AI search: find photos by describing them
+🧑 face recognition
+❌ no more remembering dates or file names
+
+⚠️ The catch: you run it yourself, so you need storage, some setup and proper backups. It's not "install and forget".
+
+💬 Comment PHOTO and I'll DM you the GitHub link + setup checklist
+🔗 All my free resources: aiwithkalyan.com
+
+➕ Follow @ai_with_kalyan. Next up: a GitHub project that answers questions about your own documents 📄
+
+#immich #selfhosted #opensource #github #googlephotos #googlephotosalternative #homelab #aitools #ai #privacy #photography #techreels #githubgoldmine #homeserver #docker
+```
+**Pinned comment (Instagram):** Comment PHOTO for the GitHub link + setup checklist 👇 What photo are YOU hunting for?
+
+**YouTube title:** Find Any Photo by Describing It: Your Own Google Photos (Immich) #shorts
+
+**YouTube description** (this text becomes the website page)
+```
+Thousands of photos, but you can't find that one picture from years ago? Immich is an open-source photo and video library you host yourself, like your own Google Photos.
+
+🔗 Project: https://github.com/immich-app/immich (AGPL-3.0)
+👀 Try it first: demo.immich.app ("Login as demo user")
+
+✅ What it does
+• AI search: type a description like "beach with red umbrella"
+• Face recognition
+• Phone apps that back up your photos automatically
+
+🛠 Setup checklist
+1. A computer or home server that stays on (official minimum: 6 GB RAM and 2 CPU cores; recommended 8 GB and 4 cores)
+2. Enough storage for your library, plus a SEPARATE backup
+3. Install Docker with the Docker Compose plugin
+4. Follow the official Docker Compose quick start at immich.app/docs
+5. Install the Immich phone app and turn on backup
+6. Keep a second copy of your photos: Immich is not a backup by itself
+
+⚠️ You run it yourself, so updates, storage and backups are your job.
+
+Source: github.com/immich-app/immich and the official docs (checked 25 Nov 2026).
+More free resources: https://aiwithkalyan.com
+GitHub Goldmine. Next: a GitHub project that lets you ask questions about your own documents.
+Subscribe to AI with Kalyan!
+
+#immich #selfhosted #shorts
+```
+**Tags:** immich, immich setup, self hosted photos, google photos alternative, self hosted google photos, open source photo app, ai photo search, search photos by description, face recognition photos, homelab, home server, docker, github projects, github goldmine, AI with Kalyan
+
+**Comment reply (public):** `Sent it to your DMs 📩 (check message requests!) Everything's also on aiwithkalyan.com`
+
+**DM**
+```
+Hey! Thanks for commenting PHOTO 🙌📸
+
+Here's the Immich GitHub link + my setup checklist (requirements, install steps and backups):
+👉 [PAGE LINK]
+
+GitHub: https://github.com/immich-app/immich
+Tip: try the live demo first at demo.immich.app ("Login as demo user") 😉
+
+More free resources from my videos: aiwithkalyan.com
+What's the photo you've been hunting for? 👀
+```
