@@ -55,6 +55,21 @@ END $$;`,
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$`,
+  // 0013: upload packages waiting for their videos
+  `CREATE TABLE IF NOT EXISTS "planned_posts" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"label" varchar(300) NOT NULL,
+	"youtube_title" varchar(300),
+	"instagram_caption" text,
+	"keywords" varchar(300) NOT NULL,
+	"prompt_name" varchar(200),
+	"prompt" text NOT NULL,
+	"extra_link" varchar(500),
+	"matched_video_ids" text[] DEFAULT '{}' NOT NULL,
+	"note" text,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+)`,
   // Tables added by these patches after the first setup: keep them closed to Supabase's Data API
   // like the rest (the app connects as the table owner, which RLS doesn't restrict).
   `DO $$ DECLARE t record; BEGIN
@@ -64,6 +79,7 @@ END $$`,
   END $$`,
 ];
 const MIGRATIONS = [
+  { hash: "6de8ac25eb3910549521420f33f81d7421d557db16c07d643306d8117054bbdf", createdAt: 1795667530871 },
   { hash: "f9b08cd7a8044a022e8ca1546d79bdfc67c06a63477206c46b351e7ff57b1a82", createdAt: 1795287698555 },
   { hash: "26288163fe3d474693ec16dca26ce105a59025a09674602ace5c6a9131d9774a", createdAt: 1795280043342 },
   { hash: "595e0bb7af0fc1261cb0558e80bd6e17f0786621a6d3902a139f59e3d1024771", createdAt: 1795134560534 },

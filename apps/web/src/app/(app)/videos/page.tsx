@@ -82,7 +82,12 @@ export default async function VideosPage() {
             The comment bot only replies on videos whose <span className="text-text">Bot</span> switch is on. New videos start with it off.
           </p>
         </div>
-        <a href="/" target="_blank" className="hidden sm:inline-block rounded-lg border border-border px-3.5 py-2 text-sm text-text-dim hover:text-text">View website ↗</a>
+        <div className="flex flex-wrap gap-2">
+          <a href="/videos/packages" className="rounded-lg bg-accent-cyan/10 border border-accent-cyan/40 px-3.5 py-2 text-sm text-accent-cyan hover:bg-accent-cyan/20">
+            📦 Import upload package
+          </a>
+          <a href="/" target="_blank" className="hidden sm:inline-block rounded-lg border border-border px-3.5 py-2 text-sm text-text-dim hover:text-text">View website ↗</a>
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-3">

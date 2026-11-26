@@ -10,3 +10,4 @@ export * from "./instagram";
 export * from "./store";
 export * from "./runner";
 export * from "./templates";
+export * from "./upload-package";

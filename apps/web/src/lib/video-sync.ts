@@ -9,6 +9,7 @@ import {
 } from "@yaos/comment-bot";
 import { slugify } from "@/lib/site";
 import { syncYouTubeAnalytics, type AnalyticsResult } from "@/lib/youtube-analytics";
+import { applyPlannedPosts } from "@/lib/upload-packages";
 
 /**
  * Pulls every video from the connected YouTube channel and Instagram account into the `videos`
@@ -367,6 +368,8 @@ async function syncStats(yt: ConnectionRow | null, ig: ConnectionRow | null): Pr
 }
 
 export interface SyncReport {
+  /** What imported upload packages set up on newly found videos. */
+  packages?: string[];
   stats?: StatsReport;
   analytics?: AnalyticsResult;
   youtube?: { created: number; updated: number; more: boolean } | { skipped: string } | { error: string };
@@ -387,6 +390,8 @@ export async function runVideoSync(options: { forceAnalytics?: boolean } = {}): 
     await writeState("INSTAGRAM", { lastError: e.message });
     return { error: e.message };
   }) : { skipped: "not connected" };
+  // New videos from an imported upload package get their keyword, prompt and bot switch now.
+  report.packages = await applyPlannedPosts().catch((e: Error) => [`Upload package matching failed: ${e.message}`]);
   report.stats = await syncStats(yt, ig);
   // After the video list is fresh, so per-video numbers land on rows that exist.
   report.analytics = await syncYouTubeAnalytics({ force: options.forceAnalytics });

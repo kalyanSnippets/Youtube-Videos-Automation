@@ -23,6 +23,14 @@ video, the original file is kept. The Instagram DM carries a direct download lin
 and YouTube don't let a bot attach a file to a comment reply or a private reply, so a link is the
 only way to deliver it. Prompts imported from a Google Doc link or typed in are still sent as text.
 
+**Upload packages set videos up for you.** Videos & prompts → **Import upload package**: paste the
+package Claude wrote (or upload it as .md). Every video in it that says "Comment WORD and I'll send
+you…" and includes the prompt is remembered. When that video appears on YouTube or Instagram (the
+hourly check, or straight away if it's already live), the app matches it by title/caption, fills in its
+keyword and prompt, and switches its bot on. Polls ("Comment AI or HUMAN") are listed as not used. A
+prompt you added to a video yourself is never replaced. The page also has a short instruction to give
+Claude so future packages always include an exact "Comment keyword / Prompt to send" block.
+
 Every comment and every reply is logged on the **Comment Bot** page of the admin area (`/comment-bot`, sign-in required).
 
 ## How it works

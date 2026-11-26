@@ -107,3 +107,27 @@ export const videoAttachments = pgTable("video_attachments", {
   data: text("data").notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+/**
+ * One video from an imported upload package: what the comment bot should send for it. The hourly
+ * sync matches it to the real video by title once it's posted, fills that video's keyword and
+ * prompt, and switches its bot on.
+ */
+export const plannedPosts = pgTable("planned_posts", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  /** Section heading in the package, e.g. "Reel 4: GPT-6.1 Terra". */
+  label: varchar("label", { length: 300 }).notNull(),
+  youtubeTitle: varchar("youtube_title", { length: 300 }),
+  instagramCaption: text("instagram_caption"),
+  /** Comma-separated, upper-cased. */
+  keywords: varchar("keywords", { length: 300 }).notNull(),
+  promptName: varchar("prompt_name", { length: 200 }),
+  prompt: text("prompt").notNull(),
+  extraLink: varchar("extra_link", { length: 500 }),
+  /** Videos this was applied to (ids in the videos table). */
+  matchedVideoIds: text("matched_video_ids").array().notNull().default([]),
+  /** Last thing worth telling the creator, e.g. "already had its own prompt". */
+  note: text("note"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});

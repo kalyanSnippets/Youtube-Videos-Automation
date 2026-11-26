@@ -1034,6 +1034,23 @@ EXCEPTION
 END $$;
 INSERT INTO "drizzle"."__drizzle_migrations" (hash, created_at) VALUES ('f9b08cd7a8044a022e8ca1546d79bdfc67c06a63477206c46b351e7ff57b1a82', 1795287698555);
 
+-- 0013_planned_posts
+CREATE TABLE IF NOT EXISTS "planned_posts" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"label" varchar(300) NOT NULL,
+	"youtube_title" varchar(300),
+	"instagram_caption" text,
+	"keywords" varchar(300) NOT NULL,
+	"prompt_name" varchar(200),
+	"prompt" text NOT NULL,
+	"extra_link" varchar(500),
+	"matched_video_ids" text[] DEFAULT '{}' NOT NULL,
+	"note" text,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+INSERT INTO "drizzle"."__drizzle_migrations" (hash, created_at) VALUES ('6de8ac25eb3910549521420f33f81d7421d557db16c07d643306d8117054bbdf', 1795667530871);
+
 -- Supabase exposes the public schema through its Data API. The app talks to Postgres directly
 -- (and bypasses row level security), so lock every table to the Data API.
 DO $$ DECLARE t record; BEGIN
