@@ -66,6 +66,12 @@ export async function verifySessionToken(token: string | undefined | null, secre
   return adminEmails().includes(email) ? email : null;
 }
 
+/** When a (valid) session token runs out, in ms since epoch. */
+export function sessionExpiry(token: string | undefined | null): number | null {
+  const exp = Number(token?.split(".")[1]);
+  return Number.isFinite(exp) ? exp : null;
+}
+
 /** Read the session from a Request's Cookie header (route handlers). */
 export async function sessionEmailFromRequest(request: Request): Promise<string | null> {
   const cookie = request.headers.get("cookie") ?? "";

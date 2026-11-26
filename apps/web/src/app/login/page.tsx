@@ -3,7 +3,12 @@ import { currentAdminEmail } from "@/lib/admin";
 import { SiteLogo } from "@/components/site-logo";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Sign in" };
+export const metadata = {
+  title: "Sign in",
+  manifest: "/app.webmanifest",
+  appleWebApp: { capable: true, title: "Kalyan OS", statusBarStyle: "black" as const },
+  icons: { icon: "/api/logo", apple: "/api/app-icon/180" },
+};
 
 const ERRORS: Record<string, string> = {
   "not-allowed": "That Google account isn't allowed. Sign in with the email listed in ADMIN_EMAILS.",

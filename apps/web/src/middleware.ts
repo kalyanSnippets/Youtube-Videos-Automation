@@ -1,11 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { SESSION_COOKIE, verifySessionToken } from "@/lib/session";
+import { appSecret, createSessionToken, SESSION_COOKIE, SESSION_DAYS, sessionExpiry, verifySessionToken } from "@/lib/session";
 
 /**
  * Everything is private (owner only) except the public resources site and the endpoints that
  * Google, Meta and the scheduler call. Anything not listed here requires a signed-in owner.
  */
-const PUBLIC_EXACT = new Set(["/", "/privacy", "/login", "/robots.txt", "/sitemap.xml", "/favicon.ico", "/icon.svg"]);
+const PUBLIC_EXACT = new Set(["/", "/privacy", "/login", "/robots.txt", "/sitemap.xml", "/favicon.ico", "/icon.svg", "/app.webmanifest", "/sw.js"]);
 const PUBLIC_PREFIXES = [
   "/r/", // resource pages
   "/v/", // video pages
@@ -16,6 +16,7 @@ const PUBLIC_PREFIXES = [
   "/api/videos/sync", // scheduler (checks APP_SECRET bearer)
   "/api/thumb/", // video thumbnails (public images)
   "/api/logo", // site logo / browser tab icon
+  "/api/app-icon/", // phone app icons
   "/_next/",
 ];
 
@@ -56,8 +57,24 @@ export async function middleware(request: NextRequest) {
   if (redirect) return redirect;
   const { pathname, search } = request.nextUrl;
   if (isPublic(pathname)) return NextResponse.next();
-  const email = await verifySessionToken(request.cookies.get(SESSION_COOKIE)?.value);
-  if (email) return NextResponse.next();
+  const token = request.cookies.get(SESSION_COOKIE)?.value;
+  const email = await verifySessionToken(token);
+  if (email) {
+    const res = NextResponse.next();
+    // Keep the phone app signed in: while you keep using it, the 30 days restart (at most once a day).
+    const exp = sessionExpiry(token);
+    const secret = appSecret();
+    if (secret && exp && !pathname.startsWith("/api/") && exp - Date.now() < (SESSION_DAYS - 1) * 86_400_000) {
+      res.cookies.set(SESSION_COOKIE, await createSessionToken(email, secret), {
+        httpOnly: true,
+        secure: true,
+        sameSite: "lax",
+        path: "/",
+        maxAge: SESSION_DAYS * 86_400,
+      });
+    }
+    return res;
+  }
   if (pathname.startsWith("/api/")) return NextResponse.json({ error: "Sign in required" }, { status: 401 });
   const login = new URL("/login", request.url);
   login.searchParams.set("next", pathname + search);

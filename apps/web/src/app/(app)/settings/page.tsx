@@ -1,3 +1,4 @@
+import { InstallApp } from "@/components/install-app";
 import { eq } from "drizzle-orm";
 import { db, schema } from "@yaos/database";
 import { getCurrentUser } from "@/lib/auth";
@@ -53,6 +54,12 @@ export default async function SettingsPage() {
         <h1 className="text-xl font-semibold mb-1">Settings</h1>
         <p className="text-sm text-text-dim">Your public website, the comment bot's notes about you, and the studio's channel profile.</p>
       </div>
+
+      <section id="phone-app" className="panel p-6 space-y-3">
+        <h2 className="text-sm font-semibold text-text-dim uppercase tracking-wide">Phone app</h2>
+        <p className="text-sm text-text-dim">Put AI with Kalyan OS on your home screen. It opens full screen with your logo, and stays signed in.</p>
+        <InstallApp inline />
+      </section>
 
       <section id="website" className="panel p-6 space-y-4">
         <div>

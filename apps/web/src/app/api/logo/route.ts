@@ -1,5 +1,4 @@
-import { eq } from "drizzle-orm";
-import { db, ensureSchemaPatches, schema } from "@yaos/database";
+import { getLogoImage } from "@/lib/logo";
 
 export const dynamic = "force-dynamic";
 
@@ -17,21 +16,7 @@ const headers = (type: string) => ({
 });
 
 export async function GET() {
-  try {
-    await ensureSchemaPatches();
-    const [settings] = await db.select({ logoData: schema.siteSettings.logoData }).from(schema.siteSettings).where(eq(schema.siteSettings.id, 1));
-    const m = settings?.logoData?.match(/^data:(image\/[\w+.-]+);base64,(.+)$/);
-    if (m) return new Response(Buffer.from(m[2]!, "base64"), { headers: headers(m[1]!) });
-
-    const [yt] = await db.select({ metadata: schema.socialConnections.metadata }).from(schema.socialConnections).where(eq(schema.socialConnections.platform, "YOUTUBE"));
-    const avatar = (yt?.metadata as { avatarUrl?: string } | null)?.avatarUrl;
-    if (avatar) {
-      const res = await fetch(avatar);
-      const type = res.headers.get("content-type") ?? "";
-      if (res.ok && type.startsWith("image/")) return new Response(res.body, { headers: headers(type) });
-    }
-  } catch {
-    // fall through to the built-in mark
-  }
+  const logo = await getLogoImage();
+  if (logo) return new Response(new Uint8Array(logo.bytes), { headers: headers(logo.type) });
   return new Response(FALLBACK, { headers: { "content-type": "image/svg+xml", "cache-control": "public, max-age=600" } });
 }
