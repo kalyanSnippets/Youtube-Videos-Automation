@@ -1,0 +1,14 @@
+{
+  "video": "r10-paperclip-ai",
+  "title": "Paperclip AI: the one-person company (Reel)",
+  "stages": {
+    "idea": { "status": "approved", "date": "2026-11-20", "note": "Recorded by Kalyan (teleprompter take); no idea-lab record in repo" },
+    "value": { "status": "not-started", "date": null, "note": "" },
+    "script": { "status": "approved", "date": "2026-11-20", "note": "Treated as approved: Kalyan recorded it and asked for the edit" },
+    "brief": { "status": "awaiting-approval", "date": "2026-11-26", "note": "edit-brief.md written; style pick Isometric People Scene (Lemo-Opuscar)" },
+    "assets": { "status": "not-started", "date": null, "note": "Needs original-quality source file (copy in workspace is 720x1280)" },
+    "edit": { "status": "not-started", "date": null, "note": "" },
+    "packaging": { "status": "not-started", "date": null, "note": "" },
+    "upload": { "status": "not-started", "date": null, "note": "" }
+  }
+}

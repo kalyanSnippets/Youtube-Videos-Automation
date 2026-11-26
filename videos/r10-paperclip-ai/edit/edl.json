@@ -1,0 +1,126 @@
+{
+ "source": "Teleprompter-2026-20-11_16-58-49.mp4 (Drive 1l91AoOdjbpcFjfCZTYMdtsj3k5QGSaKE)",
+ "duration": 57.59,
+ "clips": [
+  {
+   "beat": "hook-1",
+   "src_in": 1.4,
+   "src_out": 4.96,
+   "cut_in": 0,
+   "cut_out": 3.56,
+   "text": "So the next billion-dollar company might have just one human employee."
+  },
+  {
+   "beat": "hook-2",
+   "src_in": 5.44,
+   "src_out": 8.45,
+   "cut_in": 3.56,
+   "cut_out": 6.57,
+   "text": "Sounds crazy, right? But wait until you hear this."
+  },
+  {
+   "beat": "problem-1",
+   "src_in": 12.48,
+   "src_out": 17.74,
+   "cut_in": 6.57,
+   "cut_out": 11.83,
+   "text": "Think about starting a software company. You need a CEO, developers, designers, marketers,"
+  },
+  {
+   "beat": "problem-1b",
+   "src_in": 18.6,
+   "src_out": 18.92,
+   "cut_in": 11.83,
+   "cut_out": 12.15,
+   "text": "right?"
+  },
+  {
+   "beat": "problem-2",
+   "src_in": 33.04,
+   "src_out": 36.46,
+   "cut_in": 12.15,
+   "cut_out": 15.57,
+   "text": "I mean, that's an entire team before you have even launched anything else."
+  },
+  {
+   "beat": "name",
+   "src_in": 52.72,
+   "src_out": 55.8,
+   "cut_in": 15.57,
+   "cut_out": 18.65,
+   "text": "But there is this open source project called Paperclip AI,"
+  },
+  {
+   "beat": "turn",
+   "src_in": 62.76,
+   "src_out": 73.62,
+   "cut_in": 18.65,
+   "cut_out": 29.51,
+   "text": "And here is where it gets really interesting. It lets you organize AI agents like an actual company. One acts like a CEO, other acts like a developer, and other handles marketing."
+  },
+  {
+   "beat": "goal",
+   "src_in": 79.0,
+   "src_out": 80.76,
+   "cut_in": 29.51,
+   "cut_out": 31.27,
+   "text": "Now imagine giving them one goal."
+  },
+  {
+   "beat": "tasks",
+   "src_in": 81.92,
+   "src_out": 85.24,
+   "cut_in": 31.27,
+   "cut_out": 34.59,
+   "text": "The agents can break into task and coordinate the work,"
+  },
+  {
+   "beat": "control",
+   "src_in": 86.9,
+   "src_out": 89.3,
+   "cut_in": 34.59,
+   "cut_out": 36.99,
+   "text": "and you can monitor progress and control spending."
+  },
+  {
+   "beat": "caveat",
+   "src_in": 90.02,
+   "src_out": 94.62,
+   "cut_in": 36.99,
+   "cut_out": 41.59,
+   "text": "But don't confuse AI agents with real employees. You still need to rework their work."
+  },
+  {
+   "beat": "tip-1",
+   "src_in": 95.38,
+   "src_out": 96.8,
+   "cut_in": 41.59,
+   "cut_out": 43.01,
+   "text": "Now here is something useful."
+  },
+  {
+   "beat": "tip-2",
+   "src_in": 99.94,
+   "src_out": 102.8,
+   "cut_in": 43.01,
+   "cut_out": 45.87,
+   "text": "start with just two agents, a researcher and a writer."
+  },
+  {
+   "beat": "cta-1",
+   "src_in": 103.42,
+   "src_out": 106.32,
+   "cut_in": 45.87,
+   "cut_out": 48.77,
+   "text": "And if you want the project link and the beginner-friendly setup plan,"
+  },
+  {
+   "beat": "cta-2",
+   "src_in": 116.22,
+   "src_out": 125.04,
+   "cut_in": 48.77,
+   "cut_out": 57.59,
+   "text": "comment company in the comments below, and I'll send you the link. And follow AI with Kalyan because I'm breaking down how one person can use AI to do all of the work of a team."
+  }
+ ]
+}
