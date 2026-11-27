@@ -1,0 +1,14 @@
+{
+  "video": "r11-headroom",
+  "title": "Headroom: stop Claude Code eating your tokens (GitHub Goldmine Reel)",
+  "stages": {
+    "idea": { "status": "approved", "date": "2026-11-26", "note": "Recorded by Kalyan (two teleprompter takes)" },
+    "value": { "status": "not-started", "date": null, "note": "" },
+    "script": { "status": "approved", "date": "2026-11-26", "note": "Treated as approved: Kalyan recorded it and asked for the Reel" },
+    "brief": { "status": "awaiting-approval", "date": "2026-11-27", "note": "Kalyan chose: face on hook + CTA only, no savings number, amber, style frames first. Style frames sent." },
+    "assets": { "status": "approved", "date": "2026-11-27", "note": "All editor-built; source takes are 720x1280 via Descript" },
+    "edit": { "status": "not-started", "date": null, "note": "" },
+    "packaging": { "status": "not-started", "date": null, "note": "" },
+    "upload": { "status": "not-started", "date": null, "note": "" }
+  }
+}

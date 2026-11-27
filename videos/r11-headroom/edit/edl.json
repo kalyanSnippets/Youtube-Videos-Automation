@@ -1,0 +1,144 @@
+{
+ "sources": {
+  "A": "Teleprompter-2026-26-11_16-20-49.mp4 (Drive 1FVha-E_v0dNbRHODeXQxab49sgVZnWlk)",
+  "B": "Teleprompter-2026-26-11_16-25-32.mp4 (Drive 1kqsmII9LQa1DhGslRwmItlX9JmQtS6Qs)"
+ },
+ "duration": 86.34,
+ "clips": [
+  {
+   "beat": "hook",
+   "take": "B",
+   "src_in": 10.92,
+   "src_out": 18.86,
+   "cut_in": 0,
+   "cut_out": 7.94,
+   "text": "this is exactly why I love exploring GitHub, because sometimes you find a project and you're like, \"Wait, someone actually built this?\""
+  },
+  {
+   "beat": "problem",
+   "take": "A",
+   "src_in": 27.14,
+   "src_out": 40.72,
+   "cut_in": 7.94,
+   "cut_out": 21.52,
+   "text": "So you know when you're using Claude Code, you ask it to fix one small bug, and suddenly it's reading hundreds of lines of terminal output, logs, and all the repeated information, right? And all of that can eat up all your tokens."
+  },
+  {
+   "beat": "imagine",
+   "take": "A",
+   "src_in": 48.7,
+   "src_out": 54.62,
+   "cut_in": 21.52,
+   "cut_out": 27.44,
+   "text": "Now imagine if there was something that could automatically clean up that information before Claude even reads it."
+  },
+  {
+   "beat": "reveal",
+   "take": "A",
+   "src_in": 58.34,
+   "src_out": 61.6,
+   "cut_in": 27.44,
+   "cut_out": 30.7,
+   "text": "Well, there actually is. It's called Headroom."
+  },
+  {
+   "beat": "clever",
+   "take": "B",
+   "src_in": 83.76,
+   "src_out": 85.96,
+   "cut_in": 30.7,
+   "cut_out": 32.9,
+   "text": "the idea behind this is pretty clever."
+  },
+  {
+   "beat": "sits",
+   "take": "B",
+   "src_in": 89.14,
+   "src_out": 94.16,
+   "cut_in": 32.9,
+   "cut_out": 37.92,
+   "text": "it sits between your AI coding agent and the model, compressing all the repetitive information."
+  },
+  {
+   "beat": "compact",
+   "take": "A",
+   "src_in": 100.7,
+   "src_out": 104.22,
+   "cut_in": 37.92,
+   "cut_out": 41.44,
+   "text": "So Claude gets a much more compact version of what it needs."
+  },
+  {
+   "beat": "interesting",
+   "take": "A",
+   "src_in": 111.3,
+   "src_out": 113.56,
+   "cut_in": 41.44,
+   "cut_out": 43.7,
+   "text": "But you know what makes this really interesting?"
+  },
+  {
+   "beat": "scenario",
+   "take": "A",
+   "src_in": 119.3,
+   "src_out": 127.06,
+   "cut_in": 43.7,
+   "cut_out": 51.46,
+   "text": "Imagine you're working on a huge project, running tests, debugging errors, and your AI agent keeps processing all those logs, right?"
+  },
+  {
+   "beat": "helps",
+   "take": "B",
+   "src_in": 126.32,
+   "src_out": 131.98,
+   "cut_in": 51.46,
+   "cut_out": 57.12,
+   "text": "Headroom can help reduce that unnecessary token usage automatically, which is pretty useful,"
+  },
+  {
+   "beat": "helps2",
+   "take": "B",
+   "src_in": 133.56,
+   "src_out": 136.86,
+   "cut_in": 57.12,
+   "cut_out": 60.42,
+   "text": "especially when you're working with AI coding agents every day."
+  },
+  {
+   "beat": "cta",
+   "take": "B",
+   "src_in": 139.96,
+   "src_out": 149.66,
+   "cut_in": 60.42,
+   "cut_out": 70.12,
+   "text": "this is the kind of project I want to keep finding for you. So if you're using Claude Code, comment \"gold\" and I'll share you the GitHub repository and step-by-step setup guide."
+  },
+  {
+   "beat": "series",
+   "take": "B",
+   "src_in": 149.84,
+   "src_out": 159.08,
+   "cut_in": 70.12,
+   "cut_out": 79.36,
+   "text": "And listen, this is just one of the discoveries in my GitHub goldmine series. I've got another project coming up that helps AI navigate massive codebases."
+  },
+  {
+   "beat": "follow",
+   "take": "B",
+   "src_in": 159.22,
+   "src_out": 163.32,
+   "cut_in": 79.36,
+   "cut_out": 83.46,
+   "text": "So follow AI with Kalyan here on Instagram and subscribe on YouTube."
+  },
+  {
+   "beat": "end",
+   "take": "A",
+   "src_in": 224.7,
+   "src_out": 227.58,
+   "cut_in": 83.46,
+   "cut_out": 86.34,
+   "text": "You really don't want to miss the next GitHub find."
+  }
+ ]
+}
