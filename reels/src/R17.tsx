@@ -115,7 +115,41 @@ const Intro: React.FC = () => {
     </>
   );
 };
-const Wow: React.FC = () => ( // full face: "wait… someone actually built this?"
+const Start: React.FC = () => ( // full face opening
+  <>
+    <Row y={150}><Pill at={2} bg={INK} color={GOLD}>⛏ GITHUB GOLDMINE</Pill></Row>
+    <Serif at={L(1.4, 0)} y={260} size={110} color="#fff">exploring GitHub</Serif>
+  </>
+);
+const Hook: React.FC = () => { // split: "you find a project and you're like… wait, someone actually built this?"
+  const frame = useCurrentFrame(); const a = 2.7;
+  return (
+    <>
+      <Serif at={L(3.0, a)} y={110} size={92}>you find a <span style={{ color: OR }}>project</span>…</Serif>
+      <Card x={600} y={330} w={340} h={200} at={L(3.9, a)}>
+        <div style={{ padding: "26px 28px", fontFamily: MONO, fontSize: 26, color: "#555B66" }}>📁 new-repo<div style={{ marginTop: 18, fontFamily: INTER, fontWeight: 900, fontSize: 44, color: INK }}>✨ found it</div></div>
+      </Card>
+      <Mascot x={150} y={330} prop="pick" at={L(3.2, a)} />
+      <div style={{ position: "absolute", left: 330, top: 470, fontSize: 54, opacity: fadeIn(frame, L(3.6, a)), transform: `translateY(${Math.sin(frame / 6) * 6}px)` }}>🪙</div>
+      <Serif at={L(5.32, a)} y={590} size={120} color={OR}>wait…</Serif>
+      <Serif at={L(5.9, a)} y={730} size={54}>someone actually built this? 🤯</Serif>
+    </>
+  );
+};
+const There: React.FC = () => <Serif at={L(24.2, 23.95)} y={220} size={96} color="#fff">there actually is 👀</Serif>;
+const Follow: React.FC = () => {
+  const a = 42.95;
+  return (
+    <>
+      <Row y={110}><Pill at={L(43.1, a)} bg={INK} color="#fff">➕ follow</Pill></Row>
+      <Serif at={L(43.5, a)} y={220} size={110}>AI with Kalyan</Serif>
+      <Row y={400} gap={22}><Pill at={L(44.6, a)} bg="#fff" color={INK}>📸 Instagram</Pill><Pill at={L(45.4, a)} bg={RED} color="#fff">▶ YouTube</Pill></Row>
+      <Serif at={L(47.9, a)} y={560} size={88} color={OR}>the next GitHub find 💎</Serif>
+      <Mascot x={70} y={700} prop="star" at={L(46.6, a)} px={9} />
+    </>
+  );
+};
+const Wow: React.FC = () => ( // (unused) full face: "wait… someone actually built this?"
   <>
     <Serif at={L(5.14, 2.34)} y={170} size={110} color="#fff">wait…</Serif>
     <Serif at={L(5.7, 2.34)} y={300} size={70} color="#fff">someone actually built this? 🤯</Serif>
@@ -130,7 +164,7 @@ const Terminal: React.FC<{ a: number; flood?: number; still?: boolean }> = ({ a,
     <Card x={70} y={110} w={940} h={600} dark at={still ? -20 : 0}>
       <MacBar title="claude code · ~/my-app" />
       <div style={{ padding: "22px 28px", fontFamily: MONO, fontSize: 25, color: "#D6D9E0", lineHeight: 1.55 }}>
-        <div><span style={{ color: MINT }}>›</span> <Typewriter text="fix one small bug in the login test" delay={L(10.0, a)} cps={26} caret={fl < 0} caretColor={GOLD} /></div>
+        <div><span style={{ color: MINT }}>›</span> <Typewriter text="fix one small bug in the login test" delay={L(9.52, a)} cps={26} caret={fl < 0} caretColor={GOLD} /></div>
         <div style={{ position: "relative", height: 430, overflow: "hidden", marginTop: 8 }}>
           <div style={{ transform: `translateY(${-Math.max(0, n - 11) * 39}px)` }}>
             {Array.from({ length: n }, (_, i) => { const s = LOGS[(i * 7) % LOGS.length]; const rep = s.includes("utcnow"); return <div key={i} style={{ color: s.startsWith("ERROR") ? RED : rep ? "#C9A23A" : "#9AA0AC", background: rep ? "rgba(233,185,73,0.10)" : undefined, whiteSpace: "nowrap" }}>{s}</div>; })}
@@ -140,21 +174,21 @@ const Terminal: React.FC<{ a: number; flood?: number; still?: boolean }> = ({ a,
     </Card>
   );
 };
-const Prompt: React.FC = () => <><Terminal a={7.4} /><Serif at={L(10.6, 7.4)} y={735} size={80} color={OR}>one small bug 🐛</Serif></>;
+const Prompt: React.FC = () => <><Terminal a={7.15} /><Serif at={L(10.4, 7.15)} y={735} size={80} color={OR}>one small bug 🐛</Serif></>;
 const Flood: React.FC = () => {
-  const frame = useCurrentFrame(); const a = 11.5;
+  const frame = useCurrentFrame(); const a = 10.95;
   const lines = Math.round(interpolate(frame, [0, f(5.5)], [24, 1248], clamp));
   return (
     <>
-      <Terminal a={a} flood={11.6} still />
+      <Terminal a={a} flood={11.16} still />
       <div style={{ position: "absolute", right: 60, top: 70, zIndex: 3 }}><Pill at={4} bg={RED}>📜 {lines.toLocaleString()} lines read</Pill></div>
-      <Serif at={L(15.5, a)} y={735} size={76} color={OR}>repeated. again. 🔁</Serif>
+      <Serif at={L(15.3, a)} y={735} size={76} color={OR}>repeated. again. 🔁</Serif>
     </>
   );
 };
 const Tokens: React.FC = () => { // full cream graphic
-  const frame = useCurrentFrame(); const a = 16.95;
-  const fill = interpolate(frame, [L(17.6, a), L(18.9, a)], [0.18, 0.97], { ...clamp, easing: Easing.out(Easing.cubic) });
+  const frame = useCurrentFrame(); const a = 16.5;
+  const fill = interpolate(frame, [L(17.18, a), L(18.3, a)], [0.18, 0.97], { ...clamp, easing: Easing.out(Easing.cubic) });
   return (
     <Stage>
       <Serif at={2} y={330} size={150}>your <span style={{ color: OR }}>tokens</span></Serif>
@@ -171,63 +205,63 @@ const Tokens: React.FC = () => { // full cream graphic
   );
 };
 const Clean: React.FC = () => {
-  const frame = useCurrentFrame(); const a = 19.2;
-  const clean = fadeIn(frame, L(21.1, a), 14);
+  const frame = useCurrentFrame(); const a = 18.5;
+  const clean = fadeIn(frame, L(20.34, a), 14);
   return (
     <>
-      <Serif at={L(19.4, a)} y={70} size={92}>imagine it <span style={{ color: MINT }}>cleaned up</span></Serif>
-      <Card x={60} y={220} w={440} h={480} dark at={L(19.6, a)}>
+      <Serif at={L(18.66, a)} y={70} size={92}>imagine it <span style={{ color: MINT }}>cleaned up</span></Serif>
+      <Card x={60} y={220} w={440} h={480} dark at={L(18.8, a)}>
         <MacBar title="raw logs" />
         <div style={{ padding: 18, fontFamily: MONO, fontSize: 17, lineHeight: 1.5, color: "#9AA0AC" }}>{Array.from({ length: 16 }, (_, i) => { const s = LOGS[(i * 5) % LOGS.length]; return <div key={i} style={{ whiteSpace: "nowrap", opacity: 1 - clean * (s.includes("utcnow") ? 0.75 : 0.1), textDecoration: clean > 0.5 && s.includes("utcnow") ? "line-through" : undefined }}>{s.slice(0, 34)}</div>; })}</div>
       </Card>
       <div style={{ position: "absolute", left: 512, top: 420, fontSize: 64, color: INK, opacity: clean }}>→</div>
-      <Card x={590} y={280} w={430} h={360} at={L(21.4, a)}>
+      <Card x={590} y={280} w={430} h={360} at={L(20.6, a)}>
         <MacBar title="what Claude reads" dark={false} />
         <div style={{ padding: 24, fontFamily: MONO, fontSize: 22, lineHeight: 1.6, color: INK }}>
           <div>✅ 3 tests passed</div><div style={{ color: RED }}>❌ test_users: 500</div><div style={{ color: "#8A6A1F" }}>⚠ utcnow() deprecated ×6</div>
         </div>
       </Card>
-      <Mascot x={800} y={730} prop="broom" at={L(21.0, a)} px={9} />
-      <div style={{ position: "absolute", left: 60, top: 730 }}><Pill at={L(23.3, a)} bg={MINT} size={28}>before Claude reads it</Pill></div>
+      <Mascot x={800} y={730} prop="broom" at={L(20.2, a)} px={9} />
+      <div style={{ position: "absolute", left: 60, top: 730 }}><Pill at={L(22.5, a)} bg={MINT} size={28}>before Claude reads it</Pill></div>
     </>
   );
 };
 const Reveal: React.FC = () => { // full cream: the real repo
-  const frame = useCurrentFrame(); const a = 24.8;
-  const stars = Math.round(interpolate(frame, [L(25.6, a), L(26.6, a)], [0, 81], { ...clamp, easing: Easing.out(Easing.cubic) }));
+  const frame = useCurrentFrame(); const a = 25.3;
+  const stars = Math.round(interpolate(frame, [L(25.5, a), L(26.3, a)], [0, 81], { ...clamp, easing: Easing.out(Easing.cubic) }));
   return (
     <Stage>
-      <Serif at={L(27.0, a)} y={170} size={160} color={INK}>Headroom</Serif>
+      <Serif at={L(25.9, a)} y={170} size={160} color={INK}>Headroom</Serif>
       <Card x={60} y={420} w={960} h={654} at={2}>
         <MacBar title="github.com/headroomlabs-ai/headroom" dark={false} />
         <OffthreadVideo src={staticFile("b/r17/gh_top.mp4")} muted style={{ width: 960, height: 600, objectFit: "cover", objectPosition: "50% 0%" }} />
       </Card>
-      <Row y={1120}><Pill at={L(25.5, a)} bg={INK} color={GOLD}>⭐ {stars}K stars</Pill><Pill at={L(26.0, a)} bg="#fff" color={INK}>🔓 open source · Apache-2.0</Pill></Row>
-      <Mascot x={800} y={1250} prop="star" at={L(26.2, a)} px={8} />
+      <Row y={1120}><Pill at={L(25.4, a)} bg={INK} color={GOLD}>⭐ {stars}K stars</Pill><Pill at={L(25.8, a)} bg="#fff" color={INK}>🔓 open source · Apache-2.0</Pill></Row>
+      <Mascot x={800} y={1250} prop="star" at={L(26.0, a)} px={8} />
     </Stage>
   );
 };
 const Clever: React.FC = () => <Serif at={L(29.3, 27.45)} y={200} size={90} color="#fff">pretty clever 💡</Serif>;
 const Flow: React.FC = () => {
-  const frame = useCurrentFrame(); const a = 29.95;
+  const frame = useCurrentFrame(); const a = 27.0;
   const node = (x: number, at: number, icon: string, label: string, hl?: boolean) => (
     <Card x={x} y={250} w={290} h={250} at={at} style={hl ? { border: `4px solid ${OR}` } : undefined}>
       <div style={{ textAlign: "center", paddingTop: 34 }}><div style={{ fontSize: 86 }}>{icon}</div><div style={{ fontFamily: INTER, fontWeight: 900, fontSize: 36, color: hl ? OR : INK, marginTop: 8 }}>{label}</div></div>
     </Card>
   );
-  const p = ((frame - L(31.0, a)) % 50) / 50; const go = frame > L(31.0, a);
+  const p = ((frame - L(27.6, a)) % 50) / 50; const go = frame > L(27.6, a);
   const blockX = p < 0.5 ? interpolate(p, [0, 0.5], [270, 420]) : interpolate(p, [0.5, 1], [700, 790]);
-  const squish = p < 0.5 ? 1 : interpolate(frame - L(33.1, a), [0, 10], [1, 0.3], clamp);
+  const squish = p < 0.5 ? 1 : interpolate(frame - L(29.56, a), [0, 10], [1, 0.3], clamp);
   return (
     <>
-      <Serif at={L(30.3, a)} y={90} size={86}>it sits <span style={{ color: OR }}>in between</span></Serif>
-      {node(40, L(30.6, a), "🤖", "AI agent")}
-      {node(395, L(30.9, a), "▣", "Headroom", true)}
-      {node(750, L(32.5, a), "🧠", "the model")}
+      <Serif at={L(27.0, a)} y={90} size={86}>it sits <span style={{ color: OR }}>in between</span></Serif>
+      {node(40, L(27.1, a), "🤖", "AI agent")}
+      {node(395, L(27.4, a), "▣", "Headroom", true)}
+      {node(750, L(28.9, a), "🧠", "the model")}
       {go && <div style={{ position: "absolute", left: blockX, top: 530, width: 70, height: 150 * squish, borderRadius: 10, background: `repeating-linear-gradient(180deg, #9AA0AC 0 10px, #D7D3CB 10px 18px)`, opacity: 0.9 }} />}
-      <Serif at={L(33.1, a)} y={700} size={70} color={OR}>compressing 🗜️</Serif>
-      <Mascot x={60} y={560} prop="key" at={L(31.4, a)} px={8} />
-      <div style={{ position: "absolute", right: 40, top: 580 }}><Pill at={L(34.0, a)} bg="#fff" color={INK} size={28}>💻 runs on your machine</Pill></div>
+      <Serif at={L(29.56, a)} y={700} size={70} color={OR}>compressing 🗜️</Serif>
+      <Mascot x={60} y={560} prop="key" at={L(27.8, a)} px={8} />
+      <div style={{ position: "absolute", right: 40, top: 580 }}><Pill at={L(30.4, a)} bg="#fff" color={INK} size={28}>💻 runs on your machine</Pill></div>
     </>
   );
 };
@@ -246,7 +280,7 @@ const Compact: React.FC = () => {
   );
 };
 const Proof: React.FC = () => { // full cream: the README's own numbers
-  const a = 38.95;
+  const a = 31.4;
   return (
     <Stage>
       <Serif at={2} y={150} size={150} color={OR}>21–57%</Serif>
@@ -255,23 +289,23 @@ const Proof: React.FC = () => { // full cream: the README's own numbers
         <MacBar title="headroom · README · Proof" dark={false} />
         <OffthreadVideo src={staticFile("b/r17/gh_proof.mp4")} muted style={{ width: 960, height: 600, objectFit: "cover", objectPosition: "0% 0%" }} />
       </Card>
-      <Row y={1170}><Pill at={L(40.3, a)} bg="#fff" color={INK} size={30}>📊 measured on 4 agent tasks · project README</Pill></Row>
-      <Row y={1260}><Pill at={L(41.7, a)} bg={MINT}>⚡ automatically</Pill></Row>
+      <Row y={1170}><Pill at={L(32.4, a)} bg="#fff" color={INK} size={30}>📊 measured on 4 agent tasks · project README</Pill></Row>
+      <Row y={1260}><Pill at={L(34.2, a)} bg={MINT}>⚡ automatically</Pill></Row>
     </Stage>
   );
 };
 const Next: React.FC = () => {
-  const frame = useCurrentFrame(); const a = 48.2;
+  const frame = useCurrentFrame(); const a = 38.9;
   const nodes = Array.from({ length: 26 }, (_, i) => ({ x: 120 + ((i * 197) % 820), y: 330 + ((i * 131) % 430), r: 10 + (i % 4) * 5 }));
   return (
     <>
       <Row y={80}><Pill at={2} bg={INK} color={GOLD}>⛏ NEXT UP</Pill></Row>
-      <Serif at={L(51.1, a)} y={170} size={96}>massive <span style={{ color: OR }}>codebases</span></Serif>
+      <Serif at={L(41.6, a)} y={170} size={96}>massive <span style={{ color: OR }}>codebases</span></Serif>
       <svg style={{ position: "absolute", left: 0, top: 0 }} width={1080} height={960}>
         {nodes.map((n, i) => { const m = nodes[(i * 5 + 3) % nodes.length]; const k = interpolate(frame - i * 1.5, [0, 10], [0, 1], clamp); return <g key={i} opacity={k}><line x1={n.x} y1={n.y} x2={m.x} y2={m.y} stroke="#C9C2B5" strokeWidth={3} /><circle cx={n.x} cy={n.y} r={n.r} fill={i % 5 === 0 ? OR : "#fff"} stroke={INK} strokeWidth={3} /></g>; })}
       </svg>
-      <Mascot x={60} y={780} prop="glass" at={L(50.5, a)} px={9} />
-      <div style={{ position: "absolute", right: 50, top: 800 }}><Pill at={L(50.9, a)} bg="#fff" color={INK} size={28}>🔒 coming next</Pill></div>
+      <Mascot x={60} y={780} prop="glass" at={L(40.6, a)} px={9} />
+      <div style={{ position: "absolute", right: 50, top: 800 }}><Pill at={L(40.9, a)} bg="#fff" color={INK} size={28}>🔒 coming next</Pill></div>
     </>
   );
 };
@@ -294,20 +328,19 @@ const Outro: React.FC = () => {
 type Kind = "split" | "face" | "full";
 type Seg = { a: number; b: number; kind: Kind; C?: React.FC };
 const SEGS: Seg[] = [
-  { a: 0, b: 2.34, kind: "split", C: Intro },
-  { a: 2.34, b: 7.4, kind: "face", C: Wow },
-  { a: 7.4, b: 11.5, kind: "split", C: Prompt },
-  { a: 11.5, b: 16.95, kind: "split", C: Flood },
-  { a: 16.95, b: 19.2, kind: "full", C: Tokens },
-  { a: 19.2, b: 24.8, kind: "split", C: Clean },
-  { a: 24.8, b: 27.45, kind: "full", C: Reveal },
-  { a: 27.45, b: 29.95, kind: "face", C: Clever },
-  { a: 29.95, b: 35.7, kind: "split", C: Flow },
-  { a: 35.7, b: 38.95, kind: "split", C: Compact },
-  { a: 38.95, b: 42.5, kind: "full", C: Proof },
-  { a: 42.5, b: 48.2, kind: "face" },
-  { a: 48.2, b: 52.35, kind: "split", C: Next },
-  { a: 52.35, b: D.duration, kind: "face" },
+  { a: 0, b: 2.7, kind: "face", C: Start },
+  { a: 2.7, b: 7.15, kind: "split", C: Hook },
+  { a: 7.15, b: 10.95, kind: "split", C: Prompt },
+  { a: 10.95, b: 16.5, kind: "split", C: Flood },
+  { a: 16.5, b: 18.5, kind: "full", C: Tokens },
+  { a: 18.5, b: 23.95, kind: "split", C: Clean },
+  { a: 23.95, b: 25.3, kind: "face", C: There },
+  { a: 25.3, b: 27.0, kind: "full", C: Reveal },
+  { a: 27.0, b: 31.4, kind: "split", C: Flow },
+  { a: 31.4, b: 34.95, kind: "full", C: Proof },
+  { a: 34.95, b: 38.9, kind: "face" },
+  { a: 38.9, b: 42.95, kind: "split", C: Next },
+  { a: 42.95, b: D.duration, kind: "split", C: Follow },
   { a: D.duration, b: END, kind: "full", C: Outro },
 ];
 const segAt = (t: number) => SEGS.find((s) => t >= s.a && t < s.b) ?? SEGS[SEGS.length - 1];
@@ -346,7 +379,7 @@ const chunks = chunkWords(D.words, 3, 16);
 const KEY = /^(tokens|Headroom|GOLD|Claude|compact|compressing|GitHub)/i;
 const Captions: React.FC = () => {
   const t = useCurrentFrame() / FPS;
-  if ((t >= 44.1 && t < 48.1) || t >= D.duration) return null;
+  if ((t >= 35.0 && t < 38.75) || t >= D.duration) return null;
   const c = activeChunk(chunks, t); if (!c) return null;
   const s = segAt(t);
   const top = s.kind === "split" ? 1640 : s.kind === "face" ? 1450 : 1700;
@@ -368,12 +401,12 @@ export const Reel17: React.FC = () => {
   const faces = SEGS.filter((s) => s.kind === "face").map((s) => f(s.a));
   const since = Math.min(...faces.map((b) => (frame >= b ? frame - b : 999)));
   const zf = since < 10 ? interpolate(since, [0, 9], [1.06, 1.0], { ...clamp, easing: Easing.out(Easing.cubic) }) : 1;
-  const punch = frame >= f(5.14) && frame < f(7.4) ? 1.08 : 1; // the "wait…" punch-in
+  const punch = 1;
   const sfx: [number, string, number][] = [
-    [0.05, "pop", 0.14], [0.5, "8bit_coin", 0.08], [2.34, "swish", 0.07], [5.14, "pop", 0.12], [7.4, "click", 0.1], [10.0, "typing", 0.12],
-    [11.6, "glitch", 0.07], [16.95, "swish", 0.07], [17.6, "riser", 0.06], [19.2, "click", 0.1], [21.1, "whoosh", 0.06], [24.8, "pop", 0.12],
-    [25.6, "8bit_coin", 0.08], [27.06, "ding", 0.12], [29.95, "click", 0.1], [33.1, "whoosh", 0.06], [35.7, "click", 0.1], [36.9, "pop", 0.12],
-    [38.95, "swish", 0.07], [40.3, "ding", 0.1], [48.2, "click", 0.1], [51.1, "pop", 0.1], [D.duration + 0.05, "8bit_levelup", 0.08],
+    [0.05, "pop", 0.14], [1.4, "8bit_coin", 0.07], [2.7, "swish", 0.07], [5.32, "pop", 0.12], [7.15, "click", 0.1], [9.52, "typing", 0.12],
+    [11.16, "glitch", 0.07], [16.5, "swish", 0.07], [17.18, "riser", 0.06], [18.5, "click", 0.1], [20.34, "whoosh", 0.06], [23.95, "pop", 0.1],
+    [25.4, "8bit_coin", 0.08], [25.9, "ding", 0.12], [27.0, "click", 0.1], [29.56, "whoosh", 0.06], [31.4, "swish", 0.07], [32.4, "ding", 0.1],
+    [38.9, "click", 0.1], [41.6, "pop", 0.1], [42.95, "click", 0.1], [47.9, "pop", 0.1], [D.duration + 0.05, "8bit_levelup", 0.08],
   ];
   return (
     <AbsoluteFill style={{ background: "#000" }}>
