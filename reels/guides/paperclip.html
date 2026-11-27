@@ -1,0 +1,95 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Paperclip AI – Full Setup Guide · AI with Kalyan</title><link rel="stylesheet" href="style.css"></head><body>
+<div class="cover">
+  <span class="tag">⛏ GITHUB GOLDMINE</span>
+  <h1>Paperclip AI: Run AI Agents<br>Like a Company. Full Setup Guide</h1>
+  <p class="sub">Give AI agents roles, one goal and a budget, and watch the work from one dashboard.</p>
+  <div class="meta">AI with Kalyan · aiwithkalyan.com · Facts checked 25 Nov 2026 against github.com/paperclipai/paperclip (README)</div>
+</div>
+<main>
+<h2>1. What is Paperclip?</h2>
+<p>Paperclip is a free, open-source (MIT licence), self-hosted app (a Node.js server with a React dashboard) that organises a team of AI agents like a company. No Paperclip account is required.</p>
+<ul>
+  <li><b>Org chart for agents:</b> roles, job titles, reporting lines and permissions (for example a CEO agent, a developer agent, a marketing agent).</li>
+  <li><b>Goals → tasks:</b> define a goal; work is split into tasks assigned to agents.</li>
+  <li><b>Budgets and cost control:</b> company, agent and project budgets, threshold alerts, and automatic pauses at limits you set.</li>
+  <li><b>Governance:</b> review and approval stages, and the ability to pause, resume or stop agents.</li>
+  <li><b>Bring your own agents:</b> works with tools such as Claude Code, Codex and other CLI or HTTP agents.</li>
+</ul>
+<p>The README describes the flow in three steps: <b>Define the goal → Hire the team → Approve and run.</b></p>
+
+<div class="box warn"><b>Read this first.</b>
+<ul>
+<li>Paperclip <b>organises</b> agents. The thinking is done by an AI model you connect (for example Anthropic, OpenAI or OpenRouter), and those usually <b>cost money per use</b>. Set a budget before you start.</li>
+<li>AI agents are <b>not real employees</b>. They make mistakes. <b>Review their work</b> before you use or publish it.</li>
+<li>Never share API keys with anyone or paste them into chats.</li>
+</ul></div>
+
+<h2>2. What you need</h2>
+<table>
+<tr><th>Item</th><th>Details</th></tr>
+<tr><td>Computer</td><td>Mac, Windows or Linux</td></tr>
+<tr><td>Node.js</td><td><b>Version 24.11 or newer</b> (download from nodejs.org). Check with <code>node -v</code></td></tr>
+<tr><td>An AI provider</td><td>An API key from one provider (e.g. Anthropic, OpenAI or OpenRouter), or a supported agent tool you already use</td></tr>
+<tr><td>A budget</td><td>Decide how much you're willing to spend before you press go</td></tr>
+</table>
+
+
+<h2>3. Install (the guided quickstart)</h2>
+<ol>
+  <li>Install <b>Node.js 24.11+</b> and confirm it in a terminal:
+  <pre>node -v</pre></li>
+  <li>Run the official guided setup:
+  <pre>npx paperclipai@latest onboard --yes</pre>
+  It sets Paperclip up on your own computer. Your configuration and data are kept locally, and a database is created for you automatically.</li>
+  <li>Open the dashboard in your browser. The README gives the local address as <code>http://localhost:3100</code>.</li>
+  <li>Follow the onboarding screens to <b>connect your AI provider</b> and create your company.</li>
+</ol>
+<div class="box info"><b>Just want to try it first?</b> The README has a <b>test-drive</b> mode that starts a temporary instance with a CEO agent already set up, for example:
+<pre>ANTHROPIC_API_KEY=your_key npx paperclipai test-drive</pre>
+For OpenAI: <code>OPENAI_API_KEY=your_key npx paperclipai test-drive --harness codex</code></div>
+<div class="box tip"><b>Error "E404 for paperclipai"?</b> If your computer uses a private npm registry, force the public one:
+<pre>npx --registry https://registry.npmjs.org paperclipai@latest onboard --yes</pre>
+To change settings later: <code>npx paperclipai configure</code></div>
+
+<h2>4. Your first company: just 2 agents</h2>
+<p>Don't start with ten agents. Start with two and one small, clear goal.</p>
+<table>
+<tr><th>Step</th><th>What to do</th></tr>
+<tr><td>1. Define the goal</td><td>Make it specific, e.g. <i>"Write one helpful blog post about [your topic] this week."</i></td></tr>
+<tr><td>2. Hire 2 agents</td><td>🔎 <b>Researcher</b>: finds facts, sources and examples.<br>✍️ <b>Writer</b>: turns the research notes into a clear draft.</td></tr>
+<tr><td>3. Set a small budget</td><td>Use the budget settings so work pauses at your limit.</td></tr>
+<tr><td>4. Approve and run</td><td>Start the work and watch progress on the dashboard.</td></tr>
+<tr><td>5. Review</td><td>Check the research and the draft yourself. Fix anything wrong before publishing.</td></tr>
+</table>
+<p>When that works well, add a third agent (for example an editor or a social-media agent).</p>
+
+
+<h2>5. Tips to avoid surprises</h2>
+<ul>
+  <li><b>Small, specific goals</b> waste fewer tokens than vague ones.</li>
+  <li><b>Check the costs view</b> regularly; budgets help stop runaway spending, but reported usage can lag a little.</li>
+  <li><b>Keep humans in the loop:</b> use review/approval stages for anything that matters.</li>
+  <li><b>Stay local first.</b> The quickstart runs in a local mode. For access from other devices, the README describes private-network options (e.g. <code>--bind lan</code> or <code>--bind tailnet</code>) and Docker deployment; read those docs before exposing it.</li>
+  <li>Commands change between releases: <b>always check the README</b> on GitHub.</li>
+</ul>
+
+<h2>6. Your setup checklist</h2>
+<ul class="check">
+  <li>Node.js 24.11+ installed (<code>node -v</code>)</li>
+  <li>API key from one AI provider ready (kept private)</li>
+  <li>Ran <code>npx paperclipai@latest onboard --yes</code></li>
+  <li>Dashboard open (README: <code>http://localhost:3100</code>)</li>
+  <li>Provider connected and a <b>small budget</b> set</li>
+  <li>Goal defined; Researcher + Writer agents created</li>
+  <li>First results reviewed by me before using them</li>
+</ul>
+
+<h2>Links</h2>
+<ul>
+  <li>GitHub: <a href="https://github.com/paperclipai/paperclip">github.com/paperclipai/paperclip</a></li>
+  <li>Website / docs: <a href="https://paperclip.ing">paperclip.ing</a></li>
+  <li>More free resources: <a href="https://aiwithkalyan.com">aiwithkalyan.com</a></li>
+</ul>
+</main>
+<footer>Made by AI with Kalyan · aiwithkalyan.com · Follow @ai_with_kalyan on Instagram and AI with Kalyan on YouTube. Paperclip is an independent open-source project; this guide is not affiliated with it. Always check the official README for the latest steps.</footer>
+</body></html>

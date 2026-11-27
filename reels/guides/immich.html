@@ -1,0 +1,107 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Immich – Full Setup Guide · AI with Kalyan</title><link rel="stylesheet" href="style.css"></head><body>
+<div class="cover">
+  <span class="tag">⛏ GITHUB GOLDMINE</span>
+  <h1>Immich: Your Own Google Photos<br>Full Setup Guide</h1>
+  <p class="sub">Find any photo by describing it, on a photo library you host yourself.</p>
+  <div class="meta">AI with Kalyan · aiwithkalyan.com · Facts checked 25 Nov 2026 against github.com/immich-app/immich and the official docs</div>
+</div>
+<main>
+<h2>1. What is Immich?</h2>
+<p>Immich is a free, open-source (AGPL-3.0) photo and video library that you run on your own computer or home server. Its phone apps back up your photos to <b>your</b> machine instead of a cloud company's servers.</p>
+<ul>
+  <li><b>AI search:</b> type a description like <i>"beach with red umbrella"</i> and it finds matching photos.</li>
+  <li><b>Face recognition:</b> groups photos by the people in them.</li>
+  <li><b>Phone backup:</b> iOS and Android apps upload new photos automatically.</li>
+  <li><b>Timeline, albums and sharing</b>, much like Google Photos.</li>
+</ul>
+<div class="box tip"><b>Try it before installing:</b> open <b>demo.immich.app</b> and click <i>"Login as demo user"</i>. Try the search with a description of a photo.</div>
+
+<h2>2. Is it right for you?</h2>
+<table>
+<tr><th>Good fit if…</th><th>Think twice if…</th></tr>
+<tr><td>You want your photos on your own hardware<br>You have a computer that can stay switched on<br>You're comfortable following terminal steps</td><td>You want zero maintenance<br>You don't have space for a second backup<br>You never want to deal with updates</td></tr>
+</table>
+<div class="box warn"><b>The honest catch:</b> you run it yourself. Storage, updates and <b>backups are your job</b>. Immich is not a backup on its own: keep a second copy of your photos somewhere else.</div>
+
+<h2>3. What you need</h2>
+<table>
+<tr><th></th><th>Minimum (official)</th><th>Recommended (official)</th></tr>
+<tr><td>Memory (RAM)</td><td>6 GB</td><td>8 GB</td></tr>
+<tr><td>CPU</td><td>2 cores</td><td>4 cores</td></tr>
+<tr><td>Software</td><td colspan="2">Docker with the <b>Docker Compose plugin</b> (Linux recommended; Windows/macOS via Docker Desktop)</td></tr>
+<tr><td>Storage</td><td colspan="2">Enough for your whole library, plus room to grow, <b>plus a separate backup drive or location</b></td></tr>
+</table>
+
+
+<h2>4. Step-by-step install (Docker Compose)</h2>
+<p>These are the main steps from the official quick start. Commands and file names can change between releases, so keep <b>docs.immich.app</b> open while you install and follow it if anything differs.</p>
+<ol>
+  <li><b>Install Docker</b> and the Docker Compose plugin (docs.docker.com). Check it works:
+  <pre>docker compose version</pre></li>
+  <li><b>Make a folder</b> for Immich and go into it:
+  <pre>mkdir ./immich-app
+cd ./immich-app</pre></li>
+  <li><b>Download the two official files</b> (<code>docker-compose.yml</code> and <code>example.env</code>) from the latest Immich release, using the links in the official quick start. Rename <code>example.env</code> to <code>.env</code>.</li>
+  <li><b>Edit <code>.env</code>:</b>
+    <ul>
+      <li><code>UPLOAD_LOCATION</code>: the folder (on a disk with plenty of space) where your photos will live.</li>
+      <li><code>DB_PASSWORD</code>: change it to your own value (the docs suggest letters and numbers only).</li>
+      <li>Optionally set your time zone, as described in the file.</li>
+    </ul></li>
+  <li><b>Start Immich:</b>
+  <pre>docker compose up -d</pre></li>
+  <li><b>Open the web app</b> in your browser at <code>http://&lt;your-computer's-IP&gt;:2283</code> (or <code>http://localhost:2283</code> on the same computer). The first account you create becomes the <b>admin</b>.</li>
+</ol>
+
+<h2>5. Connect your phone</h2>
+<ol>
+  <li>Install the <b>Immich</b> app from the App Store or Google Play.</li>
+  <li>Enter your server address (the same <code>http://…:2283</code> address) and log in.</li>
+  <li>Open backup settings, choose the albums to back up and turn <b>backup on</b>. The first upload can take a long time.</li>
+</ol>
+<div class="box info"><b>Away from home?</b> By default the server is only reachable on your home network. For outside access, use a private network tool (for example a VPN) as described in the docs. Don't expose it to the internet without understanding the security steps.</div>
+
+<h2>6. Use the AI search</h2>
+<ul>
+  <li>Wait until the initial processing finishes (the admin page shows the job queues). AI search and face groups appear as photos are processed.</li>
+  <li>In the search bar, describe the photo: <i>"dog on a sofa"</i>, <i>"sunset at the beach"</i>, <i>"birthday cake"</i>.</li>
+  <li>Name people in the <b>People</b> section to search by person.</li>
+</ul>
+
+
+<h2>7. Backups (don't skip this)</h2>
+<ul>
+  <li>Follow the <b>3-2-1 idea</b>: 3 copies, on 2 different devices, with 1 copy somewhere else.</li>
+  <li>Back up your <b>photo folder</b> (<code>UPLOAD_LOCATION</code>) <b>and the database</b>. The official docs have a "Backup and Restore" page.</li>
+  <li>Test a restore once, so you know your backup actually works.</li>
+</ul>
+
+<h2>8. Updates</h2>
+<ul>
+  <li>Read the <b>release notes</b> on GitHub before updating; some releases need extra steps.</li>
+  <li>Then, in your Immich folder:
+  <pre>docker compose pull
+docker compose up -d</pre></li>
+</ul>
+
+<h2>9. Your setup checklist</h2>
+<ul class="check">
+  <li>Tried the demo at demo.immich.app</li>
+  <li>Computer with at least 6 GB RAM / 2 cores (8 GB / 4 cores better) that stays on</li>
+  <li>Enough storage + a separate backup location</li>
+  <li>Docker + Docker Compose plugin installed</li>
+  <li><code>docker-compose.yml</code> and <code>.env</code> downloaded; <code>UPLOAD_LOCATION</code> and <code>DB_PASSWORD</code> set</li>
+  <li><code>docker compose up -d</code> running; admin account created at port 2283</li>
+  <li>Phone app connected and backup turned on</li>
+  <li>Backup of photos <b>and</b> database scheduled, restore tested</li>
+</ul>
+
+<h2>Links</h2>
+<ul>
+  <li>GitHub: <a href="https://github.com/immich-app/immich">github.com/immich-app/immich</a></li>
+  <li>Docs: <a href="https://docs.immich.app">docs.immich.app</a> · Demo: demo.immich.app</li>
+  <li>More free resources: <a href="https://aiwithkalyan.com">aiwithkalyan.com</a></li>
+</ul>
+</main>
+<footer>Made by AI with Kalyan · aiwithkalyan.com · Follow @ai_with_kalyan on Instagram and AI with Kalyan on YouTube. Immich is an independent open-source project; this guide is not affiliated with it. Always check the official docs for the latest steps.</footer>
+</body></html>
