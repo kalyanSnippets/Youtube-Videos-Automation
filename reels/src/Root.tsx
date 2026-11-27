@@ -24,6 +24,7 @@ import { Reel13v2, R13V2_FRAMES } from "./R13v2";
 import { Reel15, R15_FRAMES } from "./R15";
 import { Reel16, R16_FRAMES } from "./R16";
 import { Reel16b, R16B_FRAMES } from "./R16b";
+import { Reel17, R17_FRAMES } from "./R17";
 import { Cover } from "./Cover";
 import { Cover2 } from "./Cover2";
 import { Cover3 } from "./Cover3";
@@ -57,6 +58,7 @@ export const RemotionRoot: React.FC = () => (
     <Composition id="Reel15-Immich" component={Reel15} durationInFrames={R15_FRAMES} {...common} />
     <Composition id="Reel16-Paperclip" component={Reel16} durationInFrames={R16_FRAMES} {...common} />
     <Composition id="Reel16b-Paperclip" component={Reel16b} durationInFrames={R16B_FRAMES} {...common} />
+    <Composition id="Reel17-Headroom" component={Reel17} durationInFrames={R17_FRAMES} {...common} />
     <Composition id="Cover1" component={Cover} durationInFrames={1} {...common} defaultProps={{ top: "img/cf_top1.png", topPos: "60% 40%", topZoom: 1.25, face: "img/cf_face1.png", faceY: 380, tag: "REA + CLAUDE CODE", line1: "I let AI rebuild", line2: "a real app", accent: "#CC785C" }} />
     <Composition id="Cover2" component={Cover} durationInFrames={1} {...common} defaultProps={{ top: "img/cf_top2.png", face: "img/cf_face2.png", faceY: 380, tag: "GOOGLE GENIE 4", line1: "Type a prompt.", line2: "Walk inside it.", accent: "#3B82F6" }} />
     <Composition id="Cover3" component={Cover} durationInFrames={1} {...common} defaultProps={{ top: "img/cf_top3.png", topPos: "95% 35%", topZoom: 1.15, face: "img/cf_face3.png", faceY: 330, tag: "GEMMA 4 IN ORBIT", line1: "Google put AI", line2: "in SPACE 🛰", accent: "#F2B84B" }} />
