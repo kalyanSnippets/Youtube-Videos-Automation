@@ -99,6 +99,13 @@
       "when": 1795667530871,
       "tag": "0013_planned_posts",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1795830460478,
+      "tag": "0014_content_kind",
+      "breakpoints": true
     }
   ]
 }

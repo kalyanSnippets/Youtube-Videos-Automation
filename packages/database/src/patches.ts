@@ -70,6 +70,9 @@ END $$`,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 )`,
+  // 0014: prompt vs resource wording, formatted Word documents
+  `ALTER TABLE "video_attachments" ADD COLUMN IF NOT EXISTS "html" text`,
+  `ALTER TABLE "videos" ADD COLUMN IF NOT EXISTS "content_kind" varchar(20)`,
   // Tables added by these patches after the first setup: keep them closed to Supabase's Data API
   // like the rest (the app connects as the table owner, which RLS doesn't restrict).
   `DO $$ DECLARE t record; BEGIN
@@ -78,7 +81,10 @@ END $$`,
     END LOOP;
   END $$`,
 ];
+// Newest first. A new patch MUST come with its migration added at the top: the fast path in
+// ensureSchemaPatches skips every patch once the newest hash is recorded.
 const MIGRATIONS = [
+  { hash: "4ec800fa75073f36af6829d50000d8177e86aa3df0017cde5e6ff2dc2255437b", createdAt: 1795830460478 },
   { hash: "6de8ac25eb3910549521420f33f81d7421d557db16c07d643306d8117054bbdf", createdAt: 1795667530871 },
   { hash: "f9b08cd7a8044a022e8ca1546d79bdfc67c06a63477206c46b351e7ff57b1a82", createdAt: 1795287698555 },
   { hash: "26288163fe3d474693ec16dca26ce105a59025a09674602ace5c6a9131d9774a", createdAt: 1795280043342 },
@@ -92,7 +98,16 @@ let applied: Promise<void> | null = null;
 
 export function ensureSchemaPatches(): Promise<void> {
   applied ??= (async () => {
-    for (const sql of PATCHES) await pool.query(sql);
+    // Fast path: the newest migration is already recorded, so every patch above has run before.
+    // One quick query instead of ~25 (each a round trip to the database) on every cold start.
+    const newest = MIGRATIONS[0]!;
+    const done = await pool
+      .query(`SELECT 1 FROM "drizzle"."__drizzle_migrations" WHERE hash = $1 LIMIT 1`, [newest.hash])
+      .then((r) => (r.rowCount ?? 0) > 0)
+      .catch(() => false);
+    if (done) return;
+    // All statements in one round trip (simple query protocol runs them in order).
+    await pool.query(PATCHES.map((sql) => `${sql};`).join("\n"));
     for (const m of MIGRATIONS) {
       await pool
         .query(

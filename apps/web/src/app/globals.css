@@ -42,3 +42,80 @@
 .scroll-row::-webkit-scrollbar {
   display: none;
 }
+
+/* PDF.js text layer (from pdfjs-dist/web/pdf_viewer.css, trimmed): invisible text laid exactly over
+   each rendered PDF page so it can be selected and copied. */
+.textLayer {
+  position: absolute;
+  text-align: initial;
+  inset: 0;
+  overflow: clip;
+  opacity: 1;
+  line-height: 1;
+  -webkit-text-size-adjust: none;
+  text-size-adjust: none;
+  forced-color-adjust: none;
+  transform-origin: 0 0;
+  caret-color: CanvasText;
+  z-index: 0;
+}
+.textLayer :is(span, br) {
+  color: transparent;
+  position: absolute;
+  white-space: pre;
+  cursor: text;
+  transform-origin: 0% 0%;
+}
+.textLayer > :not(.markedContent),
+.textLayer .markedContent span:not(.markedContent) {
+  z-index: 1;
+}
+.textLayer span.markedContent {
+  top: 0;
+  height: 0;
+}
+.textLayer ::selection {
+  background: rgba(0, 120, 255, 0.3);
+}
+.textLayer br::selection {
+  background: transparent;
+}
+.textLayer .endOfContent {
+  display: block;
+  position: absolute;
+  inset: 100% 0 0;
+  z-index: 0;
+  cursor: default;
+  user-select: none;
+}
+.textLayer.selecting .endOfContent {
+  top: 0;
+}
+
+/* Word / Markdown / text resources shown as a document page. */
+.doc-page {
+  color: #1f2430;
+  line-height: 1.65;
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+.doc-page h1 { font-size: 1.6em; font-weight: 700; margin: 0.2em 0 0.6em; line-height: 1.25; color: #0d1117; }
+.doc-page h2 { font-size: 1.3em; font-weight: 700; margin: 1.4em 0 0.5em; line-height: 1.3; color: #0d1117; }
+.doc-page h3, .doc-page h4 { font-size: 1.08em; font-weight: 700; margin: 1.2em 0 0.4em; color: #0d1117; }
+.doc-page p { margin: 0.6em 0; }
+.doc-page ul, .doc-page ol { margin: 0.6em 0; padding-left: 1.5em; }
+.doc-page ul { list-style: disc; }
+.doc-page ol { list-style: decimal; }
+.doc-page li { margin: 0.25em 0; }
+.doc-page a { color: #0b6bcb; text-decoration: underline; }
+.doc-page strong, .doc-page b { font-weight: 700; color: #0d1117; }
+.doc-page em { font-style: italic; }
+.doc-page table { border-collapse: collapse; margin: 0.8em 0; width: 100%; font-size: 0.95em; }
+.doc-page th, .doc-page td { border: 1px solid #d6dae3; padding: 0.4em 0.6em; text-align: left; vertical-align: top; }
+.doc-page th { background: #f2f4f8; font-weight: 600; }
+.doc-page code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; background: #f0f2f6; border-radius: 4px; padding: 0.1em 0.35em; }
+.doc-page pre { position: relative; background: #f4f6fa; border: 1px solid #e1e5ec; border-radius: 8px; padding: 0.9em 1em; margin: 0.8em 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.doc-page pre code { background: none; padding: 0; font-size: 0.88em; }
+.doc-page blockquote { border-left: 3px solid #c9cfdb; padding-left: 1em; color: #4a5263; margin: 0.8em 0; }
+.doc-page hr { border: 0; border-top: 1px solid #e1e5ec; margin: 1.4em 0; }
+.doc-page img { max-width: 100%; height: auto; }

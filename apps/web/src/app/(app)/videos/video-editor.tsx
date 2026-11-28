@@ -23,19 +23,19 @@ export function VideoEditor({ video, onDone }: { video: VideoRowData; onDone: ()
   function runImport(fd: FormData) {
     startImport(async () => {
       const r = await importPrompt(fd);
-      if (r.error || !r.text) {
+      if (r.error || (!r.text && !r.filename)) {
         if (fd.get("file")) setPendingFile(null);
         setImportMsg({ ok: false, text: r.error ?? "Nothing to import." });
         return;
       }
-      setPrompt(r.text);
+      if (r.text) setPrompt(r.text);
       if (r.keyword && !keyword) setKeyword(r.keyword);
       setSource({ source: r.source ?? "text", filename: r.filename ?? null });
       setImportMsg({
         ok: true,
         text: r.filename
-          ? `${r.filename} is ready. Click Save: viewers will get this file as a download.`
-          : `Imported ${r.text.length.toLocaleString()} characters. Check it below, then Save.`,
+          ? `${r.filename} is ready. Click Save: your site shows it as it looks, with a Download button.`
+          : `Imported ${(r.text ?? "").length.toLocaleString()} characters. Check it below, then Save.`,
       });
     });
   }
@@ -117,7 +117,7 @@ export function VideoEditor({ video, onDone }: { video: VideoRowData; onDone: ()
         <input type="hidden" name="promptFilename" value={source?.filename ?? ""} />
 
         <label className="block space-y-1">
-          <span className="text-xs font-medium">{attachedName ? "Text version (shown on the page under the download)" : "Prompt text"}</span>
+          <span className="text-xs font-medium">{attachedName ? "Text from the file (for search; the website shows the file itself)" : "Prompt or resource text"}</span>
           <textarea
             name="prompt"
             value={prompt}
@@ -128,9 +128,19 @@ export function VideoEditor({ video, onDone }: { video: VideoRowData; onDone: ()
           />
           <span className="block text-[11px] text-text-faint">
             {attachedName
-              ? "Viewers can still read and copy this on your site. The bot sends the file, not this text."
-              : "This is what viewers copy on your site and what the bot sends. Upload a file above to send a document instead."}
+              ? "Viewers see the file itself on your site, formatted as it looks, and can copy from it. The bot sends a download link."
+              : "This is what viewers see and copy on your site, and what the bot sends. Upload a file above to share a document instead."}
           </span>
+        </label>
+
+        <label className="block space-y-1">
+          <span className="text-xs font-medium">Viewers see this as</span>
+          <select name="contentKind" defaultValue={video.contentKind ?? ""} className={`${inputClass} sm:max-w-[360px]`}>
+            <option value="">Automatic (now: {video.kind === "prompt" ? "a prompt" : "a resource"})</option>
+            <option value="prompt">A prompt (text to paste into an AI)</option>
+            <option value="resource">A resource (a guide, setup steps, template or file)</option>
+          </select>
+          <span className="block text-[11px] text-text-faint">Changes the wording on your site and in the bot&apos;s messages: &ldquo;Here&apos;s the prompt…&rdquo; or &ldquo;Here&apos;s the resource…&rdquo;.</span>
         </label>
 
         <div className="grid gap-4 sm:grid-cols-[180px_1fr]">
@@ -140,9 +150,9 @@ export function VideoEditor({ video, onDone }: { video: VideoRowData; onDone: ()
             <span className="block text-[11px] text-text-faint">The word viewers comment, in any case (game, Game, GAME). Several? Separate with commas.</span>
           </label>
           <label className="block space-y-1">
-            <span className="text-xs font-medium">Prompt name (optional)</span>
-            <input name="resourceTitle" defaultValue={video.resourceTitle ?? ""} placeholder="e.g. Claude Fable 5.2: 3 ready-to-use prompts" className={inputClass} />
-            <span className="block text-[11px] text-text-faint">Used in the bot's message: "Here's the &lt;name&gt; you asked for". Defaults to the video title.</span>
+            <span className="text-xs font-medium">Name (optional)</span>
+            <input name="resourceTitle" defaultValue={video.resourceTitle ?? ""} placeholder="e.g. Immich setup guide" className={inputClass} />
+            <span className="block text-[11px] text-text-faint">Shown at the top of the document on your site. Defaults to the file name or the video title.</span>
           </label>
         </div>
 

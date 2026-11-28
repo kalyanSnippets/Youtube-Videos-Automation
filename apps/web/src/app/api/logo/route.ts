@@ -12,7 +12,7 @@ const FALLBACK = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><d
 const headers = (type: string) => ({
   "content-type": type,
   "cache-control": "public, max-age=3600",
-  "netlify-cdn-cache-control": "public, s-maxage=3600, stale-while-revalidate=86400",
+  "netlify-cdn-cache-control": "public, durable, s-maxage=3600, stale-while-revalidate=86400",
 });
 
 export async function GET() {

@@ -1,9 +1,10 @@
 import { desc, eq } from "drizzle-orm";
 import { db, ensureSchemaPatches, schema } from "@yaos/database";
-import { listConnections } from "@yaos/comment-bot";
+import { listConnections, resolveContentKind } from "@yaos/comment-bot";
 import { latestStats, type PlatformStats } from "@/lib/channel-stats";
 import { moveResourceToVideo } from "@/lib/actions/videos";
 import { cleanTitle, findTwin } from "@/lib/video-match";
+import { thumbSrc } from "@/lib/public-data";
 import { inputClass } from "@/components/form-fields";
 import { SyncButton } from "./sync-button";
 import { kindLabel, type VideoRowData } from "./types";
@@ -53,6 +54,9 @@ export default async function VideosPage() {
       publishedAt: v.publishedAt ? v.publishedAt.toISOString() : null,
       slug: v.slug,
       hidden: v.hidden,
+      thumb: thumbSrc(v),
+      kind: resolveContentKind(v),
+      contentKind: v.contentKind,
       botEnabled: v.botEnabled,
       keyword: v.keyword,
       resourceTitle: v.resourceTitle,
@@ -65,7 +69,7 @@ export default async function VideosPage() {
       twin: twin ? { id: twin.id, label: `${kindLabel(twin)} “${(cleanTitle(twin.title) || twin.title).slice(0, 60)}”`, hasPrompt: Boolean(twin.prompt) } : null,
     };
   });
-  const needs = videos.filter((v) => !v.prompt && !v.hidden).length;
+  const needs = videos.filter((v) => !v.prompt && !v.attachment && !v.hidden).length;
   const lastSync = connections
     .map((c) => (c.metadata as { sync?: { lastSyncAt?: string; lastError?: string | null } } | null)?.sync)
     .filter((s): s is { lastSyncAt?: string; lastError?: string | null } => Boolean(s?.lastSyncAt))
@@ -76,9 +80,9 @@ export default async function VideosPage() {
     <div className="p-4 sm:p-6 space-y-6 max-w-5xl">
       <div className="flex flex-wrap items-start gap-3">
         <div className="flex-1 min-w-[240px]">
-          <h1 className="text-xl font-semibold mb-1">Videos & prompts</h1>
+          <h1 className="text-xl font-semibold mb-1">Videos & resources</h1>
           <p className="text-sm text-text-dim">
-            Every new YouTube video and Instagram post appears here by itself. Add a prompt and a keyword to a video, and it shows on your website.
+            Every new YouTube video and Instagram post appears here by itself. Add a prompt or resource (a guide, a file) and a keyword to a video, and it shows on your website.
             The comment bot only replies on videos whose <span className="text-text">Bot</span> switch is on. New videos start with it off.
           </p>
         </div>
@@ -96,7 +100,7 @@ export default async function VideosPage() {
         <div className="panel p-4 min-w-[160px] flex-1">
           <p className="text-xs text-text-dim">Videos</p>
           <p className="text-2xl font-semibold mt-0.5">{videos.filter((v) => !v.hidden).length}</p>
-          <p className="text-xs text-text-dim">{needs ? <span className="text-status-warning">{needs} need a prompt</span> : "all have prompts 🎉"}</p>
+          <p className="text-xs text-text-dim">{needs ? <span className="text-status-warning">{needs} need a prompt or resource</span> : "all ready 🎉"}</p>
         </div>
       </div>
 

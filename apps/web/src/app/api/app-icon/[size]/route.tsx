@@ -50,6 +50,6 @@ export async function GET(_request: Request, { params }: { params: Promise<{ siz
         )}
       </div>
     ),
-    { width: size, height: size, headers: { "cache-control": "public, max-age=3600" } },
+    { width: size, height: size, headers: { "cache-control": "public, max-age=3600", "netlify-cdn-cache-control": "public, durable, s-maxage=86400, stale-while-revalidate=604800" } },
   );
 }

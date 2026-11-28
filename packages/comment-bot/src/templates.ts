@@ -6,7 +6,8 @@
  *   {name}    the viewer's username, e.g. @ravi
  *   {title}   the resource or video title
  *   {keyword} the keyword they commented, e.g. FABLE
- *   {prompt}  the prompt text itself
+ *   {kind}    "prompt" or "resource" (a guide, file, template), set per video
+ *   {prompt}  the prompt or resource itself (a download link for uploaded files)
  *   {link}    the page on your site where they can copy it
  *   {video}   the YouTube/Instagram link (or a resource's extra link)
  * A line whose {link}, {video} or {keyword} is empty is left out entirely.
@@ -41,7 +42,8 @@ export const PLACEHOLDERS: { token: string; meaning: string }[] = [
   { token: "{name}", meaning: "viewer's username, e.g. @ravi" },
   { token: "{title}", meaning: "resource or video title" },
   { token: "{keyword}", meaning: "the word they commented, e.g. FABLE" },
-  { token: "{prompt}", meaning: "the prompt text" },
+  { token: "{kind}", meaning: "\"prompt\" or \"resource\" (set on each video)" },
+  { token: "{prompt}", meaning: "the prompt or resource itself" },
   { token: "{link}", meaning: "page on your site to copy it" },
   { token: "{video}", meaning: "YouTube / Instagram link" },
   { token: "{site}", meaning: "your website's home page" },
@@ -57,12 +59,12 @@ export const DEFAULT_TEMPLATES: ReplyTemplates = {
   igPublicReplies: [
     "Sent! Check your DMs 📩",
     "Just sent it to your DMs, {name} 🙌",
-    "Done! The prompt is in your DMs 📬",
+    "Done! The {kind} is in your DMs 📬",
     "Check your DMs, {name}! Sent it over 🚀",
     "It's in your DMs ✅ Enjoy!",
   ],
-  igDm: "Hey {name}! 👋 Here's the prompt you asked for 👇\n\n{prompt}\n\n📄 Copy it here: {link}\n🌐 More free prompts and videos: {site}",
-  youtubeKeywordReply: "Here you go {name} 👇 You can find the prompt here:\n{link}",
+  igDm: "Hey {name}! 👋 Here's the {kind} you asked for 👇\n\n{prompt}\n\n📄 Copy it here: {link}\n🌐 More free prompts and resources: {site}",
+  youtubeKeywordReply: "Here you go {name} 👇 You can find the {kind} here:\n{link}",
   aiStyle: "Warm, casual and helpful, like a friendly creator. 1-3 short sentences. At most one emoji.",
   generalMode: "fixed",
   generalReplies: DEFAULT_TEMPLATES_GENERAL,
@@ -89,8 +91,8 @@ export const TEMPLATE_PRESETS: { id: string; label: string; description: string;
     description: "Explains how to use the prompt. Good for tutorials.",
     templates: {
       igPublicReplies: ["Sent you the {title} 📩 Tip: swap the [brackets] for your own details!", "Check your DMs, {name}. It's all there with tips 👍"],
-      igDm: "Hi {name}! Here's the {title} 👇\n\n{prompt}\n\nHow to use it: copy it into ChatGPT, Claude or Gemini and replace anything in [brackets] with your own details.\n\n📄 Easy-copy version: {link}\n🌐 More free prompts and videos: {site}",
-      youtubeKeywordReply: "Hi {name}! The {title} is here, with the full prompt to copy:\n{link}\nTip: replace anything in [brackets] with your own details.",
+      igDm: "Hi {name}! Here's the {title} 👇\n\n{prompt}\n\nHow to use it: copy it into ChatGPT, Claude or Gemini and replace anything in [brackets] with your own details.\n\n📄 Easy-copy version: {link}\n🌐 More free prompts and resources: {site}",
+      youtubeKeywordReply: "Hi {name}! The {title} is here, with the full {kind} to copy:\n{link}\nTip: replace anything in [brackets] with your own details.",
       aiStyle: "Patient and clear, like a teacher. Explain briefly in 2-3 sentences. Use simple words. At most one emoji.",
       generalMode: "ai",
       generalReplies: DEFAULT_TEMPLATES_GENERAL,
@@ -121,23 +123,37 @@ const OLD_DEFAULT_IG_PUBLIC = [
   "It's in your DMs ✅ Enjoy!",
 ];
 
+/** The default list before it said "{kind}". */
+const PROMPT_ONLY_IG_PUBLIC = [
+  "Sent! Check your DMs 📩",
+  "Just sent it to your DMs, {name} 🙌",
+  "Done! The prompt is in your DMs 📬",
+  "Check your DMs, {name}! Sent it over 🚀",
+  "It's in your DMs ✅ Enjoy!",
+];
+
 /** Earlier built-in wording; a saved copy of one is upgraded to the current version. Custom wording is kept. */
 const LEGACY_IG_DMS: Record<string, string> = {
-  ["Hey {name}! Here's the {title} you asked for 👇\n\n{prompt}\n\n📄 Copy it here: {link}\n🌐 More free prompts and videos: {site}"]: "Hey {name}! 👋 Here's the prompt you asked for 👇\n\n{prompt}\n\n📄 Copy it here: {link}\n🌐 More free prompts and videos: {site}",
-  ["Hey {name}! Here's the {title} you asked for 👇\n\n{prompt}\n\n📄 Copy it here: {link}\n🔗 {video}"]: "Hey {name}! 👋 Here's the prompt you asked for 👇\n\n{prompt}\n\n📄 Copy it here: {link}\n🌐 More free prompts and videos: {site}",
+  ["Hey {name}! 👋 Here's the prompt you asked for 👇\n\n{prompt}\n\n📄 Copy it here: {link}\n🌐 More free prompts and videos: {site}"]: "Hey {name}! 👋 Here's the {kind} you asked for 👇\n\n{prompt}\n\n📄 Copy it here: {link}\n🌐 More free prompts and resources: {site}",
+  ["Hi {name}! Here's the {title} 👇\n\n{prompt}\n\nHow to use it: copy it into ChatGPT, Claude or Gemini and replace anything in [brackets] with your own details.\n\n📄 Easy-copy version: {link}\n🌐 More free prompts and videos: {site}"]:
+    "Hi {name}! Here's the {title} 👇\n\n{prompt}\n\nHow to use it: copy it into ChatGPT, Claude or Gemini and replace anything in [brackets] with your own details.\n\n📄 Easy-copy version: {link}\n🌐 More free prompts and resources: {site}",
+  ["Hey {name}! Here's the {title} you asked for 👇\n\n{prompt}\n\n📄 Copy it here: {link}\n🌐 More free prompts and videos: {site}"]: "Hey {name}! 👋 Here's the {kind} you asked for 👇\n\n{prompt}\n\n📄 Copy it here: {link}\n🌐 More free prompts and resources: {site}",
+  ["Hey {name}! Here's the {title} you asked for 👇\n\n{prompt}\n\n📄 Copy it here: {link}\n🔗 {video}"]: "Hey {name}! 👋 Here's the {kind} you asked for 👇\n\n{prompt}\n\n📄 Copy it here: {link}\n🌐 More free prompts and resources: {site}",
   ["Hi {name}! Here's the {title} 👇\n\n{prompt}\n\nHow to use it: copy it into ChatGPT, Claude or Gemini and replace anything in [brackets] with your own details.\n\n📄 Easy-copy version: {link}\n▶️ Rewatch the video: {video}"]:
-    "Hi {name}! Here's the {title} 👇\n\n{prompt}\n\nHow to use it: copy it into ChatGPT, Claude or Gemini and replace anything in [brackets] with your own details.\n\n📄 Easy-copy version: {link}\n🌐 More free prompts and videos: {site}",
+    "Hi {name}! Here's the {title} 👇\n\n{prompt}\n\nHow to use it: copy it into ChatGPT, Claude or Gemini and replace anything in [brackets] with your own details.\n\n📄 Easy-copy version: {link}\n🌐 More free prompts and resources: {site}",
 };
 const LEGACY_YOUTUBE_REPLIES: Record<string, string> = {
-  ["Here you go {name} 👇 The {title} is ready to copy on my site:\n{link}"]: "Here you go {name} 👇 You can find the prompt here:\n{link}",
-  ["Here you go {name} 👇 {title}\n\n{prompt}\n\n📄 Copy it here: {link}\n🔗 {video}"]: "Here you go {name} 👇 You can find the prompt here:\n{link}",
+  ["Here you go {name} 👇 You can find the prompt here:\n{link}"]: "Here you go {name} 👇 You can find the {kind} here:\n{link}",
+  ["Hi {name}! The {title} is here, with the full prompt to copy:\n{link}\nTip: replace anything in [brackets] with your own details."]: "Hi {name}! The {title} is here, with the full {kind} to copy:\n{link}\nTip: replace anything in [brackets] with your own details.",
+  ["Here you go {name} 👇 The {title} is ready to copy on my site:\n{link}"]: "Here you go {name} 👇 You can find the {kind} here:\n{link}",
+  ["Here you go {name} 👇 {title}\n\n{prompt}\n\n📄 Copy it here: {link}\n🔗 {video}"]: "Here you go {name} 👇 You can find the {kind} here:\n{link}",
   ["{title} 👇\n\n{prompt}\n\n{link}"]: "{title} 👉 {link}",
-  ["Hi {name}! Here's the {title} 👇\n\n{prompt}\n\nTip: replace anything in [brackets] with your own details.\n📄 Easy-copy version: {link}"]: "Hi {name}! The {title} is here, with the full prompt to copy:\n{link}\nTip: replace anything in [brackets] with your own details.",
+  ["Hi {name}! Here's the {title} 👇\n\n{prompt}\n\nTip: replace anything in [brackets] with your own details.\n📄 Easy-copy version: {link}"]: "Hi {name}! The {title} is here, with the full {kind} to copy:\n{link}\nTip: replace anything in [brackets] with your own details.",
   ["🔥 {name}, here's the {title}!\n\n{prompt}\n\n📄 {link}"]: "🔥 {name}, grab the {title} here 👉 {link}",
 };
 
 /** Keyword set on a video whose prompt isn't added yet: point them at the page anyway. */
-export const COMING_SOON_REPLY = "Thanks {name}! 🙌 The prompt for this video is coming soon. It'll be here:\n{link}";
+export const COMING_SOON_REPLY = "Thanks {name}! 🙌 The {kind} for this video is coming soon. It'll be here:\n{link}";
 
 /** Used for YouTube when there's no site link to send (SITE_URL / URL not set). */
 export const YOUTUBE_PROMPT_FALLBACK = "Here you go {name} 👇 {title}\n\n{prompt}";
@@ -153,7 +169,9 @@ export function normaliseTemplates(raw: unknown): ReplyTemplates {
     Array.isArray(v) ? v.filter((x): x is string => typeof x === "string").map((x) => x.trim()).filter(Boolean).slice(0, 20).map((x) => x.slice(0, 300)) : [];
   const savedReplies = lines(r.igPublicReplies);
   // The earlier built-in list used {title}, which reads badly with long video titles: upgrade it.
-  const replies = JSON.stringify(savedReplies) === JSON.stringify(OLD_DEFAULT_IG_PUBLIC) ? DEFAULT_TEMPLATES.igPublicReplies : savedReplies;
+  const replies = [OLD_DEFAULT_IG_PUBLIC, PROMPT_ONLY_IG_PUBLIC].some((old) => JSON.stringify(savedReplies) === JSON.stringify(old))
+    ? DEFAULT_TEMPLATES.igPublicReplies
+    : savedReplies;
   const general = lines(r.generalReplies);
   const mode = r.generalMode === "ai" || r.generalMode === "off" || r.generalMode === "fixed" ? r.generalMode : DEFAULT_TEMPLATES.generalMode;
   return {
@@ -177,6 +195,8 @@ export interface TemplateVars {
   title: string;
   keyword?: string;
   prompt?: string;
+  /** "prompt" or "resource"; defaults to "prompt". */
+  kind?: "prompt" | "resource";
   link?: string;
   video?: string;
   /** Home page of the site. */
@@ -190,6 +210,7 @@ export function fillTemplate(template: string, vars: TemplateVars): string {
     title: vars.title,
     keyword: vars.keyword ?? "",
     prompt: vars.prompt ?? "",
+    kind: vars.kind ?? "prompt",
     link: vars.link ?? "",
     video: vars.video && vars.video !== vars.link ? vars.video : "",
     site: vars.site ?? "",
@@ -199,7 +220,7 @@ export function fillTemplate(template: string, vars: TemplateVars): string {
     .split("\n")
     .filter((line) => !optional.some((k) => line.includes(`{${k}}`) && !values[k]))
     .join("\n")
-    .replace(/\{(name|title|keyword|prompt|link|video|site)\}/g, (_, k: string) => values[k] ?? "")
+    .replace(/\{(name|title|keyword|prompt|kind|link|video|site)\}/g, (_, k: string) => values[k] ?? "")
     .replace(/\n{3,}/g, "\n\n")
     .replace(/[ \t]+\n/g, "\n")
     .trim();
@@ -215,7 +236,7 @@ export function renderDelivery(template: string, vars: TemplateVars, limit: numb
   const marker = "\u0000PROMPT\u0000";
   const shell = fillTemplate(template, { ...vars, prompt: marker });
   const fullLink = vars.link || vars.video;
-  const extra = fullLink && !shell.includes(fullLink) ? `\n\n📄 Full prompt here 👉 ${fullLink}` : "";
+  const extra = fullLink && !shell.includes(fullLink) ? `\n\n📄 Full ${vars.kind ?? "prompt"} here 👉 ${fullLink}` : "";
   const room = limit - (shell.length - marker.length) - extra.length - 1;
   const cut = `${(vars.prompt ?? "").slice(0, Math.max(0, room)).trimEnd()}…`;
   const out = `${shell.replace(marker, cut)}${extra}`;

@@ -1,5 +1,14 @@
 import Link from "next/link";
-import { getFollowLinks, type SiteSettings } from "@/lib/site";
+import { getPublicSettings } from "@/lib/public-data";
+import type { FollowLinks } from "@/lib/site";
+
+/** The few settings the header and footer need (from getPublicSettings, which is cached). */
+export interface ChromeSettings {
+  siteName: string;
+  youtubeUrl: string | null;
+  instagramUrl: string | null;
+  follow?: FollowLinks;
+}
 import { FollowCta } from "./follow-cta";
 import { SiteLogo } from "@/components/site-logo";
 
@@ -20,7 +29,7 @@ function InstagramIcon() {
   );
 }
 
-export function SocialLinks({ settings }: { settings: SiteSettings }) {
+export function SocialLinks({ settings }: { settings: ChromeSettings }) {
   return (
     <div className="flex items-center gap-2">
       {settings.youtubeUrl && (
@@ -37,8 +46,8 @@ export function SocialLinks({ settings }: { settings: SiteSettings }) {
   );
 }
 
-export async function PublicHeader({ settings }: { settings: SiteSettings }) {
-  const links = await getFollowLinks(settings);
+export async function PublicHeader({ settings }: { settings: ChromeSettings }) {
+  const links = settings.follow ?? (await getPublicSettings()).follow;
   return (
     <header className="border-b border-border-subtle">
       <div className="mx-auto max-w-5xl px-4 h-16 flex items-center justify-between">
@@ -57,7 +66,7 @@ export async function PublicHeader({ settings }: { settings: SiteSettings }) {
   );
 }
 
-export function PublicFooter({ settings }: { settings: SiteSettings }) {
+export function PublicFooter({ settings }: { settings: ChromeSettings }) {
   return (
     <footer className="border-t border-border-subtle mt-16">
       <div className="mx-auto max-w-5xl px-4 py-8 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between text-xs text-text-faint">

@@ -2,6 +2,7 @@
 
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { refreshPublicSite } from "@/lib/public-data";
 import { db, ensureSchemaPatches, schema } from "@yaos/database";
 import { clearPromptLibraryCache, splitKeywords } from "@yaos/comment-bot";
 import { requireAdmin } from "@/lib/admin";
@@ -25,6 +26,7 @@ function refresh() {
   clearPromptLibraryCache();
   revalidatePath("/videos");
   revalidatePath("/", "layout");
+  refreshPublicSite();
 }
 
 function optionalUrl(value: string): string | null {
@@ -44,9 +46,11 @@ export async function importPrompt(form: FormData): Promise<ImportResult> {
     const file = form.get("file");
     const docLink = String(form.get("docLink") ?? "").trim();
     if (file instanceof File && file.size > 0) {
-      const r = await readUpload(file);
-      if (!r.text) return { error: "That file had no text in it." };
-      return { text: r.text, keyword: r.keyword, source: r.source, filename: r.filename };
+      // The file itself is what viewers get, so its text is a bonus (search, the bot's AI context).
+      // A PDF whose text can't be read (scans, unusual PDFs) is still accepted.
+      await readAttachment(file); // size and type checks
+      const r = await readUpload(file).catch(() => null);
+      return { text: r?.text ?? "", keyword: r?.keyword ?? null, source: r?.source ?? "text", filename: file.name };
     }
     if (docLink) {
       if (!googleDocId(docLink)) return { error: "That doesn't look like a Google Docs link." };
@@ -92,6 +96,8 @@ export async function saveVideo(_prev: VideoFormState, form: FormData): Promise<
       return { error: "The extra link must be a full address starting with https://" };
     }
     const hidden = form.get("hidden") === "on";
+    const kindChoice = String(form.get("contentKind") ?? "");
+    const contentKind = kindChoice === "prompt" || kindChoice === "resource" ? kindChoice : null;
     const twinId = String(form.get("twinId") ?? "");
     const [twin] = twinId ? await db.select().from(schema.videos).where(eq(schema.videos.id, twinId)) : [];
 
@@ -122,7 +128,7 @@ export async function saveVideo(_prev: VideoFormState, form: FormData): Promise<
       promptFilename: prompt ? (promptChanged ? String(form.get("promptFilename") ?? "") || null : video.promptFilename) : null,
       updatedAt: new Date(),
     };
-    await db.update(schema.videos).set({ ...fields, hidden }).where(eq(schema.videos.id, video.id));
+    await db.update(schema.videos).set({ ...fields, hidden, contentKind }).where(eq(schema.videos.id, video.id));
     if (twin) await db.update(schema.videos).set(fields).where(eq(schema.videos.id, twin.id));
     for (const target of twin ? [video.id, twin.id] : [video.id]) {
       if (attachment) await setAttachment(target, attachment);
@@ -153,8 +159,8 @@ async function setAttachment(videoId: string, file: { name: string; type: string
   }
   await db
     .insert(schema.videoAttachments)
-    .values({ videoId, data: file.base64, updatedAt: new Date() })
-    .onConflictDoUpdate({ target: schema.videoAttachments.videoId, set: { data: file.base64, updatedAt: new Date() } });
+    .values({ videoId, data: file.base64, html: null, updatedAt: new Date() })
+    .onConflictDoUpdate({ target: schema.videoAttachments.videoId, set: { data: file.base64, html: null, updatedAt: new Date() } });
   await db.update(schema.videos).set({ attachmentName: file.name, attachmentType: file.type, attachmentSize: file.size }).where(eq(schema.videos.id, videoId));
 }
 

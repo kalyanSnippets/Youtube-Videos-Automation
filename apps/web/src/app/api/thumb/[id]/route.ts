@@ -46,7 +46,7 @@ function imageResponse(res: Response): Response {
       "content-type": res.headers.get("content-type") ?? "image/jpeg",
       // Browsers keep it a day; Netlify's CDN keeps it a day and serves stale copies for a week while refreshing.
       "cache-control": "public, max-age=86400",
-      "netlify-cdn-cache-control": "public, s-maxage=86400, stale-while-revalidate=604800",
+      "netlify-cdn-cache-control": "public, durable, s-maxage=86400, stale-while-revalidate=604800",
     },
   });
 }

@@ -11,3 +11,4 @@ export * from "./store";
 export * from "./runner";
 export * from "./templates";
 export * from "./upload-package";
+export * from "./content-kind";

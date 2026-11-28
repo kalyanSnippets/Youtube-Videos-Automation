@@ -13,8 +13,8 @@ type Filter = "all" | "bot-on" | "needs" | "ready" | "yt-long" | "yt-short" | "i
 const FILTERS: { id: Filter; label: string; test: (v: VideoRowData) => boolean }[] = [
   { id: "all", label: "All", test: (v) => !v.hidden },
   { id: "bot-on", label: "Bot on", test: (v) => !v.hidden && v.botEnabled },
-  { id: "needs", label: "Needs a prompt", test: (v) => !v.hidden && !v.prompt },
-  { id: "ready", label: "Prompt ready", test: (v) => !v.hidden && Boolean(v.prompt) },
+  { id: "needs", label: "Needs content", test: (v) => !v.hidden && !v.prompt && !v.attachment },
+  { id: "ready", label: "Ready", test: (v) => !v.hidden && Boolean(v.prompt || v.attachment) },
   { id: "yt-long", label: "YouTube videos", test: (v) => !v.hidden && v.platform === "YOUTUBE" && v.format !== "SHORT" },
   { id: "yt-short", label: "Shorts", test: (v) => !v.hidden && v.platform === "YOUTUBE" && v.format === "SHORT" },
   { id: "ig-reel", label: "Reels", test: (v) => !v.hidden && v.platform === "INSTAGRAM" && v.format === "REEL" },
@@ -24,16 +24,18 @@ const FILTERS: { id: Filter; label: string; test: (v: VideoRowData) => boolean }
 
 function Status({ v }: { v: VideoRowData }) {
   if (v.hidden) return <span className="badge border bg-bg-raised text-text-dim border-border">Hidden</span>;
-  if (v.prompt && v.keyword)
-    return <span className="badge border bg-status-success/10 text-status-success border-status-success/30">✓ Prompt · {v.keyword}</span>;
-  if (v.prompt) return <span className="badge border bg-status-success/10 text-status-success border-status-success/30">✓ Prompt (no keyword)</span>;
+  const label = v.kind === "prompt" ? "Prompt" : v.attachment ? "Resource (file)" : "Resource";
+  const ready = Boolean(v.prompt || v.attachment);
+  if (ready && v.keyword)
+    return <span className="badge border bg-status-success/10 text-status-success border-status-success/30">✓ {label} · {v.keyword}</span>;
+  if (ready) return <span className="badge border bg-status-success/10 text-status-success border-status-success/30">✓ {label} (no keyword)</span>;
   if (v.keyword)
-    return <span className="badge border bg-status-warning/10 text-status-warning border-status-warning/30">{v.keyword} · add the prompt</span>;
-  return <span className="badge border bg-status-warning/10 text-status-warning border-status-warning/30">Needs a prompt</span>;
+    return <span className="badge border bg-status-warning/10 text-status-warning border-status-warning/30">{v.keyword} · add the prompt or resource</span>;
+  return <span className="badge border bg-status-warning/10 text-status-warning border-status-warning/30">Needs a prompt or resource</span>;
 }
 
 export function VideoList({ videos }: { videos: VideoRowData[] }) {
-  const [filter, setFilter] = useState<Filter>(videos.some((v) => !v.prompt && !v.hidden) ? "needs" : "all");
+  const [filter, setFilter] = useState<Filter>(videos.some((v) => !v.prompt && !v.attachment && !v.hidden) ? "needs" : "all");
   const [q, setQ] = useState("");
   const [open, setOpen] = useState<string | null>(null);
   // Videos you opened stay in view until you change the filter, even if saving moves them to another filter.
@@ -75,7 +77,7 @@ export function VideoList({ videos }: { videos: VideoRowData[] }) {
           <div key={v.id}>
             <div className="flex items-center gap-3 p-3 sm:p-4">
               <div className={`relative shrink-0 overflow-hidden rounded-md bg-bg-raised ${v.format === "SHORT" || v.format === "REEL" ? "h-16 w-9" : "h-12 w-20"}`}>
-                <Image src={`/api/thumb/${v.id}`} alt="" fill sizes="80px" className="object-cover" unoptimized />
+                <Image src={v.thumb} alt="" fill sizes="80px" className="object-cover" unoptimized />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium line-clamp-2 sm:line-clamp-1">{v.resourceTitle || v.title}</p>
@@ -107,10 +109,10 @@ export function VideoList({ videos }: { videos: VideoRowData[] }) {
                     setPinned((prev) => new Set(prev).add(v.id));
                   }}
                   className={`whitespace-nowrap rounded-lg px-3 py-2 sm:px-3.5 sm:py-1.5 text-sm font-medium transition ${
-                    open === v.id ? "border border-border text-text-dim" : v.prompt ? "border border-border hover:border-accent-cyan/40" : "bg-accent-cyan text-bg"
+                    open === v.id ? "border border-border text-text-dim" : v.prompt || v.attachment ? "border border-border hover:border-accent-cyan/40" : "bg-accent-cyan text-bg"
                   }`}
                 >
-                  {open === v.id ? "Close" : v.prompt ? "Edit prompt" : "Add prompt"}
+                  {open === v.id ? "Close" : v.prompt || v.attachment ? `Edit ${v.kind}` : "Add"}
                 </button>
               </div>
             </div>

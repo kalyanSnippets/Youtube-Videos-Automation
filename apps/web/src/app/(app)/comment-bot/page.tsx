@@ -5,6 +5,7 @@ import { db, schema } from "@yaos/database";
 import { formatRelativeTime } from "@/lib/utils";
 import { videoDetailParts, videoKind } from "@/lib/video-details";
 import { cleanTitle } from "@/lib/video-match";
+import { thumbSrc } from "@/lib/public-data";
 import { BotHeader } from "./bot-header";
 import { RowSend, SendProgress, type PendingComment } from "./send-progress";
 
@@ -63,7 +64,7 @@ function VideoBadge({ v }: { v: VideoRow }) {
   return (
     <a href={v.watchUrl} target="_blank" rel="noopener" className="group mb-2 flex items-center gap-2.5 rounded-lg bg-bg-raised/60 p-1.5 pr-3 hover:bg-bg-raised">
       <span className={`relative shrink-0 overflow-hidden rounded bg-bg-raised ${portrait ? "h-12 w-7" : "h-10 w-16"}`}>
-        <Image src={`/api/thumb/${v.id}`} alt="" fill sizes="56px" className="object-cover" unoptimized />
+        <Image src={thumbSrc(v)} alt="" fill sizes="56px" className="object-cover" unoptimized />
       </span>
       <span className="min-w-0">
         <span className="block truncate text-xs font-medium text-text group-hover:text-accent-cyan">{cleanTitle(v.title) || v.title}</span>

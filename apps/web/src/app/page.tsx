@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
-import { desc, eq } from "drizzle-orm";
-import { db, ensureSchemaPatches, schema } from "@yaos/database";
-import { getFollowLinks, getSiteSettings, listResources } from "@/lib/site";
+import { getPublicResources, getPublicSettings, getPublicVideos, type PublicVideoCard } from "@/lib/public-data";
 import { FollowCta } from "@/components/public/follow-cta";
 import { PublicFooter, PublicHeader } from "@/components/public/site-chrome";
 import { ChannelBrowser } from "@/components/public/channel-browser";
@@ -12,34 +10,27 @@ import { descriptionSummary, videoDetailParts } from "@/lib/video-details";
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const s = await getSiteSettings().catch(() => null);
-  return { title: s ? `${s.siteName} · Free AI prompts` : "Free AI prompts", description: s?.tagline };
+  const s = await getPublicSettings().catch(() => null);
+  return { title: s ? `${s.siteName} · Free AI prompts and resources` : "Free AI prompts and resources", description: s?.tagline };
 }
 
-type VideoRow = typeof schema.videos.$inferSelect;
-
-function toItem(v: VideoRow): GridItem {
+function toItem(v: PublicVideoCard): GridItem {
   return {
     href: `/v/${v.slug}`,
     title: v.title,
     summary: descriptionSummary(v.description),
-    keywords: v.keyword && v.prompt ? [v.keyword] : [],
-    thumbnail: `/api/thumb/${v.id}`,
-    // Only videos with a prompt get a label; the rest just show their details.
-    badge: v.prompt ? "Free prompt" : undefined,
-    badgeTone: "cyan",
+    keywords: v.keyword && v.hasContent ? [v.keyword.split(",")[0]!.trim()] : [],
+    thumbnail: v.thumb,
+    // Only videos with something to take away get a label; the rest just show their details.
+    badge: v.hasContent ? (v.kind === "prompt" ? "Free prompt" : "Free resource") : undefined,
+    badgeTone: v.kind === "prompt" ? "cyan" : "purple",
     meta: videoDetailParts(v).join(" · ") || undefined,
   };
 }
 
 export default async function HomePage() {
-  await ensureSchemaPatches();
-  const [settings, resources, videos] = await Promise.all([
-    getSiteSettings(),
-    listResources({ publishedOnly: true }),
-    db.select().from(schema.videos).where(eq(schema.videos.hidden, false)).orderBy(desc(schema.videos.publishedAt)).catch(() => [] as VideoRow[]),
-  ]);
-  const followLinks = await getFollowLinks(settings);
+  // All three are cached (lib/public-data.ts): no database trip unless something changed.
+  const [settings, resources, videos] = await Promise.all([getPublicSettings(), getPublicResources(), getPublicVideos()]);
   const yt = videos.filter((v) => v.platform === "YOUTUBE");
   const ig = videos.filter((v) => v.platform === "INSTAGRAM");
 
@@ -49,11 +40,12 @@ export default async function HomePage() {
       <main className="flex-1 mx-auto w-full max-w-5xl px-4 py-10 sm:py-14 space-y-10">
         <section className="space-y-3 max-w-2xl">
           <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight">
-            Free prompts from <span className="bg-gradient-to-r from-accent-cyan to-accent-purple bg-clip-text text-transparent">{settings.siteName}</span>
+            Free prompts and resources from{" "}
+            <span className="bg-gradient-to-r from-accent-cyan to-accent-purple bg-clip-text text-transparent">{settings.siteName}</span>
           </h1>
           <p className="text-text-dim">{settings.tagline}</p>
           <div className="pt-2">
-            <FollowCta links={followLinks} />
+            <FollowCta links={settings.follow} />
           </div>
         </section>
         <ChannelBrowser
@@ -62,14 +54,12 @@ export default async function HomePage() {
               // Not yet classified (format null) counts as a normal video until the next sync sorts it.
               long: yt.filter((v) => v.format !== "SHORT").map(toItem),
               shorts: yt.filter((v) => v.format === "SHORT").map(toItem),
-
             },
             instagram: {
               reels: ig.filter((v) => v.format === "REEL").map(toItem),
               posts: ig.filter((v) => v.format !== "REEL").map(toItem),
-
             },
-            prompts: resources.map((r) => ({ href: `/r/${r.slug}`, title: r.title, summary: r.summary, keywords: r.keywords ?? [] })),
+            prompts: resources.map((r) => ({ href: `/r/${r.slug}`, title: r.title, summary: r.summary, keywords: r.keywords })),
           }}
         />
         {settings.newsletterEnabled && (

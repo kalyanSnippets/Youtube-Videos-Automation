@@ -3,6 +3,7 @@ import { db, ensureSchemaPatches, schema } from "@yaos/database";
 import { normaliseTemplates } from "./templates";
 import { splitKeywords } from "./matcher";
 import type { LibraryEntry, PromptLibrary } from "./types";
+import { resolveContentKind } from "./content-kind";
 
 /** Public base URL of the site (Netlify sets URL on every deploy). */
 export function siteBaseUrl(): string | undefined {
@@ -41,6 +42,7 @@ export function videosToEntries(rows: VideoRow[], base = siteBaseUrl()): Library
       message: v.prompt ?? "",
       url: videoPageUrl(v.slug, base),
       mediaIds: [v.externalId],
+      kind: resolveContentKind(v),
       ...(fileOf(v, base) ? { file: fileOf(v, base) } : {}),
       ...(v.prompt || v.attachmentName ? {} : { comingSoon: true }),
     }));

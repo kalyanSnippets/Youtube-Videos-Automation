@@ -11,7 +11,7 @@ export const NAV_GROUPS: { title: string; items: { href: string; label: string; 
   {
     title: "Channel",
     items: [
-      { href: "/videos", label: "Videos & prompts", icon: Film },
+      { href: "/videos", label: "Videos & resources", icon: Film },
       { href: "/comment-bot", label: "Comment Bot", icon: MessagesSquare },
       { href: "/analytics", label: "Analytics", icon: BarChart3 },
       { href: "/subscribers", label: "Subscribers", icon: Mail },

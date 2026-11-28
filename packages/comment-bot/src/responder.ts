@@ -31,7 +31,7 @@ let currentSite: string | undefined;
 function deliveryVars(entry: LibraryEntry, name: string | undefined): TemplateVars {
   // An uploaded document goes out as a download link in place of the pasted text.
   const prompt = entry.file ? `📎 ${entry.file.name}\n⬇️ Download: ${entry.file.url}` : entry.message;
-  return { name, title: entry.title, keyword: entry.keyword, prompt, link: entry.url, video: entry.link, site: currentSite };
+  return { name, title: entry.title, keyword: entry.keyword, prompt, kind: entry.kind, link: entry.url, video: entry.link, site: currentSite };
 }
 
 export function buildInstagramDM(entry: LibraryEntry, name: string | undefined, templates: ReplyTemplates = DEFAULT_TEMPLATES): string {
@@ -208,7 +208,7 @@ export async function planReply(input: RespondInput): Promise<ReplyPlan> {
   const entry = match?.entry ?? aiKeywordEntry;
   if (entry?.comingSoon) {
     // Keyword set, prompt not added yet: a public reply with the page link (no DM, there's nothing to send).
-    const note = fillTemplate(COMING_SOON_REPLY, { name, title: entry.title, link: entry.url ?? entry.link });
+    const note = fillTemplate(COMING_SOON_REPLY, { name, title: entry.title, kind: entry.kind, link: entry.url ?? entry.link });
     return {
       action: "KEYWORD",
       matchedKeyword: entry.keyword,

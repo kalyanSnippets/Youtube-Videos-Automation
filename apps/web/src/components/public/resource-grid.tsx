@@ -9,7 +9,7 @@ export interface GridItem {
   summary: string | null;
   keywords: string[];
   thumbnail?: string | null;
-  /** Small label, e.g. "Free prompt". */
+  /** Small label, e.g. "Free prompt" or "Free resource". */
   badge?: string;
   badgeTone?: "cyan" | "purple" | "dim";
   /** Extra text shown next to the badge and included in search, e.g. the date. */

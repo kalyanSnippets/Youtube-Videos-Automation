@@ -1051,6 +1051,11 @@ CREATE TABLE IF NOT EXISTS "planned_posts" (
 );
 INSERT INTO "drizzle"."__drizzle_migrations" (hash, created_at) VALUES ('6de8ac25eb3910549521420f33f81d7421d557db16c07d643306d8117054bbdf', 1795667530871);
 
+-- 0014_content_kind
+ALTER TABLE "video_attachments" ADD COLUMN IF NOT EXISTS "html" text;--> statement-breakpoint
+ALTER TABLE "videos" ADD COLUMN IF NOT EXISTS "content_kind" varchar(20);
+INSERT INTO "drizzle"."__drizzle_migrations" (hash, created_at) VALUES ('4ec800fa75073f36af6829d50000d8177e86aa3df0017cde5e6ff2dc2255437b', 1795830460478);
+
 -- Supabase exposes the public schema through its Data API. The app talks to Postgres directly
 -- (and bypasses row level security), so lock every table to the Data API.
 DO $$ DECLARE t record; BEGIN

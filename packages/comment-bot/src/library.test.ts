@@ -45,6 +45,7 @@ describe("videosToEntries", () => {
       message: "Review my video",
       url: "https://site.example/v/great-video-abc123",
       mediaIds: ["abc"],
+      kind: "prompt",
     });
   });
   it("skips videos without a keyword or that are hidden", () => {
@@ -61,5 +62,15 @@ describe("a keyword box saved as 'GAME, GAME'", () => {
     const [entry] = videosToEntries([video({ keyword: "GAME, GAME" })], "https://s");
     expect(entry?.keywords).toEqual(["GAME"]);
     expect(entry?.keyword).toBe("GAME");
+  });
+});
+
+describe("resolveContentKind", () => {
+  it("calls uploaded documents and long step-by-step guides resources, and AI instructions prompts", async () => {
+    const { resolveContentKind } = await import("./content-kind");
+    expect(resolveContentKind({ attachmentName: "Setup_Guide.pdf", prompt: "x" })).toBe("resource");
+    expect(resolveContentKind({ prompt: "You are a senior engineer. Review my code." })).toBe("prompt");
+    expect(resolveContentKind({ prompt: "1. Install Docker\n2. Download the file\n3. Run it\n4. Open the app" })).toBe("resource");
+    expect(resolveContentKind({ contentKind: "prompt", attachmentName: "x.pdf" })).toBe("prompt");
   });
 });

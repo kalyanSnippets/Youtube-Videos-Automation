@@ -40,6 +40,8 @@ export const videos = pgTable(
      * pasted text. The bytes live in video_attachments so listing videos stays light.
      */
     attachmentName: varchar("attachment_name", { length: 300 }),
+    /** "prompt" or "resource" (a guide, file, template...). Null = decide automatically. */
+    contentKind: varchar("content_kind", { length: 20 }),
     attachmentType: varchar("attachment_type", { length: 150 }),
     attachmentSize: integer("attachment_size"),
     /** YouTube Analytics, lifetime totals (refreshed every few hours). Null until the first analytics sync. */
@@ -105,6 +107,8 @@ export const videoAttachments = pgTable("video_attachments", {
     .primaryKey()
     .references(() => videos.id, { onDelete: "cascade" }),
   data: text("data").notNull(),
+  /** Word documents converted to formatted HTML for the video page (made on first view). */
+  html: text("html"),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

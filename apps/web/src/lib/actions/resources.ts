@@ -2,6 +2,7 @@
 
 import { and, eq, ne } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { refreshPublicSite } from "@/lib/public-data";
 import { redirect } from "next/navigation";
 import { db, ensureSchemaPatches, schema } from "@yaos/database";
 import { clearPromptLibraryCache, normaliseKeyword } from "@yaos/comment-bot";
@@ -31,6 +32,7 @@ function optionalUrl(value: string, field: string): string | null {
 function refresh() {
   clearPromptLibraryCache();
   revalidatePath("/", "layout");
+  refreshPublicSite();
 }
 
 export async function saveResource(_prev: FormState, form: FormData): Promise<FormState> {
@@ -135,6 +137,7 @@ export async function saveLogo(_prev: FormState, form: FormData): Promise<FormSt
       .values({ id: 1, logoData })
       .onConflictDoUpdate({ target: schema.siteSettings.id, set: { logoData, updatedAt: new Date() } });
     revalidatePath("/", "layout");
+  refreshPublicSite();
     return { saved: true };
   } catch (error) {
     return { error: (error as Error).message };

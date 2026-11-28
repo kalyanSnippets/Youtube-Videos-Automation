@@ -32,7 +32,7 @@ describe("planReply", () => {
     const plan = await planReply({ comment: ig("FABLE"), library, llm, pick: () => 0 });
     expect(plan.action).toBe("KEYWORD");
     expect(plan.privateReply).toContain("Do the thing.");
-    expect(plan.privateReply).toContain("More free prompts and videos: https://site.example");
+    expect(plan.privateReply).toContain("More free prompts and resources: https://site.example");
     expect(plan.privateReply).toContain("Copy it here: https://site.example/r/fable");
     expect(plan.publicReply).toBe("Sent! Check your DMs 📩");
     expect(llm.calls).toBe(0);

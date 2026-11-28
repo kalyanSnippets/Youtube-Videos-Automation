@@ -63,7 +63,7 @@ export function ChannelBrowser({ data }: { data: ChannelData }) {
       { label: "YouTube Shorts", items: data.youtube.shorts.filter((i) => matches(i, term)), shape: "portrait" },
       { label: "Instagram Reels", items: data.instagram.reels.filter((i) => matches(i, term)), shape: "portrait" },
       { label: "Instagram posts", items: data.instagram.posts.filter((i) => matches(i, term)), shape: "square" },
-      { label: "Prompts", items: data.prompts.filter((i) => matches(i, term)), shape: "none" },
+      { label: "More resources", items: data.prompts.filter((i) => matches(i, term)), shape: "none" },
     ];
     return groups.filter((g) => g.items.length);
   }, [term, data]);
@@ -91,7 +91,7 @@ export function ChannelBrowser({ data }: { data: ChannelData }) {
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Search all videos, prompts or keywords"
+          placeholder="Search videos, prompts, resources or keywords"
           className="w-full rounded-xl bg-bg-panel border border-border pl-9 pr-3 py-3 text-sm focus:outline-none focus:border-accent-cyan/50"
         />
       </div>
@@ -112,7 +112,7 @@ export function ChannelBrowser({ data }: { data: ChannelData }) {
           <div className="flex flex-wrap gap-2">
             {tabButton("youtube", "YouTube")}
             {tabButton("instagram", "Instagram")}
-            {data.prompts.length > 0 && tabButton("prompts", "Prompts", String(data.prompts.length))}
+            {data.prompts.length > 0 && tabButton("prompts", "More resources", String(data.prompts.length))}
           </div>
 
           {tab !== "prompts" && (

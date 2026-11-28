@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { refreshPublicSite } from "@/lib/public-data";
 import { requireAdmin } from "@/lib/admin";
 import { MAX_UPLOAD_BYTES } from "@/lib/prompt-import";
 import { deletePlannedPost, importUploadPackage, linkPlannedPost, type ImportSummary } from "@/lib/upload-packages";
@@ -14,6 +15,7 @@ function refresh() {
   revalidatePath("/videos");
   revalidatePath("/videos/packages");
   revalidatePath("/", "layout");
+  refreshPublicSite();
 }
 
 /** Paste the package Claude wrote, or upload it as a .md / .txt file. */

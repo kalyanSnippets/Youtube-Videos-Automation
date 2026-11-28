@@ -7,6 +7,11 @@ export interface VideoRowData {
   publishedAt: string | null;
   slug: string;
   hidden: boolean;
+  /** Thumbnail address (YouTube's own image servers, or our Instagram proxy). */
+  thumb: string;
+  /** "prompt" or "resource" as shown to viewers; contentKind is the saved choice (null = automatic). */
+  kind: "prompt" | "resource";
+  contentKind: string | null;
   /** Comment bot switch for this video. */
   botEnabled: boolean;
   keyword: string | null;
