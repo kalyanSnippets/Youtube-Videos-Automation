@@ -29,3 +29,4 @@ Notes: the Pexels site blocked direct page fetches from this session, so the Pex
 | mx43832 https://mixkit.co/free-stock-video/face-of-a-very-surprised-young-woman-43832/ | Mixkit Stock Video Free License | Not required | USE |
 | mx39852 https://mixkit.co/free-stock-video/frustrated-and-tired-young-man-working-on-computer-39852/ | Mixkit Stock Video Free License | Not required | USE |
 | ai_open.mp4 | Higgsfield Seedance 2.5, generated 2026-11-28 on the user's account (35 credits) | Higgsfield | user-owned generation | Not required | USE |
+| ai_compress.mp4 | Higgsfield MAGI-2 1080p 4 s, generated 2026-11-28 on the user's account (10 credits); Reel 17 total 45 credits | Higgsfield | user-owned generation | Not required | USE |

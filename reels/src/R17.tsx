@@ -279,7 +279,7 @@ const Flow: React.FC = () => {
       {node(395, L(26.56, a), "▣", "Headroom", true)}
       {node(750, L(28.06, a), "🧠", "the model")}
       {go && [0, 1, 2].map((j) => { const q = ((frame - L(26.76, a) + j * 17) % 50) / 50; const bx = q < 0.5 ? interpolate(q, [0, 0.5], [270, 420]) : interpolate(q, [0.5, 1], [700, 790]); const sq = q < 0.5 ? 1 : (frame > L(28.72, a) ? 0.3 : 1); return <div key={j} style={{ position: "absolute", left: bx, top: 530 + (1 - sq) * 60, width: 70, height: 150 * sq, borderRadius: 10, background: q < 0.5 ? `repeating-linear-gradient(180deg, #9AA0AC 0 10px, #D7D3CB 10px 18px)` : `repeating-linear-gradient(180deg, ${MINT} 0 10px, #BFEBD9 10px 18px)`, opacity: 0.9 }} />; })}
-      <Serif at={L(28.72, a)} y={700} size={70} color={OR}>compressing 🗜️</Serif>
+      <Serif at={L(28.72, a)} y={700} size={70} color={OR}>compressing 📦</Serif>
       <Mascot x={60} y={560} prop="key" at={L(26.96, a)} px={8} />
       <div style={{ position: "absolute", right: 40, top: 580 }}><Pill at={L(29.56, a)} bg="#fff" color={INK} size={28}>💻 runs on your machine</Pill></div>
     </>
@@ -356,12 +356,8 @@ const Scribble: React.FC<{ kind: "arrow" | "circle"; x: number; y: number; w: nu
   return <svg style={{ position: "absolute", left: x, top: y, transform: `rotate(${rot}deg)`, overflow: "visible" }} width={w} height={h}><path d={d} fill="none" stroke={RED} strokeWidth={14} strokeLinecap="round" strokeLinejoin="round" pathLength={1} strokeDasharray={1} strokeDashoffset={1 - k} style={{ filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.35))" }} /></svg>;
 };
 type Cut = { a: number; b: number; src: string; from: number; tag?: string; land?: boolean; mark?: { kind: "arrow" | "circle"; x: number; y: number; w: number; h: number; rot?: number }; pos?: string };
-const CUTS: Cut[] = [
+const CUTS: Cut[] = [ // only 1–2 stock meme moments per reel
   { a: 5.3, b: 6.45, src: "b/r17/mx9228.mp4", from: 3.2, land: true, mark: { kind: "arrow", x: 640, y: 1190, w: 300, h: 240, rot: 200 } },
-  { a: 9.0, b: 9.95, src: "b/r17/mx41646.mp4", from: 2.0, land: true, mark: { kind: "arrow", x: 160, y: 470, w: 380, h: 300 } },
-  { a: 13.3, b: 14.3, src: "b/r17/mx25585.mp4", from: 11.6, pos: "55% 50%" },
-  { a: 15.25, b: 16.1, src: "b/r17/mx39852.mp4", from: 5.0, pos: "50% 50%" },
-  { a: 17.2, b: 18.14, src: "b/r17/mx18303.mp4", from: 3.0, land: true, tag: "🪙 your tokens", mark: { kind: "circle", x: 40, y: 560, w: 1000, h: 600, rot: -3 } },
   { a: 33.3, b: 34.1, src: "b/r17/mx43832.mp4", from: 0.6, pos: "50% 40%" },
 ];
 const CutShot: React.FC<{ c: Cut }> = ({ c }) => {
@@ -379,14 +375,20 @@ const CutShot: React.FC<{ c: Cut }> = ({ c }) => {
     </AbsoluteFill>
   );
 };
-const OPEN_END = 1.9;
-const Opener: React.FC = () => { // AI-generated surreal opening shot (Higgsfield Seedance 2.5)
-  const frame = useCurrentFrame(); const z = interpolate(frame, [0, f(OPEN_END)], [1.0, 1.1], clamp);
-  const out = interpolate(frame, [f(OPEN_END) - 4, f(OPEN_END)], [1, 0], clamp);
+const OPEN_END = 0; // the AI shot now lands on the "tokens wasted" line, not the opening
+type AiClip = { a: number; b: number; src: string; from: number; tag?: string };
+const AI: AiClip[] = [ // Higgsfield-generated clips (see demo/ASSETS.md)
+  { a: 16.14, b: 18.14, src: "b/r17/ai_open.mp4", from: 0, tag: "🪙 your tokens" },
+  { a: 28.6, b: 30.3, src: "b/r17/ai_compress.mp4", from: 0, tag: "📦 compressing" },
+];
+const AiShot: React.FC<{ c: AiClip }> = ({ c }) => {
+  const frame = useCurrentFrame(); const dur = f(c.b - c.a);
+  const z = interpolate(frame, [0, dur], [1.0, 1.08], clamp);
+  const k = Math.min(interpolate(frame, [0, 4], [0, 1], clamp), interpolate(frame, [dur - 4, dur], [1, 0], clamp));
   return (
-    <AbsoluteFill style={{ opacity: out, background: CREAM }}>
-      <AbsoluteFill style={{ transform: `scale(${z})` }}><OffthreadVideo src={staticFile("b/r17/ai_open.mp4")} muted style={{ width: "100%", height: "100%", objectFit: "cover" }} /></AbsoluteFill>
-      <Row y={150}><Pill at={2} bg={INK} color={GOLD}>⛏ GITHUB GOLDMINE</Pill></Row>
+    <AbsoluteFill style={{ opacity: k, background: CREAM }}>
+      <AbsoluteFill style={{ transform: `scale(${z})` }}><OffthreadVideo src={staticFile(c.src)} muted startFrom={Math.round(c.from * FPS)} style={{ width: "100%", height: "100%", objectFit: "cover" }} /></AbsoluteFill>
+      {c.tag && <Row y={170}><Pill at={4} bg={INK} color={GOLD} size={46}>{c.tag}</Pill></Row>}
     </AbsoluteFill>
   );
 };
@@ -448,7 +450,7 @@ const Captions: React.FC = () => {
   const t = useCurrentFrame() / FPS;
   if ((t >= 34.16 && t < 37.91) || t >= D.duration) return null;
   const c = activeChunk(chunks, t); if (!c) return null;
-  const s = segAt(t); const inCut = t < OPEN_END || CUTS.some((c) => t >= c.a && t < c.b);
+  const s = segAt(t); const inCut = CUTS.some((c) => t >= c.a && t < c.b) || AI.some((c) => t >= c.a && t < c.b);
   const top = inCut ? 1500 : s.kind === "split" ? 1640 : s.kind === "face" ? 1450 : 1700;
   return (
     <div style={{ position: "absolute", top, left: 40, right: 40, display: "flex", justifyContent: "center" }}>
@@ -470,7 +472,7 @@ export const Reel17: React.FC = () => {
   const zf = since < 10 ? interpolate(since, [0, 9], [1.06, 1.0], { ...clamp, easing: Easing.out(Easing.cubic) }) : 1;
   const punch = 1;
   const sfx: [number, string, number][] = [
-    [0.05, "impact", 0.1], [0.3, "8bit_coin", 0.07], [0.9, "8bit_coin", 0.06], [1.4, "8bit_coin", 0.07], [1.9, "swish", 0.07], [5.3, "whoosh", 0.06], [9.0, "typing", 0.12], [13.3, "glitch", 0.07], [15.25, "swish", 0.06], [17.2, "riser", 0.05], [17.4, "impact", 0.08], [33.3, "pop", 0.1], [2.7, "swish", 0.07], [5.32, "pop", 0.12], [7.15, "click", 0.1], [9, "typing", 0.12],
+    [0.05, "pop", 0.14], [5.3, "whoosh", 0.06], [16.14, "impact", 0.08], [16.5, "8bit_coin", 0.07], [17.1, "8bit_coin", 0.06], [17.6, "8bit_coin", 0.07], [28.7, "whoosh", 0.07], [29.6, "pop", 0.12], [33.3, "pop", 0.1], [2.7, "swish", 0.07], [5.32, "pop", 0.12], [7.15, "click", 0.1], [9, "typing", 0.12],
     [10.8, "glitch", 0.07], [16.14, "swish", 0.07], [16.82, "riser", 0.06], [18.14, "click", 0.1], [19.98, "whoosh", 0.06], [23.31, "pop", 0.1],
     [24.56, "8bit_coin", 0.08], [25.06, "ding", 0.12], [26.16, "click", 0.1], [28.72, "whoosh", 0.06], [30.56, "swish", 0.07], [31.56, "ding", 0.1],
     [38.06, "click", 0.1], [40.76, "pop", 0.1], [42.11, "click", 0.1], [47.06, "pop", 0.1], [D.duration + 0.05, "8bit_levelup", 0.08],
@@ -486,7 +488,7 @@ export const Reel17: React.FC = () => {
         </Sequence>
       )))}
       {CUTS.map((c, i) => <Sequence key={`c${i}`} from={f(c.a)} durationInFrames={f(c.b) - f(c.a)}><CutShot c={c} /></Sequence>)}
-      <Sequence from={0} durationInFrames={f(OPEN_END)}><Opener /></Sequence>
+      {AI.map((c, i) => <Sequence key={`ai${i}`} from={f(c.a)} durationInFrames={f(c.b) - f(c.a)}><AiShot c={c} /></Sequence>)}
       <Captions />
       <Audio src={staticFile(BASE)} />
       <Music src="r/r17_music.wav" total={END} base={0.07} boosts={[[D.duration, END, 0.12]]} />
