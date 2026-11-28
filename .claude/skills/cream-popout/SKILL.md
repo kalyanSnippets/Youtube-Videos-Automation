@@ -58,3 +58,17 @@ The user is not technical: keep replies short, do the work, never ask them to ru
 - Register in `reels/src/Root.tsx`; bundle once (`npx remotion bundle src/index.ts --out-dir <dir>`) and render stills from the bundle (parallel `remotion still` without a bundle fills the disk).
 - Check stills at every beat: nothing covers the face, nothing cut off, captions readable. Render with `--concurrency=3 --crf=18`; target about −16 LUFS.
 - Send the video, wait for APPROVE / IMPROVE. After approval: cover (`VThumb<n>`), upload package (send viewers to aiwithkalyan.com), setup-guide PDF (`reels/guides/`).
+
+## 6. Premium layer (approved 2026-11-28; apply on every reel)
+Inspired by the "Hidden GitHub Gems" reel breakdown. The cream pop-out look stays; this adds the premium B-roll rhythm on top.
+- **AI surreal opening shot (one per reel, Higgsfield credits approved by the user):** a 4–5 s 9:16 clip for the first ~1.5–2 s that visualises the
+  problem as a strange, funny image (e.g. a vintage computer chewing a GPU, a robot drowning in log printouts). Default model `seedance_2_5`, 720p, 5 s,
+  `generate_audio: false` (we add our own sound). Show the user the prompt and the credit cost before generating; one generation, no retries without asking.
+  Never generate real people, actors, brands' mascots or logos. Speaker card/caption sit over the clip as usual; add matching foley (crunch, sparks, crackle).
+- **Stock "meme moments" (no movie or TV clips, ever):** a 0.8–1.5 s full-screen cutaway every 3–4 s from free licensed stock (Pexels/Mixkit):
+  frantic typing, a person shocked at a laptop, someone face-palming, money burning, server racks, etc. Pick clips that land as the punchline of the line
+  being said; add a red hand-drawn arrow or circle on top when it helps the joke. Record each clip's source URL and licence in the reel's asset notes.
+- **Rhythm:** something new on screen every 1–1.8 s (≈25–30 visual changes in 50 s): split beat → full cutaway → full graphic → split.
+- **More motion graphics per beat:** glowing icon/chip cards with pulsing lines, counters that roll, meters/ECG-style load graphs, things that turn
+  green→red on overload, connected-icon diagrams with animated dashed lines, a 3D object moment (Three.js, e.g. a lock opening) where it fits.
+- **Sound sync:** every movement gets its own foley (UI click, whoosh, CRT power-on, keyboard clatter, cash register, lock click, alarm beep), music low underneath.
