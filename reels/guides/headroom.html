@@ -1,0 +1,77 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Headroom – Full Setup Guide · AI with Kalyan</title><link rel="stylesheet" href="style.css"></head><body>
+<div class="cover">
+  <span class="tag">⛏ GITHUB GOLDMINE</span>
+  <h1>Headroom: Stop Wasting<br>Claude Code Tokens. Setup Guide</h1>
+  <p class="sub">Compress the logs and tool output your AI coding agent reads, before they reach the model.</p>
+  <div class="meta">AI with Kalyan · aiwithkalyan.com · Facts checked 27 Nov 2026 against github.com/headroomlabs-ai/headroom (README)</div>
+</div>
+<main>
+<h2>1. What is Headroom?</h2>
+<p>Headroom (<code>headroom-ai</code> on PyPI) is a free, open-source tool (Apache-2.0 licence) that compresses everything your AI agent reads — tool outputs, logs, files, search results and conversation history — <b>before it reaches the model</b>. The idea: same answers, fewer input tokens.</p>
+<ul>
+  <li><b>Works with coding agents</b> like Claude Code, Codex, Cursor, Copilot, OpenCode and Aider.</li>
+  <li><b>Zero code changes:</b> one command "wraps" your agent so its traffic goes through Headroom.</li>
+  <li><b>Runs on your machine:</b> the README says compression is local and no prompt or file content is sent anywhere to be compressed.</li>
+</ul>
+
+<h2>2. What does it actually save?</h2>
+<table>
+<tr><th>Scenario (from the project's own benchmark)</th><th>Tokens saved</th></tr>
+<tr><td>Code search (100 results)</td><td>21%</td></tr>
+<tr><td>SRE incident debugging</td><td>57%</td></tr>
+<tr><td>Codebase exploration</td><td>42%</td></tr>
+<tr><td>GitHub issue triage</td><td>30%</td></tr>
+</table>
+<div class="box info"><b>Be realistic:</b> savings depend on how repetitive the input is. The README says repeated JSON and log lines compress a lot (90%+ in its benchmark), while normal prose and already-compact output compress very little. Measure your own with <code>headroom savings</code>.</div>
+
+<h2>3. What you need</h2>
+<table>
+<tr><th>Item</th><th>Details</th></tr>
+<tr><td>A computer</td><td>Mac, Windows or Linux, with a terminal</td></tr>
+<tr><td>uv (recommended)</td><td>A Python tool installer from <b>docs.astral.sh/uv</b>. It sets up the right Python (3.13) for Headroom automatically.<br>Or use <code>pip</code> if you already manage Python yourself.</td></tr>
+<tr><td>Your coding agent</td><td>For example Claude Code, already installed and working</td></tr>
+</table>
+
+<h2>4. Install and wrap Claude Code</h2>
+<ol>
+  <li><b>Install uv</b> by following docs.astral.sh/uv, then check: <pre>uv --version</pre></li>
+  <li><b>Install Headroom</b> (the README's recommended command for coding agents):
+  <pre>uv tool install --python 3.13 "headroom-ai[all]"</pre>
+  Using pip instead: <code>pip install "headroom-ai[all]"</code></li>
+  <li><b>Start Claude Code through Headroom:</b>
+  <pre>headroom wrap claude</pre>
+  This starts a local proxy and launches Claude Code routed through it. Use this command each time you start a session (the wrap is session-scoped and stops when the agent exits).</li>
+  <li><b>Check it works:</b>
+  <pre>headroom doctor</pre></li>
+  <li><b>Watch the savings</b> (while a wrapped session or proxy is running):
+  <pre>headroom dashboard</pre></li>
+</ol>
+<div class="box tip"><b>Undo anytime:</b> <code>headroom unwrap claude</code> removes the setup. Other agents work the same way, e.g. <code>headroom wrap codex</code> or <code>headroom wrap cursor</code> (Cursor needs a manual settings step — see the README's Agent compatibility table).</div>
+<div class="box info"><b>Want it always on?</b> The README describes <code>headroom deploy</code> for a turnkey local setup that survives reboots. Start with <code>wrap</code> first so you can see the difference.</div>
+
+<h2>5. Tips</h2>
+<ul>
+  <li>Try it on a <b>log-heavy task</b> (running tests, debugging errors) — that's where repetitive output, and the biggest savings, come from.</li>
+  <li>Compare a normal session and a wrapped session on the same task, and check <code>headroom savings</code>.</li>
+  <li>If anything looks off, run <code>headroom doctor</code> and check the README's troubleshooting section.</li>
+  <li>Commands change between releases: <b>always check the README</b> on GitHub.</li>
+</ul>
+
+<h2>6. Your setup checklist</h2>
+<ul class="check">
+  <li>uv installed (<code>uv --version</code>)</li>
+  <li>Installed Headroom with <code>uv tool install --python 3.13 "headroom-ai[all]"</code></li>
+  <li>Started Claude Code with <code>headroom wrap claude</code></li>
+  <li><code>headroom doctor</code> says routing works</li>
+  <li>Watched savings in <code>headroom dashboard</code> on a log-heavy task</li>
+</ul>
+
+<h2>Links</h2>
+<ul>
+  <li>GitHub: <a href="https://github.com/headroomlabs-ai/headroom">github.com/headroomlabs-ai/headroom</a></li>
+  <li>Docs: <a href="https://docs.headroomlabs.ai/docs">docs.headroomlabs.ai/docs</a></li>
+  <li>More free resources: <a href="https://aiwithkalyan.com">aiwithkalyan.com</a></li>
+</ul>
+</main>
+<footer>Made by AI with Kalyan · aiwithkalyan.com · Follow @ai_with_kalyan on Instagram and AI with Kalyan on YouTube. Headroom is an independent open-source project; this guide is not affiliated with it. Always check the official README for the latest steps.</footer>
+</body></html>

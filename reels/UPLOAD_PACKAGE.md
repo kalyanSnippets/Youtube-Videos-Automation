@@ -1147,3 +1147,82 @@ Tip: try the live demo first at demo.immich.app ("Login as demo user") 😉
 More free resources from my videos: aiwithkalyan.com
 What's the photo you've been hunting for? 👀
 ```
+
+---
+
+# Reel 17: Headroom, GitHub Goldmine (approved 2026-11-28)
+
+| Video | Cover | Guide | Length | Comment keyword |
+|---|---|---|---|---|
+| `17_Headroom_GitHub-Goldmine.mp4` | `17_cover.jpg` | `17_Headroom_Setup_Guide.pdf` | 51s | GOLD |
+
+Style: Cream Pop-out (skill `.claude/skills/cream-popout`). Facts from github.com/headroomlabs-ai/headroom (27 Nov 2026): 81k stars, Apache-2.0, README benchmark 21–57% fewer input tokens on four agent tasks.
+
+**YouTube title:** Claude Code Is Wasting Your Tokens. This Free Tool Fixes It (Headroom) #shorts
+Alternatives: "Stop Wasting Claude Code Tokens 🪙 #shorts" · "This GitHub Tool Compresses What Claude Reads 🤯 #shorts"
+
+**YouTube description**
+```
+Claude Code reading hundreds of lines of logs just to fix one small bug? 😩 That eats your tokens.
+
+Headroom is a free, open-source tool that sits between your AI coding agent and the model and compresses repetitive logs and tool output before Claude reads them.
+
+✅ Works with Claude Code, Codex, Cursor, Copilot and more
+✅ One command: headroom wrap claude
+✅ Runs on your machine (compression is local)
+📊 The project's own benchmark: 21–57% fewer input tokens on four agent tasks (more on repetitive logs, little on normal prose)
+
+📘 FULL SETUP GUIDE + project link + video resources:
+👉 https://aiwithkalyan.com
+
+🛠 Quick start
+1. Install uv (docs.astral.sh/uv)
+2. uv tool install --python 3.13 "headroom-ai[all]"
+3. headroom wrap claude
+4. headroom doctor (check it works) · headroom dashboard (watch the savings)
+Undo anytime: headroom unwrap claude
+
+🔗 GitHub: https://github.com/headroomlabs-ai/headroom (Apache-2.0, 81K+ ⭐)
+
+GitHub Goldmine on AI with Kalyan. Next up: a project that helps AI navigate massive codebases.
+Subscribe so you don't miss the next GitHub find!
+
+#claudecode #headroom #aitools #githubgoldmine #shorts
+```
+**Tags:** headroom, headroom ai, claude code tokens, save claude tokens, claude code usage limit, reduce token usage, token compression, ai coding agent, claude code tips, codex, cursor, github projects, github goldmine, open source ai tools, AI with Kalyan
+**Settings:** Not made for kids · Altered or synthetic content: No · Category: Science & Technology
+
+**Instagram caption**
+```
+Claude Code reads hundreds of lines of logs… just to fix ONE small bug 😩 And all of that eats your tokens.
+
+Headroom ⛏ GitHub Goldmine
+🗜️ compresses repetitive logs & tool output before Claude reads them
+🤖 works with Claude Code, Codex, Cursor, Copilot & more
+⚡ one command: headroom wrap claude
+💻 runs on your machine
+📊 project's own benchmark: 21–57% fewer input tokens on 4 agent tasks
+🔓 free & open source, 81K+ ⭐ on GitHub
+
+📘 Full setup guide, project link & all my video resources: aiwithkalyan.com 👉 link in bio
+💬 Or comment GOLD and I'll DM you the link
+
+➕ Follow @ai_with_kalyan. Next up: a GitHub project that helps AI navigate massive codebases 🔍
+
+#claudecode #headroom #claude #aitools #ai #coding #developer #opensource #github #githubgoldmine #aiagents #programming #devtools #techreels #productivity
+```
+**Pinned comment:** 📘 Full setup guide + GitHub link: aiwithkalyan.com (link in bio) 👆 How many tokens did your last Claude Code session burn? 🪙
+
+**Public reply to GOLD:** `Sent it to your DMs 📩 (check message requests!) Everything's also on aiwithkalyan.com`
+
+**DM**
+```
+Hey! Thanks for commenting GOLD 🙌🪙
+
+The full Headroom setup guide, GitHub link and video resources are here:
+👉 https://aiwithkalyan.com
+
+GitHub: https://github.com/headroomlabs-ai/headroom
+Quick start: uv tool install --python 3.13 "headroom-ai[all]" → headroom wrap claude
+Tip: try it on a log-heavy task (tests, debugging) — that's where it saves the most 😉
+```
