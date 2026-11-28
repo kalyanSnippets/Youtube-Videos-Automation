@@ -347,6 +347,50 @@ const Outro: React.FC = () => {
   );
 };
 
+/* ---------- premium layer: AI opening shot + stock "meme moment" cutaways ---------- */
+const Scribble: React.FC<{ kind: "arrow" | "circle"; x: number; y: number; w: number; h: number; rot?: number }> = ({ kind, x, y, w, h, rot = 0 }) => {
+  const frame = useCurrentFrame(); const k = interpolate(frame, [2, 10], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) });
+  const d = kind === "circle"
+    ? `M ${w * 0.5} 6 C ${w * 0.95} 4, ${w - 4} ${h * 0.75}, ${w * 0.55} ${h - 6} C ${w * 0.1} ${h - 2}, 4 ${h * 0.35}, ${w * 0.35} 10 C ${w * 0.5} 4, ${w * 0.62} 8, ${w * 0.66} 14`
+    : `M 10 10 C ${w * 0.3} ${h * 0.1}, ${w * 0.75} ${h * 0.35}, ${w - 20} ${h - 30} M ${w - 20} ${h - 30} L ${w - 70} ${h - 46} M ${w - 20} ${h - 30} L ${w - 36} ${h - 86}`;
+  return <svg style={{ position: "absolute", left: x, top: y, transform: `rotate(${rot}deg)`, overflow: "visible" }} width={w} height={h}><path d={d} fill="none" stroke={RED} strokeWidth={14} strokeLinecap="round" strokeLinejoin="round" pathLength={1} strokeDasharray={1} strokeDashoffset={1 - k} style={{ filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.35))" }} /></svg>;
+};
+type Cut = { a: number; b: number; src: string; from: number; tag?: string; land?: boolean; mark?: { kind: "arrow" | "circle"; x: number; y: number; w: number; h: number; rot?: number }; pos?: string };
+const CUTS: Cut[] = [
+  { a: 5.3, b: 6.45, src: "b/r17/mx9228.mp4", from: 3.2, land: true, mark: { kind: "arrow", x: 640, y: 1190, w: 300, h: 240, rot: 200 } },
+  { a: 9.0, b: 9.95, src: "b/r17/mx41646.mp4", from: 2.0, land: true, mark: { kind: "arrow", x: 160, y: 470, w: 380, h: 300 } },
+  { a: 13.3, b: 14.3, src: "b/r17/mx25585.mp4", from: 11.6, pos: "55% 50%" },
+  { a: 15.25, b: 16.1, src: "b/r17/mx39852.mp4", from: 5.0, pos: "50% 50%" },
+  { a: 17.2, b: 18.14, src: "b/r17/mx18303.mp4", from: 3.0, land: true, tag: "🪙 your tokens", mark: { kind: "circle", x: 40, y: 560, w: 1000, h: 600, rot: -3 } },
+  { a: 33.3, b: 34.1, src: "b/r17/mx43832.mp4", from: 0.6, pos: "50% 40%" },
+];
+const CutShot: React.FC<{ c: Cut }> = ({ c }) => {
+  const frame = useCurrentFrame(); const z = interpolate(frame, [0, f(c.b - c.a)], [1.08, 1.0], clamp);
+  const k = interpolate(frame, [0, 3], [0, 1], clamp);
+  return (
+    <AbsoluteFill style={{ opacity: k, background: "#000" }}>
+      {c.land ? <>
+        <AbsoluteFill style={{ filter: "blur(28px) brightness(0.55)", transform: "scale(1.15)" }}><OffthreadVideo src={staticFile(c.src)} muted startFrom={Math.round(c.from * FPS)} style={{ width: "100%", height: "100%", objectFit: "cover" }} /></AbsoluteFill>
+        <div style={{ position: "absolute", left: 0, top: 560, width: 1080, height: 608, transform: `scale(${z})`, boxShadow: "0 30px 60px rgba(0,0,0,0.5)" }}><OffthreadVideo src={staticFile(c.src)} muted startFrom={Math.round(c.from * FPS)} style={{ width: 1080, height: 608, objectFit: "cover" }} /></div>
+      </> : <AbsoluteFill style={{ transform: `scale(${z})` }}><OffthreadVideo src={staticFile(c.src)} muted startFrom={Math.round(c.from * FPS)} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: c.pos ?? "50% 50%" }} /></AbsoluteFill>}
+      <AbsoluteFill style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.25), transparent 25%, transparent 70%, rgba(0,0,0,0.45))" }} />
+      {c.mark && <Scribble {...c.mark} />}
+      {c.tag && <Row y={330}><Pill at={3} bg={INK} color={GOLD} size={46}>{c.tag}</Pill></Row>}
+    </AbsoluteFill>
+  );
+};
+const OPEN_END = 1.9;
+const Opener: React.FC = () => { // AI-generated surreal opening shot (Higgsfield Seedance 2.5)
+  const frame = useCurrentFrame(); const z = interpolate(frame, [0, f(OPEN_END)], [1.0, 1.1], clamp);
+  const out = interpolate(frame, [f(OPEN_END) - 4, f(OPEN_END)], [1, 0], clamp);
+  return (
+    <AbsoluteFill style={{ opacity: out, background: CREAM }}>
+      <AbsoluteFill style={{ transform: `scale(${z})` }}><OffthreadVideo src={staticFile("b/r17/ai_open.mp4")} muted style={{ width: "100%", height: "100%", objectFit: "cover" }} /></AbsoluteFill>
+      <Row y={150}><Pill at={2} bg={INK} color={GOLD}>⛏ GITHUB GOLDMINE</Pill></Row>
+    </AbsoluteFill>
+  );
+};
+
 /* ---------- layouts ---------- */
 type Kind = "split" | "face" | "full";
 type Seg = { a: number; b: number; kind: Kind; C?: React.FC };
@@ -404,15 +448,15 @@ const Captions: React.FC = () => {
   const t = useCurrentFrame() / FPS;
   if ((t >= 34.16 && t < 37.91) || t >= D.duration) return null;
   const c = activeChunk(chunks, t); if (!c) return null;
-  const s = segAt(t);
-  const top = s.kind === "split" ? 1640 : s.kind === "face" ? 1450 : 1700;
+  const s = segAt(t); const inCut = t < OPEN_END || CUTS.some((c) => t >= c.a && t < c.b);
+  const top = inCut ? 1500 : s.kind === "split" ? 1640 : s.kind === "face" ? 1450 : 1700;
   return (
     <div style={{ position: "absolute", top, left: 40, right: 40, display: "flex", justifyContent: "center" }}>
-      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "0 16px", ...(s.kind === "full" ? { background: INK, borderRadius: 999, padding: "10px 30px" } : {}) }}>
+      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "0 16px", ...(s.kind === "full" && !inCut ? { background: INK, borderRadius: 999, padding: "10px 30px" } : {}) }}>
         {c.words.map((w, i) => {
           const on = t >= w.s - 0.03, now = on && (i === c.words.length - 1 || t < c.words[i + 1].s - 0.03);
           const word = w.w.replace(/[,.?]$/, "");
-          return <span key={i} style={{ fontFamily: INTER, fontWeight: 900, fontSize: 68, letterSpacing: -1.5, color: KEY.test(word) ? GOLD : "#fff", opacity: on ? 1 : 0.55, transform: `scale(${now ? 1.06 : 1})`, display: "inline-block", textShadow: s.kind === "full" ? undefined : "0 4px 14px rgba(0,0,0,0.65), 0 0 2px rgba(0,0,0,0.8)" }}>{word}</span>;
+          return <span key={i} style={{ fontFamily: INTER, fontWeight: 900, fontSize: 68, letterSpacing: -1.5, color: KEY.test(word) ? GOLD : "#fff", opacity: on ? 1 : 0.55, transform: `scale(${now ? 1.06 : 1})`, display: "inline-block", textShadow: s.kind === "full" && !inCut ? undefined : "0 4px 14px rgba(0,0,0,0.65), 0 0 2px rgba(0,0,0,0.8)" }}>{word}</span>;
         })}
       </div>
     </div>
@@ -426,7 +470,7 @@ export const Reel17: React.FC = () => {
   const zf = since < 10 ? interpolate(since, [0, 9], [1.06, 1.0], { ...clamp, easing: Easing.out(Easing.cubic) }) : 1;
   const punch = 1;
   const sfx: [number, string, number][] = [
-    [0.05, "pop", 0.14], [1.4, "8bit_coin", 0.07], [2.7, "swish", 0.07], [5.32, "pop", 0.12], [7.15, "click", 0.1], [9, "typing", 0.12],
+    [0.05, "impact", 0.1], [0.3, "8bit_coin", 0.07], [0.9, "8bit_coin", 0.06], [1.4, "8bit_coin", 0.07], [1.9, "swish", 0.07], [5.3, "whoosh", 0.06], [9.0, "typing", 0.12], [13.3, "glitch", 0.07], [15.25, "swish", 0.06], [17.2, "riser", 0.05], [17.4, "impact", 0.08], [33.3, "pop", 0.1], [2.7, "swish", 0.07], [5.32, "pop", 0.12], [7.15, "click", 0.1], [9, "typing", 0.12],
     [10.8, "glitch", 0.07], [16.14, "swish", 0.07], [16.82, "riser", 0.06], [18.14, "click", 0.1], [19.98, "whoosh", 0.06], [23.31, "pop", 0.1],
     [24.56, "8bit_coin", 0.08], [25.06, "ding", 0.12], [26.16, "click", 0.1], [28.72, "whoosh", 0.06], [30.56, "swish", 0.07], [31.56, "ding", 0.1],
     [38.06, "click", 0.1], [40.76, "pop", 0.1], [42.11, "click", 0.1], [47.06, "pop", 0.1], [D.duration + 0.05, "8bit_levelup", 0.08],
@@ -441,6 +485,8 @@ export const Reel17: React.FC = () => {
           {s.kind === "face" ? s.C && <s.C /> : <Shot s={s} prev={SEGS[i - 1]} />}
         </Sequence>
       )))}
+      {CUTS.map((c, i) => <Sequence key={`c${i}`} from={f(c.a)} durationInFrames={f(c.b) - f(c.a)}><CutShot c={c} /></Sequence>)}
+      <Sequence from={0} durationInFrames={f(OPEN_END)}><Opener /></Sequence>
       <Captions />
       <Audio src={staticFile(BASE)} />
       <Music src="r/r17_music.wav" total={END} base={0.07} boosts={[[D.duration, END, 0.12]]} />
