@@ -20,3 +20,12 @@ Media files live in `demo/assets/` (not committed). Checked 2026-11-16.
 | s4645.jpg (frame) | https://mixkit.co/free-stock-video/palm-tree-on-a-sunny-day-4645/ | Mixkit | Mixkit Stock Video Free License | Not required | USE |
 
 Notes: the Pexels site blocked direct page fetches from this session, so the Pexels licence is the site's standard licence as listed on each photo page, not re-read here. All brands on the pages (AURA, SoundWave, Bean House, Ember, wander.) are made up. Pages: designed.html + static.html (hook), coffee_before.html + coffee_after.html (frontend-design), travel.html (agent-browser).
+
+## Reel 17 (Headroom) premium layer
+| mx9228  https://mixkit.co/free-stock-video/couple-surprised-by-what-they-see-on-their-laptop-9228/ | Mixkit Stock Video Free License | Not required | USE |
+| mx41646 https://mixkit.co/free-stock-video/hands-of-a-programmer-typing-on-a-keyboard-41646/ | Mixkit Stock Video Free License | Not required | USE |
+| mx25585 https://mixkit.co/free-stock-video/frustrated-boy-throws-a-tantrum-while-working-on-his-computer-25585/ | Mixkit Stock Video Free License | Not required | USE |
+| mx18303 https://mixkit.co/free-stock-video/tower-of-100-dollars-being-burned-with-a-flame-18303/ | Mixkit Stock Video Free License | Not required | USE |
+| mx43832 https://mixkit.co/free-stock-video/face-of-a-very-surprised-young-woman-43832/ | Mixkit Stock Video Free License | Not required | USE |
+| mx39852 https://mixkit.co/free-stock-video/frustrated-and-tired-young-man-working-on-computer-39852/ | Mixkit Stock Video Free License | Not required | USE |
+| ai_open.mp4 | Higgsfield Seedance 2.5, generated 2026-11-28 on the user's account (35 credits) | Higgsfield | user-owned generation | Not required | USE |
